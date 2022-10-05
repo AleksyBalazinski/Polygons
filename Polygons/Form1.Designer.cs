@@ -37,6 +37,7 @@
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
+            this.buttonDraw = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -95,6 +96,7 @@
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel.Controls.Add(this.panelCanvas, 1, 1);
+            this.tableLayoutPanel.Controls.Add(this.buttonDraw, 1, 0);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(0, 24);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
@@ -121,6 +123,17 @@
             this.canvas.Size = new System.Drawing.Size(694, 370);
             this.canvas.TabIndex = 0;
             this.canvas.TabStop = false;
+            this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.canvas_MouseUp);
+            // 
+            // buttonDraw
+            // 
+            this.buttonDraw.Location = new System.Drawing.Point(103, 3);
+            this.buttonDraw.Name = "buttonDraw";
+            this.buttonDraw.Size = new System.Drawing.Size(75, 23);
+            this.buttonDraw.TabIndex = 1;
+            this.buttonDraw.Text = "Draw";
+            this.buttonDraw.UseVisualStyleBackColor = true;
+            this.buttonDraw.Click += new System.EventHandler(this.buttonDraw_Click);
             // 
             // Form1
             // 
@@ -153,5 +166,6 @@
         private TableLayoutPanel tableLayoutPanel;
         private Panel panelCanvas;
         private PictureBox canvas;
+        private Button buttonDraw;
     }
 }
