@@ -35,7 +35,24 @@ namespace Polygons
 
         public bool HitTest(Point p)
         {
-            throw new NotImplementedException();
+            int xMin = int.MaxValue;
+            int xMax = int.MinValue;
+            int yMin = int.MaxValue;
+            int yMax = int.MinValue;
+
+            foreach(var v in vertices)
+            {
+                if(v.Center.X < xMin)
+                    xMin = v.Center.X;
+                if(v.Center.X > xMax)
+                    xMax = v.Center.X;
+                if(v.Center.Y < yMin)
+                    yMin = v.Center.Y;
+                if(v.Center.Y > yMax)
+                    yMax = v.Center.Y;
+            }
+
+            return p.X >= xMin && p.X <= xMax && p.Y >= yMin && p.Y <= yMax;
         }
 
         public void Draw(Graphics g)
@@ -48,7 +65,10 @@ namespace Polygons
 
         public void Move(Point d)
         {
-            throw new NotImplementedException();
+            foreach (var v in vertices)
+                v.Move(d);
+            foreach (var e in edges)
+                e.Move(d);
         }
     }
 }

@@ -11,6 +11,8 @@ namespace Polygons
         private List<Polygon> polygons;
         private Polygon currentPolygon;
         private Segment? drawnSegment;
+
+        Point previousPoint = Point.Empty;
  
         public Form1()
         {
@@ -54,6 +56,13 @@ namespace Polygons
 
                 canvas.Invalidate();
             }
+
+            if(mode == Mode.Move)
+            {
+                // release
+
+                // TODO last edge is probably assigned to wrong polygon
+            }
         }
 
         private void buttonDraw_Click(object sender, EventArgs e)
@@ -87,7 +96,15 @@ namespace Polygons
             if(mode == Mode.Draw && drawnSegment!= null && !currentPolygon.IsEmpty())
             {
                 drawnSegment.Point2 = new Point(e.X, e.Y);
-                Debug.WriteLine($"segment end moved ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
+                //Debug.WriteLine($"segment end moved ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
+                canvas.Invalidate();
+            }
+
+            if(mode == Mode.Move)
+            {
+                var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+                currentPolygon.Move(displacement);
+                previousPoint = e.Location;
                 canvas.Invalidate();
             }
         }
@@ -97,16 +114,38 @@ namespace Polygons
             DrawScene(e.Graphics);
             if(drawnSegment != null)
             {
-                Debug.WriteLine($"segment drawn ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
+                //Debug.WriteLine($"segment drawn ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                 drawnSegment.Draw(e.Graphics);
             }
         }
 
         private void DrawScene(Graphics g)
         {
-            currentPolygon?.Draw(g);
+            currentPolygon.Draw(g);
             foreach(var polygon in polygons)
                 polygon.Draw(g);
+        }
+
+        private void buttonMove_Click(object sender, EventArgs e)
+        {
+            mode = Mode.Move;
+        }
+
+        private void canvas_MouseDown(object sender, MouseEventArgs e)
+        {
+            if(mode == Mode.Move)
+            {
+                foreach(var polygon in polygons)
+                {
+                    if (polygon.HitTest(e.Location))
+                    {
+                        Debug.WriteLine($"Polygon {polygon} hit");
+                        currentPolygon = polygon;
+                        previousPoint = e.Location;
+                    }
+                        
+                }
+            }
         }
     }
 }
