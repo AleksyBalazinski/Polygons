@@ -9,10 +9,12 @@ namespace Polygons
         Mode mode;
 
         private List<Polygon> polygons;
-        private Polygon currentPolygon;
+        private Polygon constructedPolygon;
+        private Polygon movedPolygon;
         private Segment? drawnSegment;
 
         Point previousPoint = Point.Empty;
+        bool isMoved = false;
  
         public Form1()
         {
@@ -26,19 +28,21 @@ namespace Polygons
 
             mode = Mode.Move;
             polygons = new List<Polygon>();
-            currentPolygon = new Polygon();
+            constructedPolygon = new Polygon();
+            movedPolygon = new Polygon();
         }
 
         private void canvas_MouseUp(object sender, MouseEventArgs e)
         {
             if(mode == Mode.Draw && e.Button == MouseButtons.Left)
             {
-                if(drawnSegment != null && currentPolygon.Size >= 3 && IsOnVertex(currentPolygon.GetVertex(0), e.X, e.Y, 10))
+                if(drawnSegment != null && constructedPolygon.Size >= 3 && IsOnVertex(constructedPolygon.GetVertex(0), e.X, e.Y, 10))
                 {
-                    currentPolygon.AddEdge(drawnSegment);
-                    polygons.Add(currentPolygon);
-                    Debug.WriteLine("Add polygon " + currentPolygon.ToString());
-                    currentPolygon = new Polygon();
+                    constructedPolygon.AddEdge(drawnSegment);
+                    polygons.Add(constructedPolygon);
+                    Debug.WriteLine("Add polygon " + constructedPolygon.ToString());
+                    constructedPolygon = new Polygon();
+                    drawnSegment = null;
                 }
                 else
                 {
@@ -46,12 +50,12 @@ namespace Polygons
                     
                     Debug.WriteLine("Add vertex " + v.ToString());
                     if (drawnSegment != null)
-                        currentPolygon.AddEdge(drawnSegment);
+                        constructedPolygon.AddEdge(drawnSegment);
                     drawnSegment = new Segment();
                     drawnSegment.Point1 = drawnSegment.Point2 = new Point(e.X, e.Y);
                     Debug.WriteLine($"New segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                     
-                    currentPolygon?.AddVertex(v);
+                    constructedPolygon?.AddVertex(v);
                 }
 
                 canvas.Invalidate();
@@ -59,9 +63,7 @@ namespace Polygons
 
             if(mode == Mode.Move)
             {
-                // release
-
-                // TODO last edge is probably assigned to wrong polygon
+                isMoved = false;
             }
         }
 
@@ -93,17 +95,17 @@ namespace Polygons
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mode == Mode.Draw && drawnSegment!= null && !currentPolygon.IsEmpty())
+            if(mode == Mode.Draw && drawnSegment!= null && !constructedPolygon.IsEmpty())
             {
                 drawnSegment.Point2 = new Point(e.X, e.Y);
                 //Debug.WriteLine($"segment end moved ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                 canvas.Invalidate();
             }
 
-            if(mode == Mode.Move)
+            if(mode == Mode.Move && isMoved == true)
             {
                 var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-                currentPolygon.Move(displacement);
+                movedPolygon.Move(displacement);
                 previousPoint = e.Location;
                 canvas.Invalidate();
             }
@@ -121,7 +123,7 @@ namespace Polygons
 
         private void DrawScene(Graphics g)
         {
-            currentPolygon.Draw(g);
+            constructedPolygon.Draw(g);
             foreach(var polygon in polygons)
                 polygon.Draw(g);
         }
@@ -140,8 +142,11 @@ namespace Polygons
                     if (polygon.HitTest(e.Location))
                     {
                         Debug.WriteLine($"Polygon {polygon} hit");
-                        currentPolygon = polygon;
+                        movedPolygon = polygon;
                         previousPoint = e.Location;
+                        isMoved = true;
+
+                        return;
                     }
                         
                 }
