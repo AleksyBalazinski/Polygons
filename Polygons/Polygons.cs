@@ -10,6 +10,11 @@ namespace Polygons
     {
         private List<Polygon> polygons;
 
+        public Polygons()
+        {
+            polygons = new List<Polygon>();
+        }
+
         public void Add(Polygon polygon) => polygons.Add(polygon);
     }
 }
