@@ -14,6 +14,13 @@ namespace Polygons
         {
             get => Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
                 + (Point1.Y - Point2.Y) * (Point1.Y - Point2.Y));
+            set
+            {
+                double coef = 0.5 * (value / Length - 1);
+                Point p1p2 = new Point(Point2.X - Point1.X, Point2.Y - Point1.Y);
+                Point2 = new Point((int)(Point2.X + coef * p1p2.X), (int)(Point2.Y + coef * p1p2.Y));
+                Point1 = new Point((int)(Point1.X - coef * p1p2.X), (int)(Point1.Y - coef * p1p2.Y));
+            }
         }
         public bool HitTest(Point p)
         {
@@ -40,9 +47,19 @@ namespace Polygons
             Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
         }
 
+        public void MoveStartAbs(Point p)
+        {
+            Point1 = new Point(p.X, p.Y);
+        }
+
         public void MoveEnd(Point d)
         {
             Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
+        }
+
+        public void MoveEndAbs(Point p)
+        {
+            Point2 = new Point(p.X, p.Y);
         }
 
         public override string ToString()

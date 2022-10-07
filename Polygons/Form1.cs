@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 
 namespace Polygons
@@ -309,15 +310,51 @@ namespace Polygons
                         {
                             Debug.WriteLine($"Edge {e} will have fixed length");
                             // query user for length
+                            string lengthString = "";
+                            double length = 0;
                             using (InputForm inputForm = new InputForm())
                             {
                                 inputForm.Input = e.Length.ToString();
                                 if(inputForm.ShowDialog() == DialogResult.OK)
                                 {
-                                    string length = inputForm.Input;
-                                    Debug.WriteLine("Form1 received length " + length);
+                                    lengthString = inputForm.Input;
+                                    Debug.WriteLine("Form1 received length " + lengthString);
                                 }
                             }
+                            try
+                            {
+                                length = double.Parse(lengthString);
+                            } 
+                            catch(Exception exception)
+                            {
+                                MessageBox.Show($"Invalid input: {exception}", "Polygons", 
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            if(length <= 0)
+                                MessageBox.Show($"Invalid input: Positive real values only.", 
+                                    "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                            // adjust length
+                            e.Length = length;
+                            polygon.Vertices[ei] = new Vertex(e.Point1.X, e.Point1.Y);
+
+                            if (ei == polygon.Edges.Count - 1)
+                                polygon.Vertices[0] = new Vertex(e.Point2.X, e.Point2.Y);
+                            else
+                                polygon.Vertices[ei + 1] = new Vertex(e.Point2.X, e.Point2.Y);
+
+                            if (ei == 0)
+                                polygon.Edges[^1].MoveEndAbs(new Point(e.Point1.X, e.Point1.Y));
+                            else
+                                polygon.Edges[ei - 1].MoveEndAbs(new Point(e.Point1.X, e.Point1.Y));
+
+                            if (ei == polygon.Edges.Count - 1)
+                                polygon.Edges[0].MoveStartAbs(new Point(e.Point2.X, e.Point2.Y));
+                            else
+                                polygon.Edges[ei + 1].MoveStartAbs(new Point(e.Point2.X, e.Point2.Y));
+
                             polygon.FixedLengthEdges.Add(e);
 
                             canvas.Invalidate();
