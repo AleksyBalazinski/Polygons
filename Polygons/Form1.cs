@@ -4,9 +4,9 @@ namespace Polygons
 {
     public partial class Form1 : Form
     {
-        private Bitmap drawArea;
+        private readonly Bitmap drawArea;
         private const int zoomFactor = 1;
-        Mode mode;
+        Mode mode = Mode.Draw;
 
         private List<Polygon> polygons;
         private Polygon constructedPolygon;
@@ -15,6 +15,7 @@ namespace Polygons
 
         Point previousPoint = Point.Empty;
         bool isMoved = false;
+        readonly Algorithm drawingAlgorithm;
  
         public Form1()
         {
@@ -30,6 +31,8 @@ namespace Polygons
             polygons = new List<Polygon>();
             constructedPolygon = new Polygon();
             movedPolygon = new Polygon();
+
+            drawingAlgorithm = new Algorithm();
         }
 
         private void canvas_MouseUp(object sender, MouseEventArgs e)
@@ -72,20 +75,14 @@ namespace Polygons
             mode = Mode.Draw;
         }
 
-        private Vertex ToCartesian(int x, int y)
+        /*private Vertex ToCartesian(int x, int y)
         {
             return new Vertex((x - canvas.Width / 2) / zoomFactor, (canvas.Height / 2 - y) / zoomFactor);
         }
 
-        /*private (int, int) ToScreen(Vertex vertex)
+        private (int, int) ToScreen(Vertex vertex)
         {
             return ((int)(vertex.X * zoomFactor + canvas.Width / 2), (int)(canvas.Height / 2 - vertex.Y * zoomFactor));
-        }*/
-
-        /*private bool IsOnVertex(Vertex vertex, int x, int y, int d)
-        {
-            (int vertexX, int vertexY) = ToScreen(vertex);
-            return x >= vertexX - d && x <= vertexX + d && y >= vertexY - d && y <= vertexY + d;
         }*/
 
         private bool IsOnVertex(Vertex vertex, int x, int y, int d)
@@ -98,7 +95,6 @@ namespace Polygons
             if(mode == Mode.Draw && drawnSegment!= null && !constructedPolygon.IsEmpty())
             {
                 drawnSegment.Point2 = new Point(e.X, e.Y);
-                //Debug.WriteLine($"segment end moved ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                 canvas.Invalidate();
             }
 
@@ -116,16 +112,15 @@ namespace Polygons
             DrawScene(e.Graphics);
             if(drawnSegment != null)
             {
-                //Debug.WriteLine($"segment drawn ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
-                drawnSegment.Draw(e.Graphics);
+                drawnSegment.Draw(e.Graphics, drawingAlgorithm);
             }
         }
 
         private void DrawScene(Graphics g)
         {
-            constructedPolygon.Draw(g);
+            constructedPolygon.Draw(g, drawingAlgorithm);
             foreach(var polygon in polygons)
-                polygon.Draw(g);
+                polygon.Draw(g, drawingAlgorithm);
         }
 
         private void buttonMove_Click(object sender, EventArgs e)
@@ -151,6 +146,18 @@ namespace Polygons
                         
                 }
             }
+        }
+
+        private void radioButtonLineLibrary_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonLineLibrary.Checked == true)
+                drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineLibrary;
+        }
+
+        private void radioButtonLineBresenham_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonLineBresenham.Checked == true)
+                drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
         }
     }
 }

@@ -18,10 +18,9 @@ namespace Polygons
             throw new NotImplementedException();
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, Algorithm a)
         {
-            using (var pen = new Pen(SegmentColor, SegmentWidth))
-                g.DrawLine(pen, Point1, Point2);
+            a.Apply(g, this);
         }
 
         public void Move(Point d)

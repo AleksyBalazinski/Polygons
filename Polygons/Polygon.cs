@@ -9,29 +9,29 @@ namespace Polygons
 {
     internal class Polygon : IShape
     {
-        List<Vertex> vertices;
-        List<Segment> edges;
+        public List<Vertex> Vertices { get; }
+        public List<Segment> Edges { get; }
         
         public Polygon()
         {
-            vertices = new List<Vertex>();
-            edges = new List<Segment>();
+            Vertices = new List<Vertex>();
+            Edges = new List<Segment>();
         }
 
-        public bool IsEmpty() => vertices.Count == 0;
+        public bool IsEmpty() => Vertices.Count == 0;
 
-        public Vertex GetVertex(int indx) => vertices[indx];
-        public int Size { get { return vertices.Count; } }
-        public void AddVertex(Vertex vertex) => vertices.Add(vertex);
-        public void AddEdge(Segment edge) => edges.Add(edge);
+        public Vertex GetVertex(int indx) => Vertices[indx];
+        public int Size { get { return Vertices.Count; } }
+        public void AddVertex(Vertex vertex) => Vertices.Add(vertex);
+        public void AddEdge(Segment edge) => Edges.Add(edge);
         public override string ToString()
         {
             string res = "";
-            foreach(var v in vertices)
+            foreach(var v in Vertices)
                 res += v.ToString();
             return res;
         }
-        public Vertex? GetLastVertex() => vertices.LastOrDefault();
+        public Vertex? GetLastVertex() => Vertices.LastOrDefault();
 
         public bool HitTest(Point p)
         {
@@ -40,7 +40,7 @@ namespace Polygons
             int yMin = int.MaxValue;
             int yMax = int.MinValue;
 
-            foreach(var v in vertices)
+            foreach(var v in Vertices)
             {
                 if(v.Center.X < xMin)
                     xMin = v.Center.X;
@@ -55,19 +55,16 @@ namespace Polygons
             return p.X >= xMin && p.X <= xMax && p.Y >= yMin && p.Y <= yMax;
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, Algorithm a)
         {
-            foreach (var v in vertices)
-                v.Draw(g);
-            foreach (var e in edges)
-                e.Draw(g);
+            a.Apply(g, this);
         }
 
         public void Move(Point d)
         {
-            foreach (var v in vertices)
+            foreach (var v in Vertices)
                 v.Move(d);
-            foreach (var e in edges)
+            foreach (var e in Edges)
                 e.Move(d);
         }
     }

@@ -11,7 +11,6 @@ namespace Polygons
         public Vertex(int x, int y)
         {
             Center = new Point(x, y);
-            FillColor = Color.Black;
             Radius = 5;
         }
 
@@ -20,10 +19,9 @@ namespace Polygons
         public Point Center { get; set; }
         public int Radius { get; set; }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, Algorithm a)
         {
-            using (var brush = new SolidBrush(FillColor))
-                g.FillEllipse(brush, Center.X - Radius, Center.Y - Radius, Radius * 2, Radius * 2);
+            a.Apply(g, this);
         }
 
         public bool HitTest(Point p)

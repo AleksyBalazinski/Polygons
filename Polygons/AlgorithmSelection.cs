@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Polygons
 {
-    internal interface IShape
+    internal enum AlgorithmSelection
     {
-        bool HitTest(Point p);
-        void Draw(Graphics g, Algorithm a);
-        void Move(Point d);
+        Library,
+        Bresenham
     }
 }
