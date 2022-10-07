@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
-
-namespace Polygons
+﻿namespace Polygons
 {
     internal class Polygon : IShape
     {
@@ -26,9 +19,12 @@ namespace Polygons
         public void AddEdge(Segment edge) => Edges.Add(edge);
         public override string ToString()
         {
-            string res = "";
+            string res = "Vertices: ";
             foreach(var v in Vertices)
                 res += v.ToString();
+            res += "\nEdges: ";
+            foreach (var e in Edges)
+                res += e.ToString();
             return res;
         }
         public Vertex? GetLastVertex() => Vertices.LastOrDefault();

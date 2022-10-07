@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Polygons
+﻿namespace Polygons
 {
     internal class Segment : IShape
     {
@@ -29,9 +23,19 @@ namespace Polygons
             Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
         }
 
-        public void MoveOneEnd(Point newEnd)
+        public void MoveStart(Point d)
         {
-            Point2 = new Point(newEnd.X, newEnd.Y);
+            Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
+        }
+
+        public void MoveEnd(Point d)
+        {
+            Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
+        }
+
+        public override string ToString()
+        {
+            return $"({Point1.X}, {Point1.Y})->({Point2.X}, {Point2.Y})";
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Drawing.Drawing2D;
 
 namespace Polygons
 {
@@ -26,7 +22,11 @@ namespace Polygons
 
         public bool HitTest(Point p)
         {
-            throw new NotImplementedException();
+            var hit = false;
+            using (var path = GetPath())
+                hit = path.IsVisible(p);
+            return hit;
+
         }
 
         public void Move(Point d)
@@ -35,5 +35,12 @@ namespace Polygons
         }
 
         public override string ToString() => String.Format($"({Center.X}, {Center.Y})");
+
+        private GraphicsPath GetPath()
+        {
+            var path = new GraphicsPath();
+            path.AddEllipse(Center.X - Radius, Center.Y - Radius, 2 * Radius, 2 * Radius);
+            return path;
+        }
     }
 }
