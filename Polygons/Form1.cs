@@ -48,9 +48,9 @@ namespace Polygons
         {
             if(mode == Mode.Draw && e.Button == MouseButtons.Left)
             {
-                if(drawnSegment != null && constructedPolygon.Size >= 3 && IsOnVertex(constructedPolygon.GetVertex(0), e.X, e.Y, 10))
+                if(drawnSegment != null && constructedPolygon.Vertices.Count >= 3 && IsOnVertex(constructedPolygon.Vertices[0], e.X, e.Y, 10))
                 {
-                    constructedPolygon.AddEdge(drawnSegment);
+                    constructedPolygon.Edges.Add(drawnSegment);
                     Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                     polygons.Add(constructedPolygon);
                     Debug.WriteLine($"Add polygon {constructedPolygon}");
@@ -64,14 +64,14 @@ namespace Polygons
                     Debug.WriteLine("Add vertex " + v.ToString());
                     if (drawnSegment != null)
                     {
-                        constructedPolygon.AddEdge(drawnSegment);
+                        constructedPolygon.Edges.Add(drawnSegment);
                         Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                     }
                         
                     drawnSegment = new Segment();
                     drawnSegment.Point1 = drawnSegment.Point2 = new Point(e.X, e.Y);
-                    
-                    constructedPolygon?.AddVertex(v);
+
+                    constructedPolygon?.Vertices.Add(v);
                 }
 
                 canvas.Invalidate();
@@ -107,7 +107,7 @@ namespace Polygons
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mode == Mode.Draw && drawnSegment!= null && !constructedPolygon.IsEmpty())
+            if(mode == Mode.Draw && drawnSegment!= null && constructedPolygon.Vertices.Count != 0)
             {
                 drawnSegment.Point2 = new Point(e.X, e.Y);
                 canvas.Invalidate();
@@ -297,6 +297,35 @@ namespace Polygons
                     }
                 }
             }
+
+            if(mode == Mode.FixLength)
+            {
+                foreach(var polygon in polygons)
+                {
+                    for(int ei = 0; ei < polygon.Edges.Count; ei++)
+                    {
+                        Segment e = polygon.Edges[ei];
+                        if(e.HitTest(eventArgs.Location))
+                        {
+                            Debug.WriteLine($"Edge {e} will have fixed length");
+                            // query user for length
+                            using (InputForm inputForm = new InputForm())
+                            {
+                                inputForm.Input = e.Length.ToString();
+                                if(inputForm.ShowDialog() == DialogResult.OK)
+                                {
+                                    string length = inputForm.Input;
+                                    Debug.WriteLine("Form1 received length " + length);
+                                }
+                            }
+                            polygon.FixedLengthEdges.Add(e);
+
+                            canvas.Invalidate();
+                            return;
+                        }
+                    }
+                }
+            }
         }
 
         private void radioButtonLineLibrary_CheckedChanged(object sender, EventArgs e)
@@ -319,6 +348,11 @@ namespace Polygons
         private void buttonAddVertex_Click(object sender, EventArgs e)
         {
             mode = Mode.AddVertex;
+        }
+
+        private void buttonFixLength_Click(object sender, EventArgs e)
+        {
+            mode = Mode.FixLength;
         }
     }
 }

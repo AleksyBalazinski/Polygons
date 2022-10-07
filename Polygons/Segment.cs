@@ -10,6 +10,11 @@ namespace Polygons
         public int SegmentWidth { get; set; }
         public Point Point1 { get; set; }
         public Point Point2 { get; set; }
+        public double Length
+        {
+            get => Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
+                + (Point1.Y - Point2.Y) * (Point1.Y - Point2.Y));
+        }
         public bool HitTest(Point p)
         {
             bool result = false;

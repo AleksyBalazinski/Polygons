@@ -5,6 +5,7 @@
         Draw,
         Move,
         Delete,
-        AddVertex
+        AddVertex,
+        FixLength
     }
 }

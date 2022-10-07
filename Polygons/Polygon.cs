@@ -4,19 +4,15 @@
     {
         public List<Vertex> Vertices { get; }
         public List<Segment> Edges { get; }
+
+        public HashSet<Segment> FixedLengthEdges { get; }
         
         public Polygon()
         {
             Vertices = new List<Vertex>();
             Edges = new List<Segment>();
+            FixedLengthEdges = new HashSet<Segment>();
         }
-
-        public bool IsEmpty() => Vertices.Count == 0;
-
-        public Vertex GetVertex(int indx) => Vertices[indx];
-        public int Size { get { return Vertices.Count; } }
-        public void AddVertex(Vertex vertex) => Vertices.Add(vertex);
-        public void AddEdge(Segment edge) => Edges.Add(edge);
         public override string ToString()
         {
             string res = "Vertices: ";
@@ -27,7 +23,6 @@
                 res += e.ToString();
             return res;
         }
-        public Vertex? GetLastVertex() => Vertices.LastOrDefault();
 
         public bool HitTest(Point p)
         {
