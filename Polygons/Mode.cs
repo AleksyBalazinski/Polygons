@@ -3,6 +3,7 @@
     internal enum Mode
     {
         Draw,
-        Move
+        Move,
+        Delete
     }
 }

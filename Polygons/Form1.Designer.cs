@@ -44,6 +44,7 @@
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.buttonDelete = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -143,6 +144,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonDelete);
             this.panel1.Controls.Add(this.buttonMove);
             this.panel1.Controls.Add(this.buttonDraw);
             this.panel1.Location = new System.Drawing.Point(103, 3);
@@ -218,6 +220,16 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
             // 
+            // buttonDelete
+            // 
+            this.buttonDelete.Location = new System.Drawing.Point(231, 3);
+            this.buttonDelete.Name = "buttonDelete";
+            this.buttonDelete.Size = new System.Drawing.Size(75, 23);
+            this.buttonDelete.TabIndex = 3;
+            this.buttonDelete.Text = "Delete";
+            this.buttonDelete.UseVisualStyleBackColor = true;
+            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -259,5 +271,6 @@
         private RadioButton radioButtonLineBresenham;
         private RadioButton radioButtonLineLibrary;
         private Label label1;
+        private Button buttonDelete;
     }
 }

@@ -3,6 +3,7 @@
     internal class Segment : IShape
     {
         public Segment() { SegmentWidth = 2; SegmentColor = Color.Black; }
+        public Segment(Point p1, Point p2) { Point1 = p1; Point2 = p2; }
         public Color SegmentColor { get; set; }
         public int SegmentWidth { get; set; }
         public Point Point1 { get; set; }

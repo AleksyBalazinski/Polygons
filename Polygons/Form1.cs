@@ -6,12 +6,13 @@ namespace Polygons
     {
         private readonly Bitmap drawArea;
         private const int zoomFactor = 1;
-        Mode mode = Mode.Draw;
+        Mode mode;
 
         private List<Polygon> polygons;
         private Polygon constructedPolygon;
         private Polygon movedPolygon;
         private Vertex movedVertex;
+        private Vertex deletedVertex;
         private Segment segment1;
         private Segment segment2;
         private Segment? drawnSegment;
@@ -42,6 +43,7 @@ namespace Polygons
 
         private void canvas_MouseUp(object sender, MouseEventArgs e)
         {
+            Debug.WriteLine("should draw");
             if(mode == Mode.Draw && e.Button == MouseButtons.Left)
             {
                 if(drawnSegment != null && constructedPolygon.Size >= 3 && IsOnVertex(constructedPolygon.GetVertex(0), e.X, e.Y, 10))
@@ -186,6 +188,38 @@ namespace Polygons
                         
                 }
             }
+
+            if(mode == Mode.Delete)
+            {
+                foreach(var polygon in polygons)
+                {
+                    for(int n = 0; n < polygon.Vertices.Count; n++)
+                    {
+                        Vertex v = polygon.Vertices[n];
+                        if(v.HitTest(e.Location))
+                        {
+                            Debug.WriteLine($"Vertex {v} designated for deletion");
+                            deletedVertex = v;
+                            Segment segment2 = polygon.Edges[n];
+                            Segment segment1;
+                            if (n == 0)
+                                segment1 = polygon.Edges[polygon.Vertices.Count - 1];
+                            else
+                                segment1 = polygon.Edges[n - 1];
+
+                            if (n == 0)
+                                polygon.Edges.Add(new Segment(segment1.Point1, segment2.Point2));
+                            else
+                                polygon.Edges.Insert(n - 1, new Segment(segment1.Point1, segment2.Point2));
+
+                            polygon.Vertices.Remove(v);
+                            polygon.Edges.Remove(segment1);
+                            polygon.Edges.Remove(segment2);
+                        }
+                    }
+                }
+                canvas.Invalidate();
+            }
         }
 
         private void radioButtonLineLibrary_CheckedChanged(object sender, EventArgs e)
@@ -198,6 +232,11 @@ namespace Polygons
         {
             if (radioButtonLineBresenham.Checked == true)
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
+        }
+
+        private void buttonDelete_Click(object sender, EventArgs e)
+        {
+            mode = Mode.Delete;
         }
     }
 }
