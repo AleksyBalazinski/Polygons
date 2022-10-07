@@ -150,16 +150,16 @@ namespace Polygons
             mode = Mode.Move;
         }
 
-        private void canvas_MouseDown(object sender, MouseEventArgs e)
+        private void canvas_MouseDown(object sender, MouseEventArgs eventArgs)
         {
-            if(mode == Mode.Move)
+            if(mode == Mode.Move) // moving a single vertex
             {
                 foreach(var polygon in polygons)
                 {
                     for(int n = 0; n < polygon.Vertices.Count; n++)
                     {
                         Vertex v = polygon.Vertices[n];
-                        if (v.HitTest(e.Location))
+                        if (v.HitTest(eventArgs.Location))
                         {
                             Debug.WriteLine($"Vertex {v} hit");
                             movedVertex = v;
@@ -169,18 +169,18 @@ namespace Polygons
                             else
                                 segment2 = polygon.Edges[n - 1];
 
-                            previousPoint = e.Location;
+                            previousPoint = eventArgs.Location;
                             isVertexMoved = true;
 
                             return;
                         }
                     }
 
-                    if (polygon.HitTest(e.Location))
+                    if (polygon.HitTest(eventArgs.Location))
                     {
                         Debug.WriteLine($"Polygon {polygon} hit");
                         movedPolygon = polygon;
-                        previousPoint = e.Location;
+                        previousPoint = eventArgs.Location;
                         isPolygonMoved = true;
 
                         return;
@@ -193,28 +193,49 @@ namespace Polygons
             {
                 foreach(var polygon in polygons)
                 {
-                    for(int n = 0; n < polygon.Vertices.Count; n++)
+                    for(int vi = 0; vi < polygon.Vertices.Count; vi++)
                     {
-                        Vertex v = polygon.Vertices[n];
-                        if(v.HitTest(e.Location))
+                        Vertex v = polygon.Vertices[vi];
+                        if(v.HitTest(eventArgs.Location)) // deleting a single vertex
                         {
                             Debug.WriteLine($"Vertex {v} designated for deletion");
                             deletedVertex = v;
-                            Segment segment2 = polygon.Edges[n];
+                            Segment segment2 = polygon.Edges[vi];
                             Segment segment1;
-                            if (n == 0)
+                            if (vi == 0)
                                 segment1 = polygon.Edges[polygon.Vertices.Count - 1];
                             else
-                                segment1 = polygon.Edges[n - 1];
+                                segment1 = polygon.Edges[vi - 1];
 
-                            if (n == 0)
+                            if (vi == 0)
                                 polygon.Edges.Add(new Segment(segment1.Point1, segment2.Point2));
                             else
-                                polygon.Edges.Insert(n - 1, new Segment(segment1.Point1, segment2.Point2));
+                                polygon.Edges.Insert(vi - 1, new Segment(segment1.Point1, segment2.Point2));
 
                             polygon.Vertices.Remove(v);
                             polygon.Edges.Remove(segment1);
                             polygon.Edges.Remove(segment2);
+                        }
+                    }
+                }
+                canvas.Invalidate();
+            }
+
+            if(mode == Mode.AddVertex)
+            {
+                foreach(var polygon in polygons)
+                {
+                    for(int ei = 0; ei < polygon.Edges.Count; ei++)
+                    {
+                        Segment e = polygon.Edges[ei];
+                        if(e.HitTest(eventArgs.Location))
+                        {
+                            Debug.WriteLine($"Edge {e} designated for adding a vertex");
+                            Vertex v = new Vertex((e.Point1.X + e.Point2.X) / 2, (e.Point1.Y + e.Point2.Y) / 2);
+                            polygon.Vertices.Insert(ei + 1, v);
+                            polygon.Edges.Insert(ei, new Segment(e.Point1, v.Center));
+                            polygon.Edges.Insert(ei + 1, new Segment(v.Center, e.Point2));
+                            polygon.Edges.Remove(e);
                         }
                     }
                 }
@@ -237,6 +258,11 @@ namespace Polygons
         private void buttonDelete_Click(object sender, EventArgs e)
         {
             mode = Mode.Delete;
+        }
+
+        private void buttonAddVertex_Click(object sender, EventArgs e)
+        {
+            mode = Mode.AddVertex;
         }
     }
 }

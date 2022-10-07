@@ -4,6 +4,7 @@
     {
         Draw,
         Move,
-        Delete
+        Delete,
+        AddVertex
     }
 }

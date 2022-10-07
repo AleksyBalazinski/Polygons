@@ -1,4 +1,6 @@
-﻿namespace Polygons
+﻿using System.Drawing.Drawing2D;
+
+namespace Polygons
 {
     internal class Segment : IShape
     {
@@ -10,7 +12,11 @@
         public Point Point2 { get; set; }
         public bool HitTest(Point p)
         {
-            throw new NotImplementedException();
+            bool result = false;
+            using (var path = GetPath())
+            using (var pen = new Pen(SegmentColor, 4))
+                result = path.IsOutlineVisible(p, pen);
+            return result;
         }
 
         public void Draw(Graphics g, Algorithm a)
@@ -37,6 +43,13 @@
         public override string ToString()
         {
             return $"({Point1.X}, {Point1.Y})->({Point2.X}, {Point2.Y})";
+        }
+
+        private GraphicsPath GetPath()
+        {
+            var path = new GraphicsPath();
+            path.AddLine(Point1, Point2);
+            return path;
         }
     }
 }

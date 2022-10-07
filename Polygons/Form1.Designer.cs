@@ -38,13 +38,14 @@
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonMove = new System.Windows.Forms.Button();
             this.buttonDraw = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.buttonDelete = new System.Windows.Forms.Button();
+            this.buttonAddVertex = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -144,6 +145,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonAddVertex);
             this.panel1.Controls.Add(this.buttonDelete);
             this.panel1.Controls.Add(this.buttonMove);
             this.panel1.Controls.Add(this.buttonDraw);
@@ -151,6 +153,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(694, 44);
             this.panel1.TabIndex = 2;
+            // 
+            // buttonDelete
+            // 
+            this.buttonDelete.Location = new System.Drawing.Point(231, 3);
+            this.buttonDelete.Name = "buttonDelete";
+            this.buttonDelete.Size = new System.Drawing.Size(75, 23);
+            this.buttonDelete.TabIndex = 3;
+            this.buttonDelete.Text = "Delete";
+            this.buttonDelete.UseVisualStyleBackColor = true;
+            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
             // 
             // buttonMove
             // 
@@ -220,15 +232,15 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
             // 
-            // buttonDelete
+            // buttonAddVertex
             // 
-            this.buttonDelete.Location = new System.Drawing.Point(231, 3);
-            this.buttonDelete.Name = "buttonDelete";
-            this.buttonDelete.Size = new System.Drawing.Size(75, 23);
-            this.buttonDelete.TabIndex = 3;
-            this.buttonDelete.Text = "Delete";
-            this.buttonDelete.UseVisualStyleBackColor = true;
-            this.buttonDelete.Click += new System.EventHandler(this.buttonDelete_Click);
+            this.buttonAddVertex.Location = new System.Drawing.Point(347, 7);
+            this.buttonAddVertex.Name = "buttonAddVertex";
+            this.buttonAddVertex.Size = new System.Drawing.Size(75, 23);
+            this.buttonAddVertex.TabIndex = 4;
+            this.buttonAddVertex.Text = "Add vertex";
+            this.buttonAddVertex.UseVisualStyleBackColor = true;
+            this.buttonAddVertex.Click += new System.EventHandler(this.buttonAddVertex_Click);
             // 
             // Form1
             // 
@@ -272,5 +284,6 @@
         private RadioButton radioButtonLineLibrary;
         private Label label1;
         private Button buttonDelete;
+        private Button buttonAddVertex;
     }
 }
