@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics;
 
 namespace Polygons
@@ -49,33 +48,7 @@ namespace Polygons
         {
             if(mode == Mode.Draw && e.Button == MouseButtons.Left)
             {
-                if(drawnSegment != null && constructedPolygon.Vertices.Count >= 3 && IsOnVertex(constructedPolygon.Vertices[0], e.X, e.Y, 10))
-                {
-                    constructedPolygon.Edges.Add(drawnSegment);
-                    Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
-                    polygons.Add(constructedPolygon);
-                    Debug.WriteLine($"Add polygon {constructedPolygon}");
-                    constructedPolygon = new Polygon();
-                    drawnSegment = null;
-                }
-                else
-                {
-                    Vertex v = new Vertex(e.X, e.Y);
-                    
-                    Debug.WriteLine("Add vertex " + v.ToString());
-                    if (drawnSegment != null)
-                    {
-                        constructedPolygon.Edges.Add(drawnSegment);
-                        Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
-                    }
-                        
-                    drawnSegment = new Segment();
-                    drawnSegment.Point1 = drawnSegment.Point2 = new Point(e.X, e.Y);
-
-                    constructedPolygon?.Vertices.Add(v);
-                }
-
-                canvas.Invalidate();
+                CreatePolygon(e.X, e.Y);
             }
 
             if(mode == Mode.Move)
@@ -86,20 +59,41 @@ namespace Polygons
             }
         }
 
+        private void CreatePolygon(int x, int y)
+        {
+            if (drawnSegment != null && constructedPolygon.Vertices.Count >= 3 && IsOnVertex(constructedPolygon.Vertices[0], x, y, 10))
+            {
+                constructedPolygon.Edges.Add(drawnSegment);
+                Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
+                polygons.Add(constructedPolygon);
+                Debug.WriteLine($"Add polygon {constructedPolygon}");
+                constructedPolygon = new Polygon();
+                drawnSegment = null;
+            }
+            else
+            {
+                Vertex v = new Vertex(x, y);
+
+                Debug.WriteLine("Add vertex " + v.ToString());
+                if (drawnSegment != null)
+                {
+                    constructedPolygon.Edges.Add(drawnSegment);
+                    Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
+                }
+
+                drawnSegment = new Segment();
+                drawnSegment.Point1 = drawnSegment.Point2 = new Point(x, y);
+
+                constructedPolygon?.Vertices.Add(v);
+            }
+
+            canvas.Invalidate();
+        }
+
         private void buttonDraw_Click(object sender, EventArgs e)
         {
             mode = Mode.Draw;
         }
-
-        /*private Vertex ToCartesian(int x, int y)
-        {
-            return new Vertex((x - canvas.Width / 2) / zoomFactor, (canvas.Height / 2 - y) / zoomFactor);
-        }
-
-        private (int, int) ToScreen(Vertex vertex)
-        {
-            return ((int)(vertex.X * zoomFactor + canvas.Width / 2), (int)(canvas.Height / 2 - vertex.Y * zoomFactor));
-        }*/
 
         private bool IsOnVertex(Vertex vertex, int x, int y, int d)
         {
@@ -108,41 +102,64 @@ namespace Polygons
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if(mode == Mode.Draw && drawnSegment!= null && constructedPolygon.Vertices.Count != 0)
+            if(mode == Mode.Draw && drawnSegment != null && constructedPolygon.Vertices.Count != 0)
             {
-                drawnSegment.Point2 = new Point(e.X, e.Y);
-                canvas.Invalidate();
+                DrawEdgeUnderConstruction(e.X, e.Y);
             }
 
             if(mode == Mode.Move && isPolygonMoved == true)
             {
-                var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-                movedPolygon.Move(displacement);
-                previousPoint = e.Location;
-                canvas.Invalidate();
+                DrafAfterPolygonMoved(e.X, e.Y);
             }
 
             if(mode == Mode.Move && isVertexMoved == true)
             {
-                var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-                movedVertex.Move(displacement);
-                segment1.MoveStart(displacement);
-                segment2.MoveEnd(displacement);
-                previousPoint = e.Location;
-                canvas.Invalidate();
+                DrawAfterVertexMoved(e.X, e.Y);
             }
 
             if(mode == Mode.Move && isEdgeMoved == true)
             {
-                var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
-                movedEdge.Move(displacement);
-                segment1.MoveEnd(displacement);
-                segment2.MoveStart(displacement);
-                vertex1.Move(displacement);
-                vertex2.Move(displacement);
-                previousPoint = e.Location;
+                DrawAfterEdgeMoved(e.X, e.Y);
+            }
+        }
+
+        private void DrawEdgeUnderConstruction(int x, int y)
+        {
+            if(drawnSegment != null)
+            {
+                drawnSegment.Point2 = new Point(x, y);
                 canvas.Invalidate();
             }
+        }
+
+        private void DrafAfterPolygonMoved(int x, int y)
+        {
+            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            movedPolygon.Move(displacement);
+            previousPoint = new Point(x, y);
+            canvas.Invalidate();
+        }
+
+        private void DrawAfterVertexMoved(int x, int y)
+        {
+            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            movedVertex.Move(displacement);
+            segment1.MoveStart(displacement);
+            segment2.MoveEnd(displacement);
+            previousPoint = new Point(x, y);
+            canvas.Invalidate();
+        }
+
+        private void DrawAfterEdgeMoved(int x, int y)
+        {
+            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            movedEdge.Move(displacement);
+            segment1.MoveEnd(displacement);
+            segment2.MoveStart(displacement);
+            vertex1.Move(displacement);
+            vertex2.Move(displacement);
+            previousPoint = new Point(x, y);
+            canvas.Invalidate();
         }
 
         private void canvas_Paint(object sender, PaintEventArgs e)
@@ -170,196 +187,145 @@ namespace Polygons
         {
             if(mode == Mode.Move)
             {
-                foreach(var polygon in polygons)
-                {
-                    for(int vi = 0; vi < polygon.Vertices.Count; vi++) // moving a single vertex
-                    {
-                        Vertex v = polygon.Vertices[vi];
-                        if (v.HitTest(eventArgs.Location))
-                        {
-                            Debug.WriteLine($"Vertex {v} hit");
-                            movedVertex = v;
-                            segment1 = polygon.Edges[vi];
-                            if(vi == 0)
-                                segment2 = polygon.Edges[polygon.Vertices.Count - 1];
-                            else
-                                segment2 = polygon.Edges[vi - 1];
-
-                            previousPoint = eventArgs.Location;
-                            isVertexMoved = true;
-
-                            return;
-                        }
-                    }
-
-                    for(int ei = 0; ei < polygon.Vertices.Count; ei++) // moving a single edge
-                    {
-                        Segment e = polygon.Edges[ei];
-                        if(e.HitTest(eventArgs.Location))
-                        {
-                            Debug.WriteLine($"Edge {e} hit");
-                            movedEdge = e;
-                            if (ei == 0)
-                            {
-                                segment1 = polygon.Edges[^1];
-                                vertex1 = polygon.Vertices[0];
-                            }
-                                
-                            else
-                            {
-                                segment1 = polygon.Edges[ei - 1];
-                                vertex1 = polygon.Vertices[ei];
-                            }
-                                
-
-                            if (ei == polygon.Edges.Count - 1)
-                            {
-                                segment2 = polygon.Edges[0];
-                                vertex2 = polygon.Vertices[0];
-                            }
-                                
-                            else
-                            {
-                                segment2 = polygon.Edges[ei + 1];
-                                vertex2 = polygon.Vertices[ei + 1];
-                            }
-                                
-
-                            previousPoint = eventArgs.Location;
-                            isEdgeMoved = true;
-
-                            return;
-                        }
-                    }
-
-                    if (polygon.HitTest(eventArgs.Location)) // moving entire polygon
-                    {
-                        Debug.WriteLine($"Polygon {polygon} hit");
-                        movedPolygon = polygon;
-                        previousPoint = eventArgs.Location;
-                        isPolygonMoved = true;
-
-                        return;
-                    }
-                        
-                }
+                FindVertexToBeMoved(eventArgs.Location);
+                if (isVertexMoved) return;
+                FindEdgeToBeMoved(eventArgs.Location);
+                if (isEdgeMoved) return;
+                FindPolygonToBeMoved(eventArgs.Location);
             }
 
             if(mode == Mode.Delete)
             {
-                foreach(var polygon in polygons)
-                {
-                    for(int vi = 0; vi < polygon.Vertices.Count; vi++)
-                    {
-                        Vertex v = polygon.Vertices[vi];
-                        if(v.HitTest(eventArgs.Location)) // deleting a single vertex
-                        {
-                            Debug.WriteLine($"Vertex {v} designated for deletion");
-                            Segment segment2 = polygon.Edges[vi];
-                            Segment segment1;
-                            if (vi == 0)
-                                segment1 = polygon.Edges[polygon.Vertices.Count - 1];
-                            else
-                                segment1 = polygon.Edges[vi - 1];
-
-                            if (vi == 0)
-                                polygon.Edges.Add(new Segment(segment1.Point1, segment2.Point2));
-                            else
-                                polygon.Edges.Insert(vi - 1, new Segment(segment1.Point1, segment2.Point2));
-
-                            polygon.Vertices.Remove(v);
-                            polygon.Edges.Remove(segment1);
-                            polygon.Edges.Remove(segment2);
-                        }
-                    }
-                }
-                canvas.Invalidate();
+                DeleteVertex(eventArgs.Location);
             }
 
             if(mode == Mode.AddVertex)
             {
-                foreach(var polygon in polygons)
-                {
-                    for(int ei = 0; ei < polygon.Edges.Count; ei++)
-                    {
-                        Segment e = polygon.Edges[ei];
-                        if(e.HitTest(eventArgs.Location))
-                        {
-                            Debug.WriteLine($"Edge {e} designated for adding a vertex");
-                            Vertex v = new Vertex((e.Point1.X + e.Point2.X) / 2, (e.Point1.Y + e.Point2.Y) / 2);
-                            polygon.Vertices.Insert(ei + 1, v);
-                            polygon.Edges.Insert(ei, new Segment(e.Point1, v.Center));
-                            polygon.Edges.Insert(ei + 1, new Segment(v.Center, e.Point2));
-                            polygon.Edges.Remove(e);
-
-                            canvas.Invalidate();
-                            return;
-                        }
-                    }
-                }
+                AddVertex(eventArgs.Location);
             }
 
             if(mode == Mode.FixLength)
             {
-                foreach(var polygon in polygons)
+                FixLength(eventArgs.Location);
+            }
+        }
+
+        private void FindVertexToBeMoved(Point p)
+        {
+            foreach (var polygon in polygons)
+            {
+                foreach (var vertex in polygon.Vertices)
                 {
-                    for(int ei = 0; ei < polygon.Edges.Count; ei++)
+                    if (vertex.HitTest(p))
                     {
-                        Segment e = polygon.Edges[ei];
-                        if(e.HitTest(eventArgs.Location))
-                        {
-                            Debug.WriteLine($"Edge {e} will have fixed length");
-                            // query user for length
-                            string lengthString = "";
-                            double length = 0;
-                            using (InputForm inputForm = new InputForm())
-                            {
-                                inputForm.Input = e.Length.ToString();
-                                if(inputForm.ShowDialog() == DialogResult.OK)
-                                {
-                                    lengthString = inputForm.Input;
-                                    Debug.WriteLine("Form1 received length " + lengthString);
-                                }
-                            }
-                            try
-                            {
-                                length = double.Parse(lengthString);
-                            } 
-                            catch(Exception exception)
-                            {
-                                MessageBox.Show($"Invalid input: {exception}", "Polygons", 
-                                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                return;
-                            }
+                        Debug.WriteLine($"Vertex {vertex} hit");
+                        movedVertex = vertex;
+                        (segment1, segment2) = polygon.GetAdjacentEdges(vertex);
 
-                            if(length <= 0)
-                                MessageBox.Show($"Invalid input: Positive real values only.", 
-                                    "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        previousPoint = p;
+                        isVertexMoved = true;
 
-                            // adjust length
-                            e.Length = length;
-                            polygon.Vertices[ei] = new Vertex(e.Point1.X, e.Point1.Y);
+                        return;
+                    }
+                }
+            }
+        }
 
-                            if (ei == polygon.Edges.Count - 1)
-                                polygon.Vertices[0] = new Vertex(e.Point2.X, e.Point2.Y);
-                            else
-                                polygon.Vertices[ei + 1] = new Vertex(e.Point2.X, e.Point2.Y);
+        private void FindEdgeToBeMoved(Point p)
+        {
+            foreach(var polygon in polygons)
+            {
+                foreach (var edge in polygon.Edges)
+                {
+                    if (edge.HitTest(p))
+                    {
+                        Debug.WriteLine($"Edge {edge} hit");
+                        movedEdge = edge;
+                        (segment1, segment2) = polygon.GetAdjacentEdges(edge);
+                        (vertex1, vertex2) = polygon.GetEndpoints(edge);
 
-                            if (ei == 0)
-                                polygon.Edges[^1].MoveEndAbs(new Point(e.Point1.X, e.Point1.Y));
-                            else
-                                polygon.Edges[ei - 1].MoveEndAbs(new Point(e.Point1.X, e.Point1.Y));
+                        previousPoint = p;
+                        isEdgeMoved = true;
 
-                            if (ei == polygon.Edges.Count - 1)
-                                polygon.Edges[0].MoveStartAbs(new Point(e.Point2.X, e.Point2.Y));
-                            else
-                                polygon.Edges[ei + 1].MoveStartAbs(new Point(e.Point2.X, e.Point2.Y));
+                        return;
+                    }
+                }
+            }
+        }
 
-                            polygon.FixedLengthEdges.Add(e);
+        private void FindPolygonToBeMoved(Point p)
+        {
+            foreach(var polygon in polygons)
+            {
+                if (polygon.HitTest(p))
+                {
+                    Debug.WriteLine($"Polygon {polygon} hit");
+                    movedPolygon = polygon;
+                    previousPoint = p;
+                    isPolygonMoved = true;
 
-                            canvas.Invalidate();
-                            return;
-                        }
+                    return;
+                }
+            }
+        }
+
+        private void DeleteVertex(Point p)
+        {
+            foreach (var polygon in polygons)
+            {
+                foreach (var vertex in polygon.Vertices)
+                {
+                    if (vertex.HitTest(p))
+                    {
+                        Debug.WriteLine($"Vertex {vertex} designated for deletion");
+                        polygon.Delete(vertex);
+
+                        canvas.Invalidate();
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void AddVertex(Point p)
+        {
+            foreach (var polygon in polygons)
+            {
+                foreach (var edge in polygon.Edges)
+                {
+                    if (edge.HitTest(p))
+                    {
+                        Debug.WriteLine($"Edge {edge} designated for adding a vertex");
+                        polygon.Subdivide(edge);
+
+                        canvas.Invalidate();
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void FixLength(Point p)
+        {
+            foreach (var polygon in polygons)
+            {
+                foreach (var edge in polygon.Edges)
+                {
+                    if (edge.HitTest(p))
+                    {
+                        Debug.WriteLine($"Edge {edge} will have fixed length");
+                        // query user for length
+                        double length = QueryForEdgeLength(edge);
+                        if (length <= 0)
+                            MessageBox.Show($"Invalid input: Positive real values only.",
+                                "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        // adjust length
+                        polygon.SetLength(edge, length);
+                        polygon.FixedLengthEdges.Add(edge);
+
+                        canvas.Invalidate();
+                        return;
                     }
                 }
             }
@@ -390,6 +356,33 @@ namespace Polygons
         private void buttonFixLength_Click(object sender, EventArgs e)
         {
             mode = Mode.FixLength;
+        }
+
+        private double QueryForEdgeLength(Segment edge)
+        {
+            string lengthString = "";
+            double length;
+            using (InputForm inputForm = new InputForm())
+            {
+                inputForm.Input = edge.Length.ToString();
+                if (inputForm.ShowDialog() == DialogResult.OK)
+                {
+                    lengthString = inputForm.Input;
+                    Debug.WriteLine("Form1 received length " + lengthString);
+                }
+            }
+            try
+            {
+                length = double.Parse(lengthString);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show($"Invalid input: {exception}", "Polygons",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                length = -1;
+            }
+
+            return length;
         }
     }
 }

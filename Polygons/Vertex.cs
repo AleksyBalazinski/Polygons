@@ -10,6 +10,12 @@ namespace Polygons
             Radius = 5;
         }
 
+        public Vertex(Point p)
+        {
+            Center = p;
+            Radius = 5;
+        }
+
         public Color FillColor { get; set; }
 
         public Point Center { get; set; }
@@ -32,6 +38,11 @@ namespace Polygons
         public void Move(Point d)
         {
             Center = new Point(Center.X + d.X, Center.Y + d.Y);
+        }
+
+        public void MoveAbs(Point p)
+        {
+            Center = new Point(p.X, p.Y);
         }
 
         public override string ToString() => String.Format($"({Center.X}, {Center.Y})");

@@ -22,6 +22,11 @@ namespace Polygons
                 Point1 = new Point((int)(Point1.X - coef * p1p2.X), (int)(Point1.Y - coef * p1p2.Y));
             }
         }
+        public Point MidPoint
+        {
+            get => new Point((Point1.X + Point2.X) / 2, (Point1.Y + Point2.Y) / 2);
+        }
+
         public bool HitTest(Point p)
         {
             bool result = false;
