@@ -12,14 +12,17 @@ namespace Polygons
         private Polygon constructedPolygon;
         private Polygon movedPolygon;
         private Vertex movedVertex;
-        private Vertex deletedVertex;
+        private Segment movedEdge;
         private Segment segment1;
         private Segment segment2;
+        private Vertex vertex1; // vertices moved when an edge is moved
+        private Vertex vertex2;
         private Segment? drawnSegment;
 
         Point previousPoint = Point.Empty;
         bool isPolygonMoved = false;
         bool isVertexMoved = false;
+        bool isEdgeMoved = false;
         readonly Algorithm drawingAlgorithm;
  
         public Form1()
@@ -43,7 +46,6 @@ namespace Polygons
 
         private void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-            Debug.WriteLine("should draw");
             if(mode == Mode.Draw && e.Button == MouseButtons.Left)
             {
                 if(drawnSegment != null && constructedPolygon.Size >= 3 && IsOnVertex(constructedPolygon.GetVertex(0), e.X, e.Y, 10))
@@ -79,6 +81,7 @@ namespace Polygons
             {
                 isPolygonMoved = false;
                 isVertexMoved = false;
+                isEdgeMoved = false;
             }
         }
 
@@ -127,6 +130,18 @@ namespace Polygons
                 previousPoint = e.Location;
                 canvas.Invalidate();
             }
+
+            if(mode == Mode.Move && isEdgeMoved == true)
+            {
+                var displacement = new Point(e.X - previousPoint.X, e.Y - previousPoint.Y);
+                movedEdge.Move(displacement);
+                segment1.MoveEnd(displacement);
+                segment2.MoveStart(displacement);
+                vertex1.Move(displacement);
+                vertex2.Move(displacement);
+                previousPoint = e.Location;
+                canvas.Invalidate();
+            }
         }
 
         private void canvas_Paint(object sender, PaintEventArgs e)
@@ -152,22 +167,22 @@ namespace Polygons
 
         private void canvas_MouseDown(object sender, MouseEventArgs eventArgs)
         {
-            if(mode == Mode.Move) // moving a single vertex
+            if(mode == Mode.Move)
             {
                 foreach(var polygon in polygons)
                 {
-                    for(int n = 0; n < polygon.Vertices.Count; n++)
+                    for(int vi = 0; vi < polygon.Vertices.Count; vi++) // moving a single vertex
                     {
-                        Vertex v = polygon.Vertices[n];
+                        Vertex v = polygon.Vertices[vi];
                         if (v.HitTest(eventArgs.Location))
                         {
                             Debug.WriteLine($"Vertex {v} hit");
                             movedVertex = v;
-                            segment1 = polygon.Edges[n];
-                            if(n == 0)
+                            segment1 = polygon.Edges[vi];
+                            if(vi == 0)
                                 segment2 = polygon.Edges[polygon.Vertices.Count - 1];
                             else
-                                segment2 = polygon.Edges[n - 1];
+                                segment2 = polygon.Edges[vi - 1];
 
                             previousPoint = eventArgs.Location;
                             isVertexMoved = true;
@@ -176,7 +191,47 @@ namespace Polygons
                         }
                     }
 
-                    if (polygon.HitTest(eventArgs.Location))
+                    for(int ei = 0; ei < polygon.Vertices.Count; ei++) // moving a single edge
+                    {
+                        Segment e = polygon.Edges[ei];
+                        if(e.HitTest(eventArgs.Location))
+                        {
+                            Debug.WriteLine($"Edge {e} hit");
+                            movedEdge = e;
+                            if (ei == 0)
+                            {
+                                segment1 = polygon.Edges[^1];
+                                vertex1 = polygon.Vertices[0];
+                            }
+                                
+                            else
+                            {
+                                segment1 = polygon.Edges[ei - 1];
+                                vertex1 = polygon.Vertices[ei];
+                            }
+                                
+
+                            if (ei == polygon.Edges.Count - 1)
+                            {
+                                segment2 = polygon.Edges[0];
+                                vertex2 = polygon.Vertices[0];
+                            }
+                                
+                            else
+                            {
+                                segment2 = polygon.Edges[ei + 1];
+                                vertex2 = polygon.Vertices[ei + 1];
+                            }
+                                
+
+                            previousPoint = eventArgs.Location;
+                            isEdgeMoved = true;
+
+                            return;
+                        }
+                    }
+
+                    if (polygon.HitTest(eventArgs.Location)) // moving entire polygon
                     {
                         Debug.WriteLine($"Polygon {polygon} hit");
                         movedPolygon = polygon;
@@ -199,7 +254,6 @@ namespace Polygons
                         if(v.HitTest(eventArgs.Location)) // deleting a single vertex
                         {
                             Debug.WriteLine($"Vertex {v} designated for deletion");
-                            deletedVertex = v;
                             Segment segment2 = polygon.Edges[vi];
                             Segment segment1;
                             if (vi == 0)
@@ -236,10 +290,12 @@ namespace Polygons
                             polygon.Edges.Insert(ei, new Segment(e.Point1, v.Center));
                             polygon.Edges.Insert(ei + 1, new Segment(v.Center, e.Point2));
                             polygon.Edges.Remove(e);
+
+                            canvas.Invalidate();
+                            return;
                         }
                     }
                 }
-                canvas.Invalidate();
             }
         }
 
