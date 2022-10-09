@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Windows.Forms.VisualStyles;
 using Polygons.States;
 
 namespace Polygons
@@ -8,15 +9,18 @@ namespace Polygons
         private readonly Bitmap drawArea;
         private List<Polygon> polygons;
         readonly Algorithm drawingAlgorithm;
+        private Relations relations;
         public List<Polygon> Polygons { get => polygons; }
+        public Relations Relations { get => relations; }
         public PictureBox Canvas { get => canvas; }
 
-        private State state;
+        private State state = null!;
         public void TransitionTo(State state)
         {
             Debug.WriteLine($"Application context: Transition to {state.GetType().Name}");
             this.state = state;
             this.state.Context = this;
+            this.state.Algorithm = drawingAlgorithm;
         }
 
         public Form1()
@@ -29,11 +33,10 @@ namespace Polygons
                 g.Clear(Color.White);
             }
             polygons = new List<Polygon>();
-
             drawingAlgorithm = new Algorithm();
+            relations = new Relations();
 
-            state = new DrawState(this, drawingAlgorithm);
-            state.Context = this;
+            TransitionTo(new DrawState());
         }
         
         //
@@ -42,7 +45,6 @@ namespace Polygons
 
         private void canvas_MouseUp(object sender, MouseEventArgs e)
             => state.canvas_MouseUp(sender, e);
-
 
         private void canvas_MouseMove(object sender, MouseEventArgs e)
             => state.canvas_MouseMove(sender, e);
@@ -57,19 +59,22 @@ namespace Polygons
         //
 
         private void buttonDraw_Click(object sender, EventArgs e)
-            => TransitionTo(new DrawState(this, drawingAlgorithm));
+            => TransitionTo(new DrawState());
 
         private void buttonMove_Click(object sender, EventArgs e)
-            => TransitionTo(new MoveState(this, drawingAlgorithm));
+            => TransitionTo(new MoveState());
 
         private void buttonDelete_Click(object sender, EventArgs e)
-            => TransitionTo(new DeleteState(this, drawingAlgorithm));
+            => TransitionTo(new DeleteState());
 
         private void buttonAddVertex_Click(object sender, EventArgs e)
-            => TransitionTo(new AddVertexState(this, drawingAlgorithm));
+            => TransitionTo(new AddVertexState());
 
         private void buttonFixLength_Click(object sender, EventArgs e)
-            => TransitionTo(new FixLengthState(this, drawingAlgorithm));
+            => TransitionTo(new FixLengthState());
+
+        private void addRelation_Click(object sender, EventArgs e)
+            => TransitionTo(new AddRelationState());
 
         //
         // algorithm selection
@@ -85,6 +90,32 @@ namespace Polygons
         {
             if (radioButtonLineBresenham.Checked == true)
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
+        }
+
+        // polygons control
+        public Polygon? FindPolygon(Segment edge)
+        {
+            foreach (var p in polygons)
+            {
+                foreach (var e in p.Edges)
+                {
+                    if (e == edge)
+                        return p;
+                }
+            }
+            return null;
+        }
+        public Polygon? FindPolygon(Vertex vertex)
+        {
+            foreach (var p in polygons)
+            {
+                foreach (var v in p.Vertices)
+                {
+                    if (v == vertex)
+                        return p;
+                }
+            }
+            return null;
         }
     }
 }

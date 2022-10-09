@@ -4,7 +4,7 @@
     {
         Polygon movedPolygon;
         Point previousPoint;
-        public MovingPolygonState(Form1 context, Algorithm a, Polygon movedPolygon, Point previousPoint) : base(context, a)
+        public MovingPolygonState(Polygon movedPolygon, Point previousPoint)
         {
             this.movedPolygon = movedPolygon;
             this.previousPoint = previousPoint;
@@ -21,7 +21,7 @@
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-            context.TransitionTo(new MoveState(context, drawingAlgorithm));
+            context.TransitionTo(new MoveState());
         }
 
         private void DrawAfterPolygonMoved(int x, int y)

@@ -21,6 +21,8 @@ namespace Polygons
         public Point Center { get; set; }
         public int Radius { get; set; }
 
+        public (int?, int?) relationIds;
+
         public void Draw(Graphics g, Algorithm a)
         {
             a.Apply(g, this);

@@ -38,6 +38,7 @@
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonFixLength = new System.Windows.Forms.Button();
             this.buttonAddVertex = new System.Windows.Forms.Button();
             this.buttonDelete = new System.Windows.Forms.Button();
             this.buttonMove = new System.Windows.Forms.Button();
@@ -46,7 +47,7 @@
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.buttonFixLength = new System.Windows.Forms.Button();
+            this.addRelation = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -146,6 +147,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.addRelation);
             this.panel1.Controls.Add(this.buttonFixLength);
             this.panel1.Controls.Add(this.buttonAddVertex);
             this.panel1.Controls.Add(this.buttonDelete);
@@ -155,6 +157,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(694, 44);
             this.panel1.TabIndex = 2;
+            // 
+            // buttonFixLength
+            // 
+            this.buttonFixLength.Location = new System.Drawing.Point(474, 9);
+            this.buttonFixLength.Name = "buttonFixLength";
+            this.buttonFixLength.Size = new System.Drawing.Size(75, 23);
+            this.buttonFixLength.TabIndex = 5;
+            this.buttonFixLength.Text = "Fix length";
+            this.buttonFixLength.UseVisualStyleBackColor = true;
+            this.buttonFixLength.Click += new System.EventHandler(this.buttonFixLength_Click);
             // 
             // buttonAddVertex
             // 
@@ -244,15 +256,15 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
             // 
-            // buttonFixLength
+            // addRelation
             // 
-            this.buttonFixLength.Location = new System.Drawing.Point(474, 9);
-            this.buttonFixLength.Name = "buttonFixLength";
-            this.buttonFixLength.Size = new System.Drawing.Size(75, 23);
-            this.buttonFixLength.TabIndex = 5;
-            this.buttonFixLength.Text = "Fix length";
-            this.buttonFixLength.UseVisualStyleBackColor = true;
-            this.buttonFixLength.Click += new System.EventHandler(this.buttonFixLength_Click);
+            this.addRelation.Location = new System.Drawing.Point(596, 16);
+            this.addRelation.Name = "addRelation";
+            this.addRelation.Size = new System.Drawing.Size(75, 23);
+            this.addRelation.TabIndex = 6;
+            this.addRelation.Text = "AddRelation";
+            this.addRelation.UseVisualStyleBackColor = true;
+            this.addRelation.Click += new System.EventHandler(this.addRelation_Click);
             // 
             // Form1
             // 
@@ -298,5 +310,6 @@
         private Button buttonDelete;
         private Button buttonAddVertex;
         private Button buttonFixLength;
+        private Button addRelation;
     }
 }

@@ -2,13 +2,13 @@
 {
     internal class MovingEdgeState : State
     {
-        Segment movedEdge;
-        Segment adjacentEdge1;
-        Segment adjacentEdge2;
-        Vertex endpoint1;
-        Vertex endpoint2;
+        readonly Segment movedEdge;
+        readonly Segment adjacentEdge1;
+        readonly Segment adjacentEdge2;
+        readonly Vertex endpoint1;
+        readonly Vertex endpoint2;
         Point previousPoint;
-        public MovingEdgeState(Form1 context, Algorithm a, Segment movedEdge, Segment adjacentEdge1, Segment adjacentEdge2, Vertex endpoint1, Vertex endpoint2, Point point) : base(context, a)
+        public MovingEdgeState(Segment movedEdge, Segment adjacentEdge1, Segment adjacentEdge2, Vertex endpoint1, Vertex endpoint2, Point point)
         {
             this.movedEdge = movedEdge;
             this.adjacentEdge1 = adjacentEdge1;
@@ -29,7 +29,7 @@
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-            context.TransitionTo(new MoveState(context, drawingAlgorithm));
+            context.TransitionTo(new MoveState());
         }
 
         private void DrawAfterEdgeMoved(int x, int y)
@@ -41,7 +41,33 @@
             endpoint1.Move(displacement);
             endpoint2.Move(displacement);
             previousPoint = new Point(x, y);
+
+            // handle parallel relation
+            (int? relId1, int? relId2) = movedEdge.relationIds;
+            if (relId1 != null)
+            {
+                AdjustEdgesInRelation(relId1.Value, adjacentEdge2);
+            }
+            if (relId2 != null)
+            {
+                AdjustEdgesInRelation(relId2.Value, adjacentEdge1);
+            }
+
             context.Canvas.Invalidate();
+        }
+
+        private void AdjustEdgesInRelation(int relationId, Segment edge)
+        {
+            foreach (var coupledEdge in context.Relations.relations[relationId])
+            {
+                if (coupledEdge != edge)
+                {
+                    Polygon? p = context.FindPolygon(coupledEdge);
+                    if (p != null)
+                        p.ApplyParallelRelation(coupledEdge, edge);
+                    else throw new NullReferenceException("omg");
+                }
+            }
         }
     }
 }

@@ -2,11 +2,11 @@
 {
     internal class MovingVertexState : State
     {
-        Vertex movedVertex;
-        Segment adjacentEdge1;
-        Segment adjacentEdge2;
+        readonly Vertex movedVertex;
+        readonly Segment adjacentEdge1;
+        readonly Segment adjacentEdge2;
         Point previousPoint;
-        public MovingVertexState(Form1 context, Algorithm a, Vertex movedVertex, Segment adjacentEdge1, Segment adjacentEdge2, Point point) : base(context, a)
+        public MovingVertexState(Vertex movedVertex, Segment adjacentEdge1, Segment adjacentEdge2, Point point)
         {
             this.movedVertex = movedVertex;
             this.adjacentEdge1 = adjacentEdge1;
@@ -25,7 +25,7 @@
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-            context.TransitionTo(new MoveState(context, drawingAlgorithm));
+            context.TransitionTo(new MoveState());
         }
 
         private void DrawAfterVertexMoved(int x, int y)
@@ -35,7 +35,32 @@
             adjacentEdge1.MoveStart(displacement);
             adjacentEdge2.MoveEnd(displacement);
             previousPoint = new Point(x, y);
+            // handle parallel relation
+            (int? relId1, int? relId2) = movedVertex.relationIds;
+            if(relId1 != null)
+            {
+                AdjustEdgesInRelation(relId1.Value, adjacentEdge1);
+            }
+            if (relId2 != null)
+            {
+                AdjustEdgesInRelation(relId2.Value, adjacentEdge2);
+            }
+
             context.Canvas.Invalidate();
+        }
+
+        private void AdjustEdgesInRelation(int relationId, Segment edge)
+        {
+            foreach (var coupledEdge in context.Relations.relations[relationId])
+            {
+                if (coupledEdge != edge)
+                {
+                    Polygon? p = context.FindPolygon(coupledEdge);
+                    if (p != null)
+                        p.ApplyParallelRelation(coupledEdge, edge);
+                    else throw new NullReferenceException("omg");
+                }
+            }
         }
     }
 }

@@ -5,9 +5,6 @@ namespace Polygons.States
     internal class MoveState : State
     {
         protected Point previousPoint;
-        public MoveState(Form1 context, Algorithm a) : base(context, a)
-        {
-        }
 
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
@@ -15,7 +12,7 @@ namespace Polygons.States
             if (vertexInfo != null)
             {
                 (Vertex vertex, Segment edge1, Segment edge2) = vertexInfo.Value;
-                context.TransitionTo(new MovingVertexState(context, drawingAlgorithm, vertex, edge1, edge2, previousPoint));
+                context.TransitionTo(new MovingVertexState(vertex, edge1, edge2, previousPoint));
                 return;
             }
 
@@ -23,14 +20,14 @@ namespace Polygons.States
             if (edgeInfo != null)
             {
                 (Segment edge, Segment edge1, Segment edge2, Vertex vertex1, Vertex vertex2) = edgeInfo.Value;
-                context.TransitionTo(new MovingEdgeState(context, drawingAlgorithm, edge, edge1, edge2, vertex1, vertex2, previousPoint));
+                context.TransitionTo(new MovingEdgeState(edge, edge1, edge2, vertex1, vertex2, previousPoint));
                 return;
             }
 
             var polygon = FindPolygonToBeMoved(e.Location);
             if (polygon != null)
             {
-                context.TransitionTo(new MovingPolygonState(context, drawingAlgorithm, polygon, previousPoint));
+                context.TransitionTo(new MovingPolygonState(polygon, previousPoint));
                 return;
             }
         }
@@ -81,7 +78,7 @@ namespace Polygons.States
 
                         previousPoint = p;
 
-                        return (movedEdge, edge1, edge2, vertex1, vertex2); ;
+                        return (movedEdge, edge1, edge2, vertex1, vertex2);
                     }
                 }
             }

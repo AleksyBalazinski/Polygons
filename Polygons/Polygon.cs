@@ -4,7 +4,6 @@
     {
         public List<Vertex> Vertices { get; }
         public List<Segment> Edges { get; }
-
         public HashSet<Segment> FixedLengthEdges { get; }
         
         public Polygon()
@@ -115,7 +114,19 @@
             Vertices.Remove(v);
             Edges.Remove(edge2);
             Edges.Remove(edge1);
+        }
 
+        public void ApplyParallelRelation(Segment edge, Segment reference)
+        {
+            //double initialLength = edge.Length; // preserve initial length
+            edge.SetParallelTo(reference);
+            //edge.Length = initialLength;
+            (Segment edge1, Segment edge2) = GetAdjacentEdges(edge);
+            (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
+            edge1.Point2 = edge.Point1;
+            edge2.Point1 = edge.Point2;
+            vertex1.Center = edge.Point1;
+            vertex2.Center = edge.Point2;
         }
 
         public bool HitTest(Point p)

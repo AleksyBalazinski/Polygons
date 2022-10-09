@@ -4,10 +4,6 @@ namespace Polygons.States
 {
     internal class FixLengthState : State
     {
-        public FixLengthState(Form1 context, Algorithm a) : base(context, a)
-        {
-        }
-
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
             DrawAfterLengthFixed(e.Location);

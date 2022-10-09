@@ -10,6 +10,9 @@ namespace Polygons
         public int SegmentWidth { get; set; }
         public Point Point1 { get; set; }
         public Point Point2 { get; set; }
+        public int? RelationId { get; set; }
+
+        public (int?, int?) relationIds;
         public double Length
         {
             get => Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
@@ -65,6 +68,15 @@ namespace Polygons
         public void MoveEndAbs(Point p)
         {
             Point2 = new Point(p.X, p.Y);
+        }
+
+        public void SetParallelTo(Segment reference)
+        {
+            Segment currentAtOrigin = new Segment(new Point(0, 0), new Point(Point2.X - Point1.X, Point2.Y - Point1.Y));
+            Segment referenceAtOrigin = new Segment(new Point(0, 0), new Point(reference.Point1.X - reference.Point2.X, reference.Point1.Y - reference.Point2.Y));
+
+            Point displacement = new Point(currentAtOrigin.Point2.X - referenceAtOrigin.Point2.X, currentAtOrigin.Point2.Y - referenceAtOrigin.Point2.Y);
+            Point1 = new Point(Point1.X + displacement.X, Point1.Y + displacement.Y);
         }
 
         public override string ToString()

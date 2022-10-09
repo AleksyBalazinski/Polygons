@@ -5,10 +5,6 @@ namespace Polygons.States
 {
     internal class DeleteState : State
     {
-        public DeleteState(Form1 context, Algorithm a) : base(context, a)
-        {
-        }
-
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
             DrawAfterVertexRemoved(e.Location);
