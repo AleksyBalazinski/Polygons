@@ -80,7 +80,7 @@
             Edges.Remove(e);
         }
 
-        public void SetLength(Segment e, double length)
+        public void SetLength(Segment e, float length)
         {
             e.Length = length;
 
@@ -129,12 +129,12 @@
             vertex2.Center = edge.Point2;
         }
 
-        public bool HitTest(Point p)
+        public bool HitTest(PointF p)
         {
-            int xMin = int.MaxValue;
-            int xMax = int.MinValue;
-            int yMin = int.MaxValue;
-            int yMax = int.MinValue;
+            float xMin = float.MaxValue;
+            float xMax = float.MinValue;
+            float yMin = float.MaxValue;
+            float yMax = float.MinValue;
 
             foreach(var v in Vertices)
             {
@@ -156,7 +156,7 @@
             a.Apply(g, this);
         }
 
-        public void Move(Point d)
+        public void Move(PointF d)
         {
             foreach (var v in Vertices)
                 v.Move(d);

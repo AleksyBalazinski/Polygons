@@ -4,13 +4,13 @@ namespace Polygons
 {
     internal class Vertex : IShape
     {
-        public Vertex(int x, int y)
+        public Vertex(float x, float y)
         {
-            Center = new Point(x, y);
+            Center = new PointF(x, y);
             Radius = 5;
         }
 
-        public Vertex(Point p)
+        public Vertex(PointF p)
         {
             Center = p;
             Radius = 5;
@@ -18,8 +18,8 @@ namespace Polygons
 
         public Color FillColor { get; set; }
 
-        public Point Center { get; set; }
-        public int Radius { get; set; }
+        public PointF Center { get; set; }
+        public float Radius { get; set; }
 
         public (int?, int?) relationIds;
 
@@ -28,7 +28,7 @@ namespace Polygons
             a.Apply(g, this);
         }
 
-        public bool HitTest(Point p)
+        public bool HitTest(PointF p)
         {
             var hit = false;
             using (var path = GetPath())
@@ -37,14 +37,14 @@ namespace Polygons
 
         }
 
-        public void Move(Point d)
+        public void Move(PointF d)
         {
-            Center = new Point(Center.X + d.X, Center.Y + d.Y);
+            Center = new PointF(Center.X + d.X, Center.Y + d.Y);
         }
 
-        public void MoveAbs(Point p)
+        public void MoveAbs(PointF p)
         {
-            Center = new Point(p.X, p.Y);
+            Center = new PointF(p.X, p.Y);
         }
 
         public override string ToString() => String.Format($"({Center.X}, {Center.Y})");

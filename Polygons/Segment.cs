@@ -5,32 +5,32 @@ namespace Polygons
     internal class Segment : IShape
     {
         public Segment() { SegmentWidth = 2; SegmentColor = Color.Black; }
-        public Segment(Point p1, Point p2) { Point1 = p1; Point2 = p2; }
+        public Segment(PointF p1, PointF p2) { Point1 = p1; Point2 = p2; }
         public Color SegmentColor { get; set; }
         public int SegmentWidth { get; set; }
-        public Point Point1 { get; set; }
-        public Point Point2 { get; set; }
+        public PointF Point1 { get; set; }
+        public PointF Point2 { get; set; }
         public int? RelationId { get; set; }
 
         public (int?, int?) relationIds;
-        public double Length
+        public float Length
         {
-            get => Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
+            get => (float)Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
                 + (Point1.Y - Point2.Y) * (Point1.Y - Point2.Y));
             set
             {
-                double coef = 0.5 * (value / Length - 1);
-                Point p1p2 = new Point(Point2.X - Point1.X, Point2.Y - Point1.Y);
-                Point2 = new Point((int)(Point2.X + coef * p1p2.X), (int)(Point2.Y + coef * p1p2.Y));
-                Point1 = new Point((int)(Point1.X - coef * p1p2.X), (int)(Point1.Y - coef * p1p2.Y));
+                float coef = 0.5f * (value / Length - 1);
+                PointF p1p2 = new PointF(Point2.X - Point1.X, Point2.Y - Point1.Y);
+                Point2 = new PointF(Point2.X + coef * p1p2.X, Point2.Y + coef * p1p2.Y);
+                Point1 = new PointF(Point1.X - coef * p1p2.X, Point1.Y - coef * p1p2.Y);
             }
         }
-        public Point MidPoint
+        public PointF MidPoint
         {
-            get => new Point((Point1.X + Point2.X) / 2, (Point1.Y + Point2.Y) / 2);
+            get => new PointF((Point1.X + Point2.X) / 2, (Point1.Y + Point2.Y) / 2);
         }
 
-        public bool HitTest(Point p)
+        public bool HitTest(PointF p)
         {
             bool result = false;
             using (var path = GetPath())
@@ -44,39 +44,39 @@ namespace Polygons
             a.Apply(g, this);
         }
 
-        public void Move(Point d)
+        public void Move(PointF d)
         {
-            Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
-            Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
+            Point1 = new PointF(Point1.X + d.X, Point1.Y + d.Y);
+            Point2 = new PointF(Point2.X + d.X, Point2.Y + d.Y);
         }
 
-        public void MoveStart(Point d)
+        public void MoveStart(PointF d)
         {
-            Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
+            Point1 = new PointF(Point1.X + d.X, Point1.Y + d.Y);
         }
 
-        public void MoveStartAbs(Point p)
+        public void MoveStartAbs(PointF p)
         {
-            Point1 = new Point(p.X, p.Y);
+            Point1 = new PointF(p.X, p.Y);
         }
 
-        public void MoveEnd(Point d)
+        public void MoveEnd(PointF d)
         {
-            Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
+            Point2 = new PointF(Point2.X + d.X, Point2.Y + d.Y);
         }
 
-        public void MoveEndAbs(Point p)
+        public void MoveEndAbs(PointF p)
         {
-            Point2 = new Point(p.X, p.Y);
+            Point2 = new PointF(p.X, p.Y);
         }
 
         public void SetParallelTo(Segment reference)
         {
-            Segment currentAtOrigin = new Segment(new Point(0, 0), new Point(Point2.X - Point1.X, Point2.Y - Point1.Y));
-            Segment referenceAtOrigin = new Segment(new Point(0, 0), new Point(reference.Point1.X - reference.Point2.X, reference.Point1.Y - reference.Point2.Y));
+            Segment currentAtOrigin = new Segment(new PointF(0, 0), new PointF(Point2.X - Point1.X, Point2.Y - Point1.Y));
+            Segment referenceAtOrigin = new Segment(new PointF(0, 0), new PointF(reference.Point1.X - reference.Point2.X, reference.Point1.Y - reference.Point2.Y));
 
-            Point displacement = new Point(currentAtOrigin.Point2.X - referenceAtOrigin.Point2.X, currentAtOrigin.Point2.Y - referenceAtOrigin.Point2.Y);
-            Point1 = new Point(Point1.X + displacement.X, Point1.Y + displacement.Y);
+            PointF displacement = new PointF(currentAtOrigin.Point2.X - referenceAtOrigin.Point2.X, currentAtOrigin.Point2.Y - referenceAtOrigin.Point2.Y);
+            Point1 = new PointF(Point1.X + displacement.X, Point1.Y + displacement.Y);
         }
 
         public override string ToString()

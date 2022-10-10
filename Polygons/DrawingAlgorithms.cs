@@ -2,9 +2,9 @@
 {
     internal static class DrawingAlgorithms
     {
-        public static void LineBresenham(Graphics g, Point p1, Point p2)
+        public static void LineBresenham(Graphics g, PointF p1, PointF p2)
         {
-            int x1 = p1.X, y1 = p1.Y, x2 = p2.X, y2 = p2.Y;
+            float x1 = p1.X, y1 = p1.Y, x2 = p2.X, y2 = p2.Y;
             /*
             int dx = p2.X - p1.X;
             int dy = p2.Y - p1.Y;
@@ -34,7 +34,7 @@
                 PutPixel(g, x, y);
             }*/
 
-            int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+            float x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
             dx = x2 - x1;
             dy = y2 - y1;
             dx1 = Math.Abs(dx);
@@ -117,19 +117,19 @@
             }
         }
 
-        public static void LineLibrary(Graphics g, Point p1, Point p2)
+        public static void LineLibrary(Graphics g, PointF p1, PointF p2)
         {
             using (var pen = new Pen(Color.Black, 2))
                 g.DrawLine(pen, p1, p2);
         }
 
-        public static void CircleLibrary(Graphics g, Point center, int radius)
+        public static void CircleLibrary(Graphics g, PointF center, float radius)
         {
             using (var brush = new SolidBrush(Color.Black))
                 g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
         }
 
-        private static void PutPixel(Graphics g, int x, int y)
+        private static void PutPixel(Graphics g, float x, float y)
         {
             using (var brush = new SolidBrush(Color.Red))
                 g.FillRectangle(brush, x, y, 1, 1);

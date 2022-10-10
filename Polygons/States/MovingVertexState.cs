@@ -5,8 +5,8 @@
         readonly Vertex movedVertex;
         readonly Segment adjacentEdge1;
         readonly Segment adjacentEdge2;
-        Point previousPoint;
-        public MovingVertexState(Vertex movedVertex, Segment adjacentEdge1, Segment adjacentEdge2, Point point)
+        PointF previousPoint;
+        public MovingVertexState(Vertex movedVertex, Segment adjacentEdge1, Segment adjacentEdge2, PointF point)
         {
             this.movedVertex = movedVertex;
             this.adjacentEdge1 = adjacentEdge1;
@@ -30,11 +30,11 @@
 
         private void DrawAfterVertexMoved(int x, int y)
         {
-            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
             movedVertex.Move(displacement);
             adjacentEdge1.MoveStart(displacement);
             adjacentEdge2.MoveEnd(displacement);
-            previousPoint = new Point(x, y);
+            previousPoint = new PointF(x, y);
             // handle parallel relation
             (int? relId1, int? relId2) = movedVertex.relationIds;
             if(relId1 != null)

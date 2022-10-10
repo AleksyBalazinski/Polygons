@@ -53,7 +53,7 @@ namespace Polygons.States
                 }
 
                 drawnSegment = new Segment();
-                drawnSegment.Point1 = drawnSegment.Point2 = new Point(x, y);
+                drawnSegment.Point1 = drawnSegment.Point2 = new PointF(x, y);
 
                 constructedPolygon.Vertices.Add(v);
                 definingNewPolygon = false;
@@ -64,7 +64,7 @@ namespace Polygons.States
 
         private void DrawEdgeUnderConstruction(int x, int y)
         {
-            drawnSegment.Point2 = new Point(x, y);
+            drawnSegment.Point2 = new PointF(x, y);
             context.Canvas.Invalidate();
         }
 

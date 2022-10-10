@@ -1,15 +1,13 @@
 using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
 using Polygons.States;
 
 namespace Polygons
 {
     partial class Form1 : Form
     {
-        private readonly Bitmap drawArea;
-        private List<Polygon> polygons;
+        private readonly List<Polygon> polygons;
         readonly Algorithm drawingAlgorithm;
-        private Relations relations;
+        private readonly Relations relations;
         public List<Polygon> Polygons { get => polygons; }
         public Relations Relations { get => relations; }
         public PictureBox Canvas { get => canvas; }
@@ -26,9 +24,8 @@ namespace Polygons
         public Form1()
         {
             InitializeComponent();
-            drawArea = new Bitmap(canvas.Size.Width, canvas.Size.Height);
-            canvas.Image = drawArea;
-            using (Graphics g = Graphics.FromImage(drawArea))
+            canvas.Image = new Bitmap(canvas.Size.Width, canvas.Size.Height);
+            using (Graphics g = Graphics.FromImage(canvas.Image))
             {
                 g.Clear(Color.White);
             }

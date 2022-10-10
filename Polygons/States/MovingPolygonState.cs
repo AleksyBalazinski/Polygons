@@ -3,8 +3,8 @@
     internal class MovingPolygonState : State
     {
         Polygon movedPolygon;
-        Point previousPoint;
-        public MovingPolygonState(Polygon movedPolygon, Point previousPoint)
+        PointF previousPoint;
+        public MovingPolygonState(Polygon movedPolygon, PointF previousPoint)
         {
             this.movedPolygon = movedPolygon;
             this.previousPoint = previousPoint;
@@ -26,9 +26,9 @@
 
         private void DrawAfterPolygonMoved(int x, int y)
         {
-            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
             movedPolygon.Move(displacement);
-            previousPoint = new Point(x, y);
+            previousPoint = new PointF(x, y);
             context.Canvas.Invalidate();
         }
     }

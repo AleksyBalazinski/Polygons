@@ -4,7 +4,7 @@ namespace Polygons.States
 {
     internal class MoveState : State
     {
-        protected Point previousPoint;
+        protected PointF previousPoint;
 
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
@@ -40,7 +40,7 @@ namespace Polygons.States
         {
         }
 
-        private (Vertex, Segment, Segment)? FindVertexToBeMoved(Point p)
+        private (Vertex, Segment, Segment)? FindVertexToBeMoved(PointF p)
         {
             Vertex movedVertex;
             foreach (var polygon in context.Polygons)
@@ -62,7 +62,7 @@ namespace Polygons.States
             return null;
         }
 
-        private (Segment, Segment, Segment, Vertex, Vertex)? FindEdgeToBeMoved(Point p)
+        private (Segment, Segment, Segment, Vertex, Vertex)? FindEdgeToBeMoved(PointF p)
         {
             Segment movedEdge;
             foreach (var polygon in context.Polygons)
@@ -86,7 +86,7 @@ namespace Polygons.States
             return null;
         }
 
-        private Polygon? FindPolygonToBeMoved(Point p)
+        private Polygon? FindPolygonToBeMoved(PointF p)
         {
             Polygon? movedPolygon;
             foreach (var polygon in context.Polygons)

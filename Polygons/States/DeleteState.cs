@@ -18,7 +18,7 @@ namespace Polygons.States
         {
         }
 
-        private void DrawAfterVertexRemoved(Point p)
+        private void DrawAfterVertexRemoved(PointF p)
         {
             foreach (var polygon in context.Polygons)
             {

@@ -17,7 +17,7 @@ namespace Polygons.States
         {
         }
 
-        private void DrawAfterLengthFixed(Point p)
+        private void DrawAfterLengthFixed(PointF p)
         {
             foreach (var polygon in context.Polygons)
             {
@@ -27,7 +27,7 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Edge {edge} will have fixed length");
 
-                        double length = Utilities.QueryForEdgeLength(edge);
+                        float length = Utilities.QueryForEdgeLength(edge);
                         if (length <= 0)
                             MessageBox.Show($"Invalid input: Positive real values only.",
                                 "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);

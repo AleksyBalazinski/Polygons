@@ -4,15 +4,15 @@ namespace Polygons
 {
     static class Utilities
     {
-        public static bool IsOnVertex(Vertex vertex, int x, int y, int d)
+        public static bool IsOnVertex(Vertex vertex, float x, float y, float d)
         {
             return x >= vertex.Center.X - d && x <= vertex.Center.X + d && y >= vertex.Center.Y - d && y <= vertex.Center.Y + d;
         }
 
-        public static double QueryForEdgeLength(Segment edge)
+        public static float QueryForEdgeLength(Segment edge)
         {
             string lengthString = "";
-            double length;
+            float length;
             using (InputForm inputForm = new InputForm())
             {
                 inputForm.Input = edge.Length.ToString();
@@ -24,7 +24,7 @@ namespace Polygons
             }
             try
             {
-                length = double.Parse(lengthString);
+                length = float.Parse(lengthString);
             }
             catch (Exception exception)
             {

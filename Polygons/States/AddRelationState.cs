@@ -36,7 +36,7 @@ namespace Polygons.States
         {
         }
 
-        private (Segment, Polygon)? FindSelectedEdge(Point p)
+        private (Segment, Polygon)? FindSelectedEdge(PointF p)
         {
             Segment selectedEdge;
             foreach (var polygon in context.Polygons)

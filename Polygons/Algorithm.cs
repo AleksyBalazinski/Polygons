@@ -2,8 +2,8 @@
 {
     internal class Algorithm
     {
-        public Action<Graphics, Point, Point> SegmentDrawingAlgorithm { get; set; }
-        public Action<Graphics, Point, int> CircleDrawingAlgorithm { get; set; }
+        public Action<Graphics, PointF, PointF> SegmentDrawingAlgorithm { get; set; }
+        public Action<Graphics, PointF, float> CircleDrawingAlgorithm { get; set; }
 
         public Algorithm()
         {
