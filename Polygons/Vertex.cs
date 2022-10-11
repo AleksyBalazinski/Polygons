@@ -22,6 +22,7 @@ namespace Polygons
         public float Radius { get; set; }
 
         public (int?, int?) relationIds;
+        public (bool, bool) fixedLenghts;
 
         public void Draw(Graphics g, Algorithm a)
         {

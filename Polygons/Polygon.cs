@@ -4,13 +4,13 @@
     {
         public List<Vertex> Vertices { get; }
         public List<Segment> Edges { get; }
-        public HashSet<Segment> FixedLengthEdges { get; }
+        //public HashSet<Segment> FixedLengthEdges { get; }
         
         public Polygon()
         {
             Vertices = new List<Vertex>();
             Edges = new List<Segment>();
-            FixedLengthEdges = new HashSet<Segment>();
+            //FixedLengthEdges = new HashSet<Segment>();
         }
         public override string ToString()
         {
@@ -23,7 +23,7 @@
             return res;
         }
 
-        public (Segment, Segment) GetAdjacentEdges(Vertex v)
+        public (Segment, Segment) GetAdjacentEdges(Vertex v) // TODO cache results
         {
             int vi = Vertices.IndexOf(v);
             Segment edge1 = Edges[vi];
@@ -36,7 +36,7 @@
             return (edge1, edge2);
         }
 
-        public (Segment, Segment) GetAdjacentEdges(Segment e)
+        public (Segment, Segment) GetAdjacentEdges(Segment e) // TODO cache results
         {
             int ei = Edges.IndexOf(e);
             Segment edge1, edge2;
@@ -53,7 +53,7 @@
             return (edge1, edge2);
         }
 
-        public (Vertex, Vertex) GetEndpoints(Segment e)
+        public (Vertex, Vertex) GetEndpoints(Segment e) // TODO cache results
         {
             int ei = Edges.IndexOf(e);
             Vertex vertex1, vertex2;

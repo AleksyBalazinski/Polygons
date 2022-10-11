@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Security.Cryptography.Xml;
 
 namespace Polygons.States
 {
@@ -33,7 +34,14 @@ namespace Polygons.States
                                 "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                         polygon.SetLength(edge, length);
-                        polygon.FixedLengthEdges.Add(edge);
+                        //polygon.FixedLengthEdges.Add(edge);
+                        edge.fixedLength = true;
+                        (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
+                        v1.fixedLenghts.Item1 = true;
+                        v2.fixedLenghts.Item2 = true;
+                        (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+                        e1.fixedLengths.Item1 = true;
+                        e2.fixedLengths.Item2 = true;
 
                         context.Canvas.Invalidate();
                         return;

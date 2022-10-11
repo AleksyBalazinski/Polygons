@@ -17,7 +17,7 @@ namespace Polygons.States
             if (edgeInfo != null)
             {
                 (Segment edge, Polygon polygon) = edgeInfo.Value;
-                if(definingNewRelation)
+                if (definingNewRelation)
                 {
                     relationId = context.Relations.AddEmptyRelation();
                     definingNewRelation = false;

@@ -1,4 +1,6 @@
-﻿namespace Polygons.States
+﻿using System.Diagnostics;
+
+namespace Polygons.States
 {
     internal class MovingEdgeState : State
     {
@@ -34,6 +36,11 @@
 
         private void DrawAfterEdgeMoved(int x, int y)
         {
+            if(movedEdge.fixedLengths.Item1 || movedEdge.fixedLengths.Item2)
+            {
+                Debug.WriteLine("Cannot move -- adjacent to an edge of fixed length"); // TODO
+                return;
+            } 
             var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
             movedEdge.Move(displacement);
             adjacentEdge1.MoveEnd(displacement);

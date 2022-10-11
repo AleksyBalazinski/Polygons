@@ -13,7 +13,9 @@ namespace Polygons
         public PointF Point2 { get; set; }
         public int? RelationId { get; set; }
 
-        public (int?, int?) relationIds;
+        public (int?, int?) relationIds; // adjacent edges RENAME
+        public bool fixedLength;
+        public (bool, bool) fixedLengths;
         public float Length
         {
             get => (float)Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
