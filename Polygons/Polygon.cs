@@ -118,15 +118,23 @@
 
         public void ApplyParallelRelation(Segment edge, Segment reference)
         {
-            //double initialLength = edge.Length; // preserve initial length
-            edge.SetParallelTo(reference);
-            //edge.Length = initialLength;
+            edge.SetParallelTo(reference, IsBefore(edge, reference));
             (Segment edge1, Segment edge2) = GetAdjacentEdges(edge);
             (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
             edge1.Point2 = edge.Point1;
             edge2.Point1 = edge.Point2;
             vertex1.Center = edge.Point1;
             vertex2.Center = edge.Point2;
+        }
+
+        private bool IsBefore(Segment s1, Segment s2)
+        {
+            int indxS1 = Edges.IndexOf(s1);
+            int indxS2 = Edges.IndexOf(s2);
+
+            if(indxS1 < indxS2 || indxS1 == Edges.Count - 1 && indxS2 == 0)
+                return true;
+            return false;
         }
 
         public bool HitTest(PointF p)

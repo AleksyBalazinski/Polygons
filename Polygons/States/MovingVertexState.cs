@@ -35,6 +35,7 @@
             adjacentEdge1.MoveStart(displacement);
             adjacentEdge2.MoveEnd(displacement);
             previousPoint = new PointF(x, y);
+
             // handle parallel relation
             (int? relId1, int? relId2) = movedVertex.relationIds;
             if(relId1 != null)

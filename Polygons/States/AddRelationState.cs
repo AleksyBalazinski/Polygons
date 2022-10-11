@@ -70,7 +70,7 @@ namespace Polygons.States
                 }
                 else
                 {
-                    polygon.ApplyParallelRelation(edge, relation[0]);
+                    polygon.ApplyParallelRelation(edge, relation[^1]);
                     AddToRelationInternal(relation, edge, polygon);
                 }
             }
