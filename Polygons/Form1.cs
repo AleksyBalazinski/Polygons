@@ -7,9 +7,10 @@ namespace Polygons
     {
         private readonly List<Polygon> polygons;
         readonly Algorithm drawingAlgorithm;
-        private readonly Relations relations;
         public List<Polygon> Polygons { get => polygons; }
-        public Relations Relations { get => relations; }
+        // Each relation has a unique identifier associated with it and is comprised of a number of "chains",
+        // where each chain is just a sequence of adjacent edges that are in the relation
+        public Dictionary<int, List<List<Segment>>> relations;
         public PictureBox Canvas { get => canvas; }
 
         private State state = null!;
@@ -27,11 +28,11 @@ namespace Polygons
             canvas.Image = new Bitmap(canvas.Size.Width, canvas.Size.Height);
             using (Graphics g = Graphics.FromImage(canvas.Image))
             {
-                g.Clear(Color.White);
+                g.Clear(Color.WhiteSmoke);
             }
             polygons = new List<Polygon>();
             drawingAlgorithm = new Algorithm();
-            relations = new Relations();
+            relations = new Dictionary<int, List<List<Segment>>>();
 
             TransitionTo(new DrawState());
         }
@@ -113,6 +114,18 @@ namespace Polygons
                 }
             }
             return null;
+        }
+
+        private void clearToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            polygons.Clear();
+            using (Graphics g = Graphics.FromImage(canvas.Image))
+            {
+                g.Clear(Color.WhiteSmoke);
+            }
+            relations.Clear();
+            TransitionTo(new DrawState());
+            this.Refresh();
         }
     }
 }

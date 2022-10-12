@@ -16,6 +16,7 @@ namespace Polygons
         public (int?, int?) relationIds; // adjacent edges RENAME
         public bool fixedLength;
         public (bool, bool) fixedLengths;
+        public List<Segment>? chain; // pointer to mother chain
         public float Length
         {
             get => (float)Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
@@ -84,6 +85,7 @@ namespace Polygons
 
         public void SetParallelTo(Segment reference, bool isBefore) // isBefore guards us against a "positive feedback loop"
         {
+            // BUG sequence of djacent edges in a relation -- we should move points alternatingly, i.e. start of the first edge, end of the second edge, etc.
             PointF vector = new PointF(Point2.X - Point1.X, Point2.Y - Point1.Y);
             PointF referenceVector = new PointF(reference.Point2.X - reference.Point1.X, reference.Point2.Y - reference.Point1.Y);
             if(DotProduct(referenceVector, vector) < 0) // favor non-self-intersecting polygons
@@ -95,7 +97,11 @@ namespace Polygons
             PointF vectorRotated = Rotate(vector, sin, cos);
             Debug.WriteLine($"(1) vectorRotated = ({vectorRotated.X}, {vectorRotated.Y})");
             if(isBefore)
+            {
+                Debug.WriteLine("isBefore");
                 Point1 = new PointF(Point2.X - vectorRotated.X, Point2.Y - vectorRotated.Y);
+            }
+                
             else
                 Point2 = new PointF(Point1.X + vectorRotated.X, Point1.Y + vectorRotated.Y);
 
@@ -107,11 +113,6 @@ namespace Polygons
         {
             float cosTheta = DotProduct(a, b) / (VectorLength(a) * VectorLength(b));
             float sinTheta = CrossProduct(a, b) / (VectorLength(a) * VectorLength(b));
-
-            /*if (MathF.Abs(sinTheta) < 0.001)
-                sinTheta = 0;
-            if (MathF.Abs(cosTheta - 1) < 0.001)
-                cosTheta = 1;*/
 
             return (sinTheta, cosTheta);
         }

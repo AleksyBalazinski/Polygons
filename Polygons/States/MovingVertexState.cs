@@ -69,7 +69,7 @@ namespace Polygons.States
             
 
             // handle parallel relation
-            (int? relId1, int? relId2) = movedVertex.relationIds;
+            /*(int? relId1, int? relId2) = movedVertex.relationIds;
             if(relId1 != null)
             {
                 AdjustEdgesInRelation(relId1.Value, adjacentEdge1);
@@ -77,14 +77,14 @@ namespace Polygons.States
             if (relId2 != null)
             {
                 AdjustEdgesInRelation(relId2.Value, adjacentEdge2);
-            }
+            }*/
 
             context.Canvas.Invalidate();
         }
 
         private void AdjustEdgesInRelation(int relationId, Segment edge)
         {
-            foreach (var coupledEdge in context.Relations.relations[relationId])
+            /*foreach (var coupledEdge in context.Relations.relations[relationId])
             {
                 if (coupledEdge != edge)
                 {
@@ -93,7 +93,7 @@ namespace Polygons.States
                         p.ApplyParallelRelation(coupledEdge, edge);
                     else throw new NullReferenceException("omg");
                 }
-            }
+            }*/
         }
     }
 }

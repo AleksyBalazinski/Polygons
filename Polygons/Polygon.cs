@@ -1,4 +1,6 @@
-﻿namespace Polygons
+﻿using System.Diagnostics;
+
+namespace Polygons
 {
     internal class Polygon : IShape
     {
@@ -118,6 +120,7 @@
 
         public void ApplyParallelRelation(Segment edge, Segment reference)
         {
+            Debug.WriteLine($"ApplyParallelRelation({edge}, {reference})");
             edge.SetParallelTo(reference, IsBefore(edge, reference));
             (Segment edge1, Segment edge2) = GetAdjacentEdges(edge);
             (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);

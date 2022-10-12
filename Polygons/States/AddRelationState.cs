@@ -19,7 +19,7 @@ namespace Polygons.States
                 (Segment edge, Polygon polygon) = edgeInfo.Value;
                 if (definingNewRelation)
                 {
-                    relationId = context.Relations.AddEmptyRelation();
+                    relationId = AddEmptyRelation();
                     definingNewRelation = false;
                 }
                 AddToRelation(edge, polygon, relationId);
@@ -61,41 +61,76 @@ namespace Polygons.States
         {
             Debug.WriteLine($"Add edge {edge} to relation {relationId}");
 
-            var relation = context.Relations.relations[relationId];
+            var relation = context.relations[relationId];
             if (edge.RelationId == null)
             {
                 if (relation.Count == 0)
                 {
-                    AddToRelationInternal(relation, edge, polygon);
+                    List<Segment> chain = new();
+                    AddToChain(chain, edge, polygon);
+                    relation.Add(chain);
                 }
                 else
                 {
-                    polygon.ApplyParallelRelation(edge, relation[^1]);
-                    AddToRelationInternal(relation, edge, polygon);
+                    //polygon.ApplyParallelRelation(edge, relation[^1]);
+                    (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+                    if(e1.RelationId != null && e1.RelationId == relationId
+                        && e2.RelationId != null && e2.RelationId == relationId)
+                    {
+                        MergeChains(e1.chain!, e2.chain!, relationId);
+                        AddToChain(e1.chain!, edge, polygon);
+                    }
+                    else if(e1.RelationId != null && e1.RelationId == relationId)
+                    {
+                        AddToChain(e1.chain!, edge, polygon);
+                    }
+                    else if(e2.RelationId != null && e2.RelationId == relationId)
+                    {
+                        AddToChain(e2.chain!, edge, polygon);
+                    }
+                    else
+                    {
+                        List<Segment> chain = new();
+                        AddToChain(chain, edge, polygon);
+                        relation.Add(chain);
+                    }
                 }
             }
             else
             {
-                var currentRelation = context.Relations.relations[edge.RelationId.Value];
-                foreach (Segment s in currentRelation)
+                var oldRelation = context.relations[edge.RelationId.Value];
+                // move all chains from old relation to currently constructed relation
+                MergeRelations(relation, oldRelation, edge.RelationId.Value, relationId);
+
+                // invalidate each chain, i.e. for each edge check if adjacent
+                foreach(var p in context.Polygons)
                 {
-                    Polygon? p = context.FindPolygon(s);
-                    if (p != null)
-                        p.ApplyParallelRelation(s, relation[0]);
-                    else
-                        throw new NullReferenceException("edge not found!");
-
-                    AddToRelationInternal(relation, s, p);
+                    foreach(var e in p.Edges)
+                    {
+                        (Segment e1, Segment e2) = polygon.GetAdjacentEdges(e);
+                        if (e.RelationId != null && e1.RelationId != null
+                            && e.RelationId == e1.RelationId && e.chain != e1.chain)
+                        {
+                            MergeChains(e.chain, e1.chain, e.RelationId.Value);
+                        }
+                        else if(e.RelationId != null && e2.RelationId != null
+                            && e.RelationId == e2.RelationId && e.chain != e2.chain)
+                        {
+                            MergeChains(e.chain, e2.chain, e.RelationId.Value);
+                        }
+                    }
                 }
-                polygon.ApplyParallelRelation(edge, relation[0]);
+                //polygon.ApplyParallelRelation(edge, relation[0]);
 
-                AddToRelationInternal(relation, edge, polygon);
+                //AddToRelationInternal(relation, edge, polygon); ???
             }
         }
 
-        private void AddToRelationInternal(List<Segment> relation, Segment edge, Polygon polygon)
+        private void AddToChain(List<Segment> chain, Segment edge, Polygon polygon)
         {
-            relation.Add(edge);
+            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)}");
+            chain.Add(edge);
+            edge.chain = chain;
             edge.RelationId = relationId;
             (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
             v1.relationIds.Item1 = relationId;
@@ -103,6 +138,34 @@ namespace Polygons.States
             (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
             e1.relationIds.Item1 = relationId;
             e2.relationIds.Item2 = relationId;
+        }
+
+        private void MergeChains(List<Segment> c1, List<Segment> c2, int rel)
+        {
+            foreach (Segment e in c2)
+                e.chain = c1;
+            c1.AddRange(c2);
+            var chains = context.relations[rel];
+            chains.Remove(c2);
+        }
+
+        private void MergeRelations(List<List<Segment>> r1, List<List<Segment>> r2, int oldRel, int newRel)
+        {
+            foreach(var chain in r2)
+            {
+                foreach(var e in chain)
+                {
+                    e.RelationId = newRel;
+                }
+            }
+            r1.AddRange(r2);
+            context.relations.Remove(oldRel);
+        }
+
+        private int AddEmptyRelation()
+        {
+            context.relations.Add(context.relations.Count, new List<List<Segment>>());
+            return context.relations.Count - 1;
         }
     }
 }
