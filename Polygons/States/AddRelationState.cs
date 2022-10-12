@@ -67,31 +67,31 @@ namespace Polygons.States
                 if (relation.Count == 0)
                 {
                     List<Segment> chain = new();
-                    AddToChain(chain, edge, polygon);
+                    AddToChainEnd(chain, edge, polygon);
                     relation.Add(chain);
                 }
                 else
                 {
-                    //polygon.ApplyParallelRelation(edge, relation[^1]);
+                    polygon.ApplyParallelRelation(edge, relation[0][0]);
                     (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
                     if(e1.RelationId != null && e1.RelationId == relationId
                         && e2.RelationId != null && e2.RelationId == relationId)
                     {
+                        AddToChainEnd(e1.chain!, edge, polygon);
                         MergeChains(e1.chain!, e2.chain!, relationId);
-                        AddToChain(e1.chain!, edge, polygon);
                     }
                     else if(e1.RelationId != null && e1.RelationId == relationId)
                     {
-                        AddToChain(e1.chain!, edge, polygon);
+                        AddToChainEnd(e1.chain!, edge, polygon);
                     }
                     else if(e2.RelationId != null && e2.RelationId == relationId)
                     {
-                        AddToChain(e2.chain!, edge, polygon);
+                        AddToChainStart(e2.chain!, edge, polygon);
                     }
                     else
                     {
                         List<Segment> chain = new();
-                        AddToChain(chain, edge, polygon);
+                        AddToChainEnd(chain, edge, polygon);
                         relation.Add(chain);
                     }
                 }
@@ -99,6 +99,7 @@ namespace Polygons.States
             else
             {
                 var oldRelation = context.relations[edge.RelationId.Value];
+
                 // move all chains from old relation to currently constructed relation
                 MergeRelations(relation, oldRelation, edge.RelationId.Value, relationId);
 
@@ -120,16 +121,27 @@ namespace Polygons.States
                         }
                     }
                 }
-                //polygon.ApplyParallelRelation(edge, relation[0]);
-
-                //AddToRelationInternal(relation, edge, polygon); ???
             }
         }
 
-        private void AddToChain(List<Segment> chain, Segment edge, Polygon polygon)
+        private void AddToChainEnd(List<Segment> chain, Segment edge, Polygon polygon)
         {
-            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)}");
+            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)} at end");
             chain.Add(edge);
+            edge.chain = chain;
+            edge.RelationId = relationId;
+            (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
+            v1.relationIds.Item1 = relationId;
+            v2.relationIds.Item2 = relationId;
+            (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+            e1.relationIds.Item1 = relationId;
+            e2.relationIds.Item2 = relationId;
+        }
+
+        private void AddToChainStart(List<Segment> chain, Segment edge, Polygon polygon)
+        {
+            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)} at start");
+            chain.Insert(0, edge);
             edge.chain = chain;
             edge.RelationId = relationId;
             (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
@@ -151,11 +163,15 @@ namespace Polygons.States
 
         private void MergeRelations(List<List<Segment>> r1, List<List<Segment>> r2, int oldRel, int newRel)
         {
+            // wont work until chains are fully operational
             foreach(var chain in r2)
             {
                 foreach(var e in chain)
                 {
+                    Polygon? p = context.FindPolygon(e);
+                    p!.ApplyParallelRelation(e, r1[0][0]);
                     e.RelationId = newRel;
+                    context.Canvas.Invalidate();
                 }
             }
             r1.AddRange(r2);

@@ -88,53 +88,25 @@ namespace Polygons
             // BUG sequence of djacent edges in a relation -- we should move points alternatingly, i.e. start of the first edge, end of the second edge, etc.
             PointF vector = new PointF(Point2.X - Point1.X, Point2.Y - Point1.Y);
             PointF referenceVector = new PointF(reference.Point2.X - reference.Point1.X, reference.Point2.Y - reference.Point1.Y);
-            if(DotProduct(referenceVector, vector) < 0) // favor non-self-intersecting polygons
+            if(Geometry.DotProduct(referenceVector, vector) < 0) // favor non-self-intersecting polygons
                 referenceVector = new PointF(reference.Point1.X - reference.Point2.X, reference.Point1.Y - reference.Point2.Y);
 
-            (float sin, float cos) = AngleBetweenVectors(vector, referenceVector);
-            Debug.WriteLine($"Before adjusting: sin = {sin}, cos = {cos}");
+            (float sin, float cos) = Geometry.AngleBetweenVectors(vector, referenceVector);
+            //Debug.WriteLine($"Before adjusting: sin = {sin}, cos = {cos}");
 
-            PointF vectorRotated = Rotate(vector, sin, cos);
-            Debug.WriteLine($"(1) vectorRotated = ({vectorRotated.X}, {vectorRotated.Y})");
+            PointF vectorRotated = Geometry.Rotate(vector, sin, cos);
+            //Debug.WriteLine($"(1) vectorRotated = ({vectorRotated.X}, {vectorRotated.Y})");
             if(isBefore)
             {
-                Debug.WriteLine("isBefore");
+                //Debug.WriteLine("isBefore");
                 Point1 = new PointF(Point2.X - vectorRotated.X, Point2.Y - vectorRotated.Y);
             }
                 
             else
                 Point2 = new PointF(Point1.X + vectorRotated.X, Point1.Y + vectorRotated.Y);
 
-            (sin, cos) = AngleBetweenVectors(vectorRotated, referenceVector); // DEBUG
-            Debug.WriteLine($"After adjusting: sin = {sin}, cos = {cos}");
-        }
-
-        private (float, float) AngleBetweenVectors(PointF a, PointF b)
-        {
-            float cosTheta = DotProduct(a, b) / (VectorLength(a) * VectorLength(b));
-            float sinTheta = CrossProduct(a, b) / (VectorLength(a) * VectorLength(b));
-
-            return (sinTheta, cosTheta);
-        }
-
-        private float DotProduct(PointF a, PointF b)
-        {
-            return a.X * b.X + a.Y * b.Y;
-        }
-
-        private float CrossProduct(PointF a, PointF b)
-        {
-            return a.X * b.Y - b.X * a.Y;
-        }
-
-        private float VectorLength(PointF a)
-        {
-            return MathF.Sqrt(a.X * a.X + a.Y * a.Y);
-        }
-
-        private PointF Rotate(PointF v, float sinTheta, float cosTheta)
-        {
-            return new PointF(v.X * cosTheta - v.Y * sinTheta, v.X * sinTheta + v.Y * cosTheta);
+            (sin, cos) = Geometry.AngleBetweenVectors(vectorRotated, referenceVector); // DEBUG
+            //Debug.WriteLine($"After adjusting: sin = {sin}, cos = {cos}");
         }
 
         public override string ToString()

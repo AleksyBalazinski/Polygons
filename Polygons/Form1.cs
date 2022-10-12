@@ -115,6 +115,18 @@ namespace Polygons
             }
             return null;
         }
+        public Polygon? FindPolygon(List<Segment> chain)
+        {
+            foreach(var p in polygons)
+            {
+                foreach(var e in p.Edges)
+                {
+                    if (chain.Contains(e))
+                        return p;
+                }
+            }
+            return null;
+        }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {

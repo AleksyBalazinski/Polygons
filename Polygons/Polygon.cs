@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows.Forms.VisualStyles;
 
 namespace Polygons
 {
@@ -28,12 +29,12 @@ namespace Polygons
         public (Segment, Segment) GetAdjacentEdges(Vertex v) // TODO cache results
         {
             int vi = Vertices.IndexOf(v);
-            Segment edge1 = Edges[vi];
-            Segment edge2;
+            Segment edge2 = Edges[vi];
+            Segment edge1;
             if (vi == 0)
-                edge2 = Edges[^1];
+                edge1 = Edges[^1];
             else
-                edge2 = Edges[vi - 1];
+                edge1 = Edges[vi - 1];
 
             return (edge1, edge2);
         }
@@ -109,9 +110,9 @@ namespace Polygons
             (Segment edge1, Segment edge2) = GetAdjacentEdges(v);
             int vi = Vertices.IndexOf(v);
             if (vi == 0)
-                Edges.Add(new Segment(edge2.Point1, edge1.Point2));
+                Edges.Add(new Segment(edge1.Point1, edge2.Point2));
             else
-                Edges.Insert(vi - 1, new Segment(edge2.Point1, edge1.Point2));
+                Edges.Insert(vi - 1, new Segment(edge1.Point1, edge2.Point2));
 
             Vertices.Remove(v);
             Edges.Remove(edge2);
@@ -129,6 +130,26 @@ namespace Polygons
             vertex1.Center = edge.Point1;
             vertex2.Center = edge.Point2;
         }
+
+        public void ApplyParallelRelation(List<Segment> chain, PointF axis, float sinTheta, float cosTheta)
+        {
+            foreach(var e in chain)
+            {
+                (Vertex vertex1, Vertex vertex2) = GetEndpoints(e);
+                PointF v = new PointF(e.Point1.X - axis.X, e.Point1.Y - axis.Y);
+                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+                e.Point1 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+                vertex1.Center = e.Point1;
+
+                PointF u = new PointF(e.Point2.X - axis.X, e.Point2.Y - axis.Y);
+                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
+                e.Point2 = new PointF(uRot.X + axis.X, uRot.Y + axis.Y);
+                vertex2.Center = e.Point2;
+                
+            }
+        }
+
+
 
         private bool IsBefore(Segment s1, Segment s2)
         {
