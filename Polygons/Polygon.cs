@@ -146,6 +146,11 @@ namespace Polygons
                 e.Point2 = new PointF(uRot.X + axis.X, uRot.Y + axis.Y);
                 vertex2.Center = e.Point2;
                 
+                if(e == chain[^1])
+                {
+                    (_, Segment next) = GetAdjacentEdges(e);
+                    next.Point1 = e.Point2;
+                }
             }
         }
 

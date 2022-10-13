@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Runtime.ExceptionServices;
 
 namespace Polygons.States
 {
@@ -65,55 +67,103 @@ namespace Polygons.States
                     && relId1 == relId2) // inside a chain
                 {
                     var chain = adjacentEdge1.chain;
+                    Segment first = chain[0];
+                    Segment last = chain[^1];
                     var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
-                    PointF oldDirection = new PointF(adjacentEdge1.Point2.X - adjacentEdge1.Point1.X, adjacentEdge1.Point2.Y - adjacentEdge1.Point1.Y);
-                    PointF oldDirectionRev = new PointF(-oldDirection.X, -oldDirection.Y);
+                    PointF oldDirection = new PointF(previousPoint.X - first.Point1.X, previousPoint.Y - first.Point1.Y);
 
                     movedVertex.Move(displacement);
-                    adjacentEdge1.MoveEnd(displacement);
-                    PointF newDirection = new PointF(adjacentEdge1.Point2.X - adjacentEdge1.Point1.X, adjacentEdge1.Point2.Y - adjacentEdge1.Point1.Y);
-                    PointF newDirectionRev = new PointF(-newDirection.X, -newDirection.Y);
+
+                    PointF newDirection = new PointF(x - first.Point1.X, y - first.Point1.Y);
 
                     int indx = chain.IndexOf(adjacentEdge1);
                     Polygon? p = context.FindPolygon(chain);
-                    // rotate preceding edges in the chain in opposite direction
-                    (float sin1, float cos1) = Geometry.AngleBetweenVectors(oldDirectionRev, newDirectionRev);
-                    p!.ApplyParallelRelation(chain.Take(indx).ToList(), adjacentEdge1.Point1, sin1, cos1);
 
-                    // rotate succeeding edges in the chain in the same direction
-                    (float sin2, float cos2) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                    p!.ApplyParallelRelation(chain.Skip(indx + 1).ToList(), adjacentEdge1.Point1, sin2, cos2);
-                    adjacentEdge2.MoveStartAbs(adjacentEdge1.Point2);
-
-                    Segment first = chain[0];
-                    Segment last = chain[^1];
                     var firstAdjacentEdges = p.GetAdjacentEdges(first);
                     var lastAdjacentEdges = p.GetAdjacentEdges(last);
+
+                    (float sin1, float cos1) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+
+                    p!.ApplyParallelRelation(chain.Take(indx).ToList(), first.Point1, sin1, cos1);
+                    p!.ApplyParallelRelation(chain.Skip(indx + 2).ToList(), first.Point1, sin1, cos1);
+
+                    adjacentEdge1.MoveEnd(displacement);
+                    if(indx != 0)
+                        adjacentEdge1.MoveStartAbs(chain[indx - 1].Point2);
+
+                    adjacentEdge2.MoveStart(displacement);
+                    if(indx <= chain.Count - 3)
+                        adjacentEdge2.MoveEndAbs(chain[indx + 2].Point1);
+                    else
+                    {
+                        // rotate adjcaentEdge.Point2
+                        PointF v = new PointF(adjacentEdge2.Point2.X - first.Point1.X, adjacentEdge2.Point2.Y - first.Point1.Y);
+                        var vRot = Geometry.Rotate(v, sin1, cos1);
+                        adjacentEdge2.Point2 = new PointF(vRot.X + first.Point1.X, vRot.Y + first.Point1.Y);
+                        (_, Vertex v2) = p.GetEndpoints(adjacentEdge2);
+                        v2.MoveAbs(adjacentEdge2.Point2);
+                    }
+                    
                     if(firstAdjacentEdges.Item1.chain != chain) // always satisfied???
                     {
                         firstAdjacentEdges.Item1.Point2 = first.Point1;
                     }
                     if(lastAdjacentEdges.Item2.chain != chain)
                     {
-                        Debug.WriteLine("lastAdjacentEdges.Item2.chain != chain");
                         lastAdjacentEdges.Item2.Point1 = last.Point2;
                     }
 
                     previousPoint = new PointF(x, y);
 
-                    // TODO invalidate all related chains
-                }
-                else if(relId1 != null)
-                {
-
-
-                    // TODO invalidate all related chains
+                    InvalidateRelatedChains(chain, (int)relId1, sin1, cos1);
                 }
                 else if(relId2 != null)
                 {
+                    var chain = adjacentEdge1.chain;
+                    Segment first = chain[0];
+                    var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
+                    PointF oldDirection = new PointF(previousPoint.X - first.Point1.X, previousPoint.Y - first.Point1.Y);
 
+                    movedVertex.Move(displacement);
 
-                    // TODO invalidate all related chains
+                    PointF newDirection = new PointF(x - first.Point1.X, y - first.Point1.Y);
+
+                    (float sin1, float cos1) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+
+                    Polygon? p = context.FindPolygon(chain);
+                    p.ApplyParallelRelation(chain.Take(chain.Count - 1).ToList(), first.Point1, sin1, cos1);
+
+                    adjacentEdge1.MoveEnd(displacement);
+                    adjacentEdge1.MoveStartAbs(chain[chain.Count - 2].Point2);
+                    adjacentEdge2.MoveStart(displacement);
+
+                    previousPoint = new PointF(x, y);
+
+                    InvalidateRelatedChains(chain, (int)relId2, sin1, cos1);
+                }
+                else if(relId1 != null)
+                {
+                    var chain = adjacentEdge2.chain;
+                    Segment last = chain[^1];
+                    var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
+                    PointF oldDirection = new PointF(previousPoint.X - last.Point2.X, previousPoint.Y - last.Point2.Y);
+
+                    movedVertex.Move(displacement);
+
+                    PointF newDirection = new PointF(x - last.Point2.X, y - last.Point2.Y);
+
+                    (float sin1, float cos1) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+
+                    Polygon? p = context.FindPolygon(chain);
+                    p.ApplyParallelRelation(chain.Skip(1).ToList(), last.Point2, sin1, cos1);
+
+                    adjacentEdge2.MoveStart(displacement);
+                    adjacentEdge2.MoveEndAbs(chain[1].Point1);
+                    adjacentEdge1.MoveEnd(displacement);
+
+                    previousPoint = new PointF(x, y);
+
+                    InvalidateRelatedChains(chain, (int)relId1, sin1, cos1);
                 }
                 else
                 {
@@ -125,26 +175,31 @@ namespace Polygons.States
                 }
                 
             }
-
-            // handle parallel relation
-            /*(int? relId1, int? relId2) = movedVertex.relationIds;
-            if (relId1 != null)
-            {
-                AdjustEdgesInRelation(relId1.Value, adjacentEdge1);
-            }
-            if (relId2 != null)
-            {
-                AdjustEdgesInRelation(relId2.Value, adjacentEdge2);
-            }*/
-
             context.Canvas.Invalidate();
         }
 
-        private void AdjustEdgesInRelation(int relationId, Segment edge)
+        /*private void InvalidateRelatedChains(float sinTheta, float cosTheta)
+        {
+            (int? relId1, int? relId2) = movedVertex.relationIds;
+            if (relId1 != null)
+            {
+                AdjustEdgesInRelation(relId1.Value, adjacentEdge1.chain, sinTheta, cosTheta);
+            }
+            if (relId2 != null)
+            {
+                AdjustEdgesInRelation(relId2.Value, adjacentEdge2.chain, sinTheta, cosTheta);
+            }
+        }*/
+
+        private void InvalidateRelatedChains(List<Segment> chain, int relationId, float sinTheta, float cosTheta)
         {
             foreach(var relatedChain in context.relations[relationId])
             {
-                
+                if(relatedChain != chain)
+                {
+                    Polygon? p = context.FindPolygon(chain);
+                    p.ApplyParallelRelation(relatedChain, relatedChain[0].Point1, sinTheta, cosTheta);
+                }
             }
         }
     }

@@ -163,7 +163,7 @@ namespace Polygons.States
 
         private void MergeRelations(List<List<Segment>> r1, List<List<Segment>> r2, int oldRel, int newRel)
         {
-            // wont work until chains are fully operational
+            // TODO wont work until chains are fully operational
             foreach(var chain in r2)
             {
                 foreach(var e in chain)
