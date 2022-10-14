@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Microsoft.Win32.SafeHandles;
+using System.Diagnostics;
 using System.Windows.Forms.VisualStyles;
 
 namespace Polygons
@@ -119,14 +120,35 @@ namespace Polygons
             Edges.Remove(edge1);
         }
 
-        public void ApplyParallelRelation(Segment edge, Segment reference)
+        public void ApplyParallelRelation(Segment edge, PointF axis, float sinTheta, float cosTheta)
         {
-            Debug.WriteLine($"ApplyParallelRelation({edge}, {reference})");
-            edge.SetParallelTo(reference, IsBefore(edge, reference));
-            (Segment edge1, Segment edge2) = GetAdjacentEdges(edge);
+            PointF v = new PointF(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+            edge.Point2 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+            (_, Vertex vertex2) = GetEndpoints(edge);
+            vertex2.Center = edge.Point2;
+        }
+
+        public void ApplyParallelRelation1(Segment edge, PointF axis, float sinTheta, float cosTheta)
+        {
+            PointF v = new PointF(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+            edge.Point1 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+            (Vertex vertex1, _) = GetEndpoints(edge);
+            vertex1.Center = edge.Point1;
+        }
+
+        public void ApplyParallelRelation12(Segment edge, PointF axis, float sinTheta, float cosTheta)
+        {
+            PointF v = new(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+            edge.Point2 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+
+            PointF u = new(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
+            edge.Point1 = new PointF(uRot.X + axis.X, uRot.Y + axis.Y);
+
             (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
-            edge1.Point2 = edge.Point1;
-            edge2.Point1 = edge.Point2;
             vertex1.Center = edge.Point1;
             vertex2.Center = edge.Point2;
         }
@@ -154,7 +176,28 @@ namespace Polygons
             }
         }
 
+        public void ApplyTranslation(List<Segment> chain, PointF displacement)
+        {
+            foreach(var e in chain)
+            {
+                e.Point1 = new PointF(e.Point1.X + displacement.X, e.Point1.Y + displacement.Y);
+                e.Point2 = new PointF(e.Point2.X + displacement.X, e.Point2.Y + displacement.Y);
+                (Vertex vertex1, Vertex vertex2) = GetEndpoints(e);
+                vertex1.Center = e.Point1;
+                vertex2.Center = e.Point2;
 
+                if(e == chain[0])
+                {
+                    (Segment prev, _) = GetAdjacentEdges(e);
+                    prev.Point2 = e.Point1;
+                }
+                if (e == chain[^1])
+                {
+                    (_, Segment next) = GetAdjacentEdges(e);
+                    next.Point1 = e.Point2;
+                }
+            }
+        }
 
         private bool IsBefore(Segment s1, Segment s2)
         {
