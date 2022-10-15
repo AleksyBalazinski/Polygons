@@ -2,39 +2,11 @@
 {
     internal static class DrawingAlgorithms
     {
-        public static void LineBresenham(Graphics g, PointF p1, PointF p2)
+        public static void LineBresenham(Graphics g, Point p1, Point p2)
         {
             float x1 = p1.X, y1 = p1.Y, x2 = p2.X, y2 = p2.Y;
-            /*
-            int dx = p2.X - p1.X;
-            int dy = p2.Y - p1.Y;
-            int px = 2 * dy - dx;
-            int py = 2 * dx - dy;
-
-            int incrE = 2 * dy;
-            int incrNE = 2 * (dy - dx);
-
-            int x = x1;
-            int y = y1;
-
-            PutPixel(g, x, y);
-            while (x < x2)
-            {
-                if (px < 0)
-                {
-                    px += incrE;
-                    x++;
-                }
-                else
-                {
-                    px += incrNE;
-                    x++;
-                    y++;
-                }
-                PutPixel(g, x, y);
-            }*/
-
             float x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+
             dx = x2 - x1;
             dy = y2 - y1;
             dx1 = Math.Abs(dx);
@@ -117,13 +89,13 @@
             }
         }
 
-        public static void LineLibrary(Graphics g, PointF p1, PointF p2)
+        public static void LineLibrary(Graphics g, Point p1, Point p2)
         {
             using (var pen = new Pen(Color.Black, 2))
                 g.DrawLine(pen, p1, p2);
         }
 
-        public static void CircleLibrary(Graphics g, PointF center, float radius)
+        public static void CircleLibrary(Graphics g, Point center, float radius)
         {
             using (var brush = new SolidBrush(Color.Black))
                 g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);

@@ -37,7 +37,7 @@ namespace Polygons.States
         {
         }
 
-        private (Segment, Polygon)? FindSelectedEdge(PointF p)
+        private (Segment, Polygon)? FindSelectedEdge(Point p)
         {
             Segment selectedEdge;
             foreach (var polygon in context.Polygons)
@@ -48,8 +48,8 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Edge {edge} hit");
                         selectedEdge = edge;
-                        (Segment edge1, Segment edge2) = polygon.GetAdjacentEdges(edge);
-                        (Vertex vertex1, Vertex vertex2) = polygon.GetEndpoints(edge);
+                        (Segment edge1, Segment edge2) = edge.adjacentEdges;
+                        (Vertex vertex1, Vertex vertex2) = edge.endpoints;
                         return (selectedEdge, polygon);
                     }
                 }
@@ -73,42 +73,42 @@ namespace Polygons.States
                 }
                 else
                 {
-                    (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+                    (Segment e1, Segment e2) = edge.adjacentEdges;
                     if(e1.RelationId != null && e1.RelationId == relationId
                         && e2.RelationId != null && e2.RelationId == relationId)
                     {
                         Polygon? p = context.FindPolygon(edge);
-                        PointF oldDirection = new(edge.Point2.X - edge.MidPoint.X, edge.Point2.Y - edge.MidPoint.Y);
-                        PointF newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
+                        Point oldDirection = edge.Point2 - edge.MidPoint;
+                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         p.ApplyParallelRelation12(edge, edge.MidPoint, sin, cos);
 
-                        PointF newDirRot = Geometry.Rotate(newDirection, 1, 0);
-                        PointF castingVersor2 = new(newDirRot.X / Geometry.VectorLength(newDirection), newDirRot.Y / Geometry.VectorLength(newDirection));
+                        Point newDirRot = Geometry.Rotate(newDirection, 1, 0);
+                        Point castingVersor2 = newDirRot / Geometry.VectorLength(newDirection);
                         float length = Geometry.VectorLength(oldDirection) * sin;
-                        PointF castingVector2 = new(castingVersor2.X * length, castingVersor2.Y * length); 
+                        Point castingVector2 = length * castingVersor2;
                         foreach(var e in e2.chain)
                         {
-                            e.Point1 = new PointF(castingVector2.X + e.Point1.X, castingVector2.Y + e.Point1.Y);
-                            e.Point2 = new PointF(castingVector2.X + e.Point2.X, castingVector2.Y + e.Point2.Y);
-                            (Vertex v1, Vertex v2) = p.GetEndpoints(e);
-                            v2.Center = new PointF(castingVector2.X + v2.Center.X, castingVector2.Y + v2.Center.Y);
+                            e.Point1 = castingVector2 + e.Point1;
+                            e.Point2 = castingVector2 + e.Point2;
+                            (Vertex v1, Vertex v2) = e.endpoints;
+                            v2.Center = castingVector2 + v2.Center;
                         }
-                        PointF castingVector1 = new(-castingVector2.X, -castingVector2.Y);
+                        Point castingVector1 = new(-castingVector2.X, -castingVector2.Y);
                         foreach (var e in e1.chain)
                         {
-                            e.Point1 = new PointF(castingVector1.X + e.Point1.X, castingVector1.Y + e.Point1.Y);
-                            e.Point2 = new PointF(castingVector1.X + e.Point2.X, castingVector1.Y + e.Point2.Y);
-                            (Vertex v1, Vertex v2) = p.GetEndpoints(e);
-                            v1.Center = new PointF(castingVector1.X + v1.Center.X, castingVector1.Y + v1.Center.Y);
+                            e.Point1 = castingVector1 + e.Point1;
+                            e.Point2 = castingVector1 + e.Point2;
+                            (Vertex v1, Vertex v2) = e.endpoints;
+                            v1.Center = castingVector1 + v1.Center;
                         }
                         // fix ends of both chains
                         Segment last = e2.chain[^1];
-                        (_, Segment sLast) = p.GetAdjacentEdges(last);
+                        (_, Segment sLast) = last.adjacentEdges;
                         sLast.Point1 = last.Point2;
 
                         Segment first = e1.chain[0];
-                        (Segment sFirst, _) = p.GetAdjacentEdges(first);
+                        (Segment sFirst, _) = first.adjacentEdges;
                         sFirst.Point2 = first.Point1;
 
                         e2.Point1 = edge.Point2;
@@ -120,8 +120,8 @@ namespace Polygons.States
                     else if(e1.RelationId != null && e1.RelationId == relationId)
                     {
                         Polygon? p = context.FindPolygon(edge);
-                        PointF oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
-                        PointF newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
+                        Point oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
+                        Point newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (cos < 0)
                         {
@@ -136,8 +136,8 @@ namespace Polygons.States
                     else if(e2.RelationId != null && e2.RelationId == relationId)
                     {
                         Polygon? p = context.FindPolygon(edge);
-                        PointF oldDirection = new(edge.Point1.X - edge.Point2.X, edge.Point1.Y - edge.Point2.Y);
-                        PointF newDirection = new(relation[0][0].Point1.X - relation[0][0].Point2.X, relation[0][0].Point1.Y - relation[0][0].Point2.Y);
+                        Point oldDirection = new(edge.Point1.X - edge.Point2.X, edge.Point1.Y - edge.Point2.Y);
+                        Point newDirection = new(relation[0][0].Point1.X - relation[0][0].Point2.X, relation[0][0].Point1.Y - relation[0][0].Point2.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (cos < 0)
                         {
@@ -153,8 +153,8 @@ namespace Polygons.States
                     {
                         // TODO lacks some decision making
                         Polygon? p = context.FindPolygon(edge);
-                        PointF oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
-                        PointF newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
+                        Point oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
+                        Point newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if(cos < 0)
                         {
@@ -182,7 +182,7 @@ namespace Polygons.States
                 {
                     foreach(var e in p.Edges)
                     {
-                        (Segment e1, Segment e2) = p.GetAdjacentEdges(e);
+                        (Segment e1, Segment e2) = e.adjacentEdges;
                         if (e.RelationId != null && e1.RelationId != null
                             && e.RelationId == e1.RelationId && e.chain != e1.chain)
                         {
@@ -204,10 +204,10 @@ namespace Polygons.States
             chain.Add(edge);
             edge.chain = chain;
             edge.RelationId = relationId;
-            (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
+            (Vertex v1, Vertex v2) = edge.endpoints;
             v1.relationIds.Item1 = relationId;
             v2.relationIds.Item2 = relationId;
-            (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+            (Segment e1, Segment e2) = edge.adjacentEdges;
             e1.relationIds.Item1 = relationId;
             e2.relationIds.Item2 = relationId;
         }
@@ -218,10 +218,10 @@ namespace Polygons.States
             chain.Insert(0, edge);
             edge.chain = chain;
             edge.RelationId = relationId;
-            (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
+            (Vertex v1, Vertex v2) = edge.endpoints;
             v1.relationIds.Item1 = relationId;
             v2.relationIds.Item2 = relationId;
-            (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+            (Segment e1, Segment e2) = edge.adjacentEdges;
             e1.relationIds.Item1 = relationId;
             e2.relationIds.Item2 = relationId;
         }
@@ -242,8 +242,8 @@ namespace Polygons.States
                 foreach(var e in chain)
                 {
                     Polygon? p = context.FindPolygon(e);
-                    PointF oldDirection = new(e.Point2.X - e.Point1.X, e.Point2.Y - e.Point1.Y);
-                    PointF newDirection = new(r1[0][0].Point2.X - r1[0][0].Point1.X, r1[0][0].Point2.Y - r1[0][0].Point1.Y);
+                    Point oldDirection = new(e.Point2.X - e.Point1.X, e.Point2.Y - e.Point1.Y);
+                    Point newDirection = new(r1[0][0].Point2.X - r1[0][0].Point1.X, r1[0][0].Point2.Y - r1[0][0].Point1.Y);
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                     if (cos < 0)
                     {
@@ -251,14 +251,14 @@ namespace Polygons.States
                         (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                     }
                     p!.ApplyParallelRelation(e, e.Point1, sin, cos);
-                    (Segment s1, Segment s2) = p.GetAdjacentEdges(e);
+                    (Segment s1, Segment s2) = e.adjacentEdges;
                     s1.Point2 = e.Point1;
                     s2.Point1 = e.Point2;
                     e.RelationId = newRel;
-                    (Vertex v1, Vertex v2) = p.GetEndpoints(e);
+                    (Vertex v1, Vertex v2) = e.endpoints;
                     v1.relationIds.Item1 = newRel;
                     v2.relationIds.Item2 = newRel;
-                    (Segment e1, Segment e2) = p.GetAdjacentEdges(e);
+                    (Segment e1, Segment e2) = e.adjacentEdges;
                     e1.relationIds.Item1 = newRel;
                     e2.relationIds.Item2 = newRel;
                     context.Canvas.Invalidate();

@@ -9,8 +9,8 @@ namespace Polygons.States
         readonly Segment adjacentEdge2;
         readonly Vertex endpoint1;
         readonly Vertex endpoint2;
-        PointF previousPoint;
-        public MovingEdgeState(Segment movedEdge, Segment adjacentEdge1, Segment adjacentEdge2, Vertex endpoint1, Vertex endpoint2, PointF point)
+        Point previousPoint;
+        public MovingEdgeState(Segment movedEdge, Segment adjacentEdge1, Segment adjacentEdge2, Vertex endpoint1, Vertex endpoint2, Point point)
         {
             this.movedEdge = movedEdge;
             this.adjacentEdge1 = adjacentEdge1;
@@ -45,26 +45,26 @@ namespace Polygons.States
             {
                 if (movedEdge.RelationId != null)
                 {
-                    var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
+                    var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
 
-                    previousPoint = new PointF(x, y);
+                    previousPoint = new Point(x, y);
                     var chain = movedEdge.chain;
                     Polygon? p = context.FindPolygon(chain);
                     foreach (Segment e in chain)
                     {
-                        (Vertex v1, Vertex v2) = p.GetEndpoints(e);
+                        (Vertex v1, Vertex v2) = e.endpoints;
                         if (e == chain[0])
                             v1.Move(displacement);
                         e.Move(displacement);
                         v2.Move(displacement);
                         if (e == chain[0])
                         {
-                            (Segment prev, _) = p.GetAdjacentEdges(e);
+                            (Segment prev, _) = e.adjacentEdges;
                             prev.Point2 = e.Point1;
                         }
                         if (e == chain[^1])
                         {
-                            (_, Segment next) = p.GetAdjacentEdges(e);
+                            (_, Segment next) = e.adjacentEdges;
                             next.Point1 = e.Point2;
                         }
                     }
@@ -73,16 +73,16 @@ namespace Polygons.States
                 {
                     if(adjacentEdge2.RelationId != null)
                     {
-                        var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
+                        var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
                         //if(adjacentEdge1.RelationId != adjacentEdge2.RelationId)
-                            previousPoint = new PointF(x, y);
+                            previousPoint = new Point(x, y);
 
                         var chain = adjacentEdge2.chain;
                         Polygon? p = context.FindPolygon(chain);
-                        PointF oldDirection = new(movedEdge.Point2.X - chain[^1].Point2.X, movedEdge.Point2.Y - chain[^1].Point2.Y);
+                        Point oldDirection = new(movedEdge.Point2.X - chain[^1].Point2.X, movedEdge.Point2.Y - chain[^1].Point2.Y);
 
-                        PointF endMoved = new(movedEdge.Point2.X + displacement.X, movedEdge.Point2.Y + displacement.Y);
-                        PointF newDirection = new(endMoved.X - chain[^1].Point2.X, endMoved.Y - chain[^1].Point2.Y);
+                        Point endMoved = new(movedEdge.Point2.X + displacement.X, movedEdge.Point2.Y + displacement.Y);
+                        Point newDirection = new(endMoved.X - chain[^1].Point2.X, endMoved.Y - chain[^1].Point2.Y);
 
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (adjacentEdge2.chain.Count > 1)
@@ -108,15 +108,15 @@ namespace Polygons.States
                     }
                     if(adjacentEdge1.RelationId != null)
                     {
-                        var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
-                        previousPoint = new PointF(x, y);
+                        var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+                        previousPoint = new Point(x, y);
 
                         var chain = adjacentEdge1.chain;
                         Polygon? p = context.FindPolygon(chain);
-                        PointF oldDirection = new(movedEdge.Point1.X - chain[0].Point1.X, movedEdge.Point1.Y - chain[0].Point1.Y);
+                        Point oldDirection = new(movedEdge.Point1.X - chain[0].Point1.X, movedEdge.Point1.Y - chain[0].Point1.Y);
 
-                        PointF startMoved = new(movedEdge.Point1.X + displacement.X, movedEdge.Point1.Y + displacement.Y);
-                        PointF newDirection = new(startMoved.X - chain[0].Point1.X, startMoved.Y - chain[0].Point1.Y);
+                        Point startMoved = new(movedEdge.Point1.X + displacement.X, movedEdge.Point1.Y + displacement.Y);
+                        Point newDirection = new(startMoved.X - chain[0].Point1.X, startMoved.Y - chain[0].Point1.Y);
 
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (adjacentEdge1.chain.Count > 1 && adjacentEdge1.RelationId != adjacentEdge2.RelationId)
@@ -145,13 +145,13 @@ namespace Polygons.States
                 }
                 else
                 {
-                    var displacement = new PointF(x - previousPoint.X, y - previousPoint.Y);
+                    var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
                     movedEdge.Move(displacement);
                     adjacentEdge1.MoveEnd(displacement);
                     adjacentEdge2.MoveStart(displacement);
                     endpoint1.Move(displacement);
                     endpoint2.Move(displacement);
-                    previousPoint = new PointF(x, y);
+                    previousPoint = new Point(x, y);
                 }
             }
 

@@ -18,7 +18,7 @@ namespace Polygons.States
         {
         }
 
-        private void DrawAfterLengthFixed(PointF p)
+        private void DrawAfterLengthFixed(Point p)
         {
             foreach (var polygon in context.Polygons)
             {
@@ -36,10 +36,10 @@ namespace Polygons.States
                         polygon.SetLength(edge, length);
                         //polygon.FixedLengthEdges.Add(edge);
                         edge.fixedLength = true;
-                        (Vertex v1, Vertex v2) = polygon.GetEndpoints(edge);
+                        (Vertex v1, Vertex v2) = edge.endpoints;
                         v1.fixedLenghts.Item1 = true;
                         v2.fixedLenghts.Item2 = true;
-                        (Segment e1, Segment e2) = polygon.GetAdjacentEdges(edge);
+                        (Segment e1, Segment e2) = edge.adjacentEdges;
                         e1.fixedLengths.Item1 = true;
                         e2.fixedLengths.Item2 = true;
 

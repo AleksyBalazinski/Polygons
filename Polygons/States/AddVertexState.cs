@@ -17,7 +17,7 @@ namespace Polygons.States
         {
         }
 
-        private void DrawAfterVertexAdded(PointF p)
+        private void DrawAfterVertexAdded(Point p)
         {
             foreach (var polygon in context.Polygons)
             {

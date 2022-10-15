@@ -4,7 +4,7 @@ namespace Polygons.States
 {
     internal class MoveState : State
     {
-        protected PointF previousPoint;
+        protected Point previousPoint;
 
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
@@ -40,7 +40,7 @@ namespace Polygons.States
         {
         }
 
-        private (Vertex, Segment, Segment)? FindVertexToBeMoved(PointF p)
+        private (Vertex, Segment, Segment)? FindVertexToBeMoved(Point p)
         {
             Vertex movedVertex;
             foreach (var polygon in context.Polygons)
@@ -51,8 +51,8 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Vertex {vertex} hit");
                         movedVertex = vertex;
-                        (Segment edge1, Segment edge2) = polygon.GetAdjacentEdges(vertex);
-
+                        //(Segment edge1, Segment edge2) = polygon.GetAdjacentEdges(vertex);
+                        (Segment edge1, Segment edge2) = vertex.adjacentEdges;
                         previousPoint = p;
 
                         return (movedVertex, edge1, edge2);
@@ -62,7 +62,7 @@ namespace Polygons.States
             return null;
         }
 
-        private (Segment, Segment, Segment, Vertex, Vertex)? FindEdgeToBeMoved(PointF p)
+        private (Segment, Segment, Segment, Vertex, Vertex)? FindEdgeToBeMoved(Point p)
         {
             Segment movedEdge;
             foreach (var polygon in context.Polygons)
@@ -73,8 +73,8 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Edge {edge} hit");
                         movedEdge = edge;
-                        (Segment edge1, Segment edge2) = polygon.GetAdjacentEdges(edge);
-                        (Vertex vertex1, Vertex vertex2) = polygon.GetEndpoints(edge);
+                        (Segment edge1, Segment edge2) = edge.adjacentEdges;
+                        (Vertex vertex1, Vertex vertex2) = edge.endpoints;
 
                         previousPoint = p;
 
@@ -86,7 +86,7 @@ namespace Polygons.States
             return null;
         }
 
-        private Polygon? FindPolygonToBeMoved(PointF p)
+        private Polygon? FindPolygonToBeMoved(Point p)
         {
             Polygon? movedPolygon;
             foreach (var polygon in context.Polygons)

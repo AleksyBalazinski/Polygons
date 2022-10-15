@@ -6,11 +6,11 @@ namespace Polygons
     {
         public Vertex(float x, float y)
         {
-            Center = new PointF(x, y);
+            Center = new Point(x, y);
             Radius = 5;
         }
 
-        public Vertex(PointF p)
+        public Vertex(Point p)
         {
             Center = p;
             Radius = 5;
@@ -18,18 +18,19 @@ namespace Polygons
 
         public Color FillColor { get; set; }
 
-        public PointF Center { get; set; }
+        public Point Center { get; set; }
         public float Radius { get; set; }
 
         public (int?, int?) relationIds;
         public (bool, bool) fixedLenghts;
+        public (Segment, Segment) adjacentEdges;
 
         public void Draw(Graphics g, Algorithm a)
         {
             a.Apply(g, this);
         }
 
-        public bool HitTest(PointF p)
+        public bool HitTest(Point p)
         {
             var hit = false;
             using (var path = GetPath())
@@ -38,14 +39,15 @@ namespace Polygons
 
         }
 
-        public void Move(PointF d)
+        public void Move(Point d)
         {
-            Center = new PointF(Center.X + d.X, Center.Y + d.Y);
+            //Center = new Point(Center.X + d.X, Center.Y + d.Y);
+            Center += d;
         }
 
-        public void MoveAbs(PointF p)
+        public void MoveAbs(Point p)
         {
-            Center = new PointF(p.X, p.Y);
+            Center = new Point(p.X, p.Y);
         }
 
         public override string ToString() => String.Format($"({Center.X}, {Center.Y})");

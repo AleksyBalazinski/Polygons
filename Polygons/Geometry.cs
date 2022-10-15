@@ -9,7 +9,7 @@ namespace Polygons
     internal static class Geometry
     {
         // directed towards b
-        public static (float, float) AngleBetweenVectors(PointF a, PointF b)
+        public static (float, float) AngleBetweenVectors(Point a, Point b)
         {
             float cosTheta = DotProduct(a, b) / (VectorLength(a) * VectorLength(b));
             float sinTheta = CrossProduct(a, b) / (VectorLength(a) * VectorLength(b));
@@ -17,31 +17,31 @@ namespace Polygons
             return (sinTheta, cosTheta);
         }
 
-        public static float DotProduct(PointF a, PointF b)
+        public static float DotProduct(Point a, Point b)
         {
             return a.X * b.X + a.Y * b.Y;
         }
 
-        public static float CrossProduct(PointF a, PointF b)
+        public static float CrossProduct(Point a, Point b)
         {
             return a.X * b.Y - b.X * a.Y;
         }
 
-        public static float VectorLength(PointF a)
+        public static float VectorLength(Point a)
         {
             return MathF.Sqrt(a.X * a.X + a.Y * a.Y);
         }
 
-        public static PointF Rotate(PointF v, float sinTheta, float cosTheta)
+        public static Point Rotate(Point v, float sinTheta, float cosTheta)
         {
-            return new PointF(v.X * cosTheta - v.Y * sinTheta, v.X * sinTheta + v.Y * cosTheta);
+            return new Point(v.X * cosTheta - v.Y * sinTheta, v.X * sinTheta + v.Y * cosTheta);
         }
 
         // a onto b
-        public static PointF OrthogonalProjection(PointF a, PointF b)
+        public static Point OrthogonalProjection(Point a, Point b)
         {
             float c = DotProduct(a, b) / (VectorLength(b) * VectorLength(b));
-            return new PointF(c * b.X, c * b.Y);
+            return new Point(c * b.X, c * b.Y);
         }
     }
 }

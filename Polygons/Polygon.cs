@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
+﻿
 
 namespace Polygons
 {
@@ -8,13 +6,11 @@ namespace Polygons
     {
         public List<Vertex> Vertices { get; }
         public List<Segment> Edges { get; }
-        //public HashSet<Segment> FixedLengthEdges { get; }
         
         public Polygon()
         {
             Vertices = new List<Vertex>();
             Edges = new List<Segment>();
-            //FixedLengthEdges = new HashSet<Segment>();
         }
         public override string ToString()
         {
@@ -27,60 +23,34 @@ namespace Polygons
             return res;
         }
 
-        public (Segment, Segment) GetAdjacentEdges(Vertex v) // TODO cache results
-        {
-            int vi = Vertices.IndexOf(v);
-            Segment edge2 = Edges[vi];
-            Segment edge1;
-            if (vi == 0)
-                edge1 = Edges[^1];
-            else
-                edge1 = Edges[vi - 1];
-
-            return (edge1, edge2);
-        }
-
-        public (Segment, Segment) GetAdjacentEdges(Segment e) // TODO cache results
-        {
-            int ei = Edges.IndexOf(e);
-            Segment edge1, edge2;
-            if (ei == 0)
-                edge1 = Edges[^1];
-            else
-                edge1 = Edges[ei - 1];
-
-            if (ei == Edges.Count - 1)
-                edge2 = Edges[0];
-            else
-                edge2 = Edges[ei + 1];
-
-            return (edge1, edge2);
-        }
-
-        public (Vertex, Vertex) GetEndpoints(Segment e) // TODO cache results
-        {
-            int ei = Edges.IndexOf(e);
-            Vertex vertex1, vertex2;
-            if (ei == 0)
-                vertex1 = Vertices[0];
-            else
-                vertex1 = Vertices[ei];
-
-            if (ei == Edges.Count - 1)
-                vertex2 = Vertices[0];
-            else
-                vertex2 = Vertices[ei + 1];
-
-            return (vertex1, vertex2);
-        }
-
         public void Subdivide(Segment e)
         {
             int ei = Edges.IndexOf(e);
             Vertex mid = new Vertex(e.MidPoint);
+            Segment e1 = new Segment(e.Point1, mid.Center);
+            Segment e2 = new Segment(mid.Center, e.Point2);
+            mid.adjacentEdges.Item1 = e1;
+            mid.adjacentEdges.Item2 = e2;
+
+            e1.endpoints.Item1 = e.endpoints.Item1;
+            e1.endpoints.Item2 = mid;
+            e2.endpoints.Item1 = mid;
+            e2.endpoints.Item2 = e.endpoints.Item2;
+
+            e1.endpoints.Item1.adjacentEdges.Item2 = e1;
+            e2.endpoints.Item2.adjacentEdges.Item1 = e2;
+
+            e.adjacentEdges.Item1.adjacentEdges.Item2 = e1;
+            e.adjacentEdges.Item2.adjacentEdges.Item1 = e2;
+
+            e1.adjacentEdges.Item1 = e.adjacentEdges.Item1;
+            e1.adjacentEdges.Item2 = e2;
+            e2.adjacentEdges.Item2 = e.adjacentEdges.Item2;
+            e2.adjacentEdges.Item1 = e1;
+
             Vertices.Insert(ei + 1, mid);
-            Edges.Insert(ei, new Segment(e.Point1, mid.Center));
-            Edges.Insert(ei + 1, new Segment(mid.Center, e.Point2));
+            Edges.Insert(ei, e1);
+            Edges.Insert(ei + 1, e2);
             Edges.Remove(e);
         }
 
@@ -108,108 +78,102 @@ namespace Polygons
 
         public void Delete(Vertex v)
         {
-            (Segment edge1, Segment edge2) = GetAdjacentEdges(v);
+            (Segment edge1, Segment edge2) = v.adjacentEdges;
             int vi = Vertices.IndexOf(v);
-            if (vi == 0)
-                Edges.Add(new Segment(edge1.Point1, edge2.Point2));
-            else
-                Edges.Insert(vi - 1, new Segment(edge1.Point1, edge2.Point2));
+            Segment newEdge = new Segment(edge1.Point1, edge2.Point2);
+            newEdge.endpoints.Item1 = edge1.endpoints.Item1;
+            newEdge.endpoints.Item2 = edge2.endpoints.Item2;
+            edge2.endpoints.Item2.adjacentEdges.Item1 = newEdge;
+            edge1.endpoints.Item1.adjacentEdges.Item2 = newEdge;
 
+            newEdge.adjacentEdges.Item1 = edge1.adjacentEdges.Item1;
+            newEdge.adjacentEdges.Item2 = edge2.adjacentEdges.Item2;
+
+            edge1.adjacentEdges.Item1.adjacentEdges.Item2 = newEdge;
+            edge2.adjacentEdges.Item2.adjacentEdges.Item1 = newEdge;
+
+            if (vi == 0)
+            {
+                Edges.Add(newEdge);
+            }
+            else
+            {
+                Edges.Insert(vi - 1, newEdge);
+            }
+                
             Vertices.Remove(v);
             Edges.Remove(edge2);
             Edges.Remove(edge1);
         }
 
-        public void ApplyParallelRelation(Segment edge, PointF axis, float sinTheta, float cosTheta)
+        public void ApplyParallelRelation(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            PointF v = new PointF(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            //Point v = new Point(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            Point v = edge.Point2 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point2 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
-            (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
+            //edge.Point2 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
+            edge.Point2 = vRot + axis;
+            (Vertex vertex1, Vertex vertex2) = edge.endpoints;
             vertex2.Center = edge.Point2;
         }
 
-        public void ApplyParallelRelation1(Segment edge, PointF axis, float sinTheta, float cosTheta)
+        public void ApplyParallelRelation1(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            PointF v = new PointF(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            //Point v = new Point(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            Point v = edge.Point1 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point1 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
-            (Vertex vertex1, _) = GetEndpoints(edge);
+            //edge.Point1 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
+            edge.Point1 = vRot + axis;
+            (Vertex vertex1, _) = edge.endpoints;
             vertex1.Center = edge.Point1;
         }
 
-        public void ApplyParallelRelation12(Segment edge, PointF axis, float sinTheta, float cosTheta)
+        public void ApplyParallelRelation12(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            PointF v = new(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            //Point v = new(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
+            Point v = edge.Point2 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point2 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+            edge.Point2 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
 
-            PointF u = new(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            //Point u = new(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
+            Point u = edge.Point1 - axis;
             var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-            edge.Point1 = new PointF(uRot.X + axis.X, uRot.Y + axis.Y);
+            //edge.Point1 = new Point(uRot.X + axis.X, uRot.Y + axis.Y);
+            edge.Point1 = uRot + axis;
 
-            (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
+            (Vertex vertex1, Vertex vertex2) = edge.endpoints;
             vertex1.Center = edge.Point1;
             vertex2.Center = edge.Point2;
         }
 
-        public void ApplyParallelRelation(List<Segment> chain, PointF axis, float sinTheta, float cosTheta)
+        public void ApplyParallelRelation(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
         {
             foreach(var e in chain)
             {
-                (Vertex vertex1, Vertex vertex2) = GetEndpoints(e);
-                PointF v = new PointF(e.Point1.X - axis.X, e.Point1.Y - axis.Y);
+                (Vertex vertex1, Vertex vertex2) = e.endpoints;
+                //Point v = new Point(e.Point1.X - axis.X, e.Point1.Y - axis.Y);
+                Point v = e.Point1 - axis;
                 var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-                e.Point1 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
+                //e.Point1 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
+                e.Point1 = vRot + axis;
                 vertex1.Center = e.Point1;
 
-                PointF u = new PointF(e.Point2.X - axis.X, e.Point2.Y - axis.Y);
+                //Point u = new Point(e.Point2.X - axis.X, e.Point2.Y - axis.Y);
+                Point u = e.Point2 - axis;
                 var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-                e.Point2 = new PointF(uRot.X + axis.X, uRot.Y + axis.Y);
+                //e.Point2 = new Point(uRot.X + axis.X, uRot.Y + axis.Y);
+                e.Point2 = uRot + axis;
                 vertex2.Center = e.Point2;
                 
                 if(e == chain[^1])
                 {
-                    (_, Segment next) = GetAdjacentEdges(e);
+                    (_, Segment next) = e.adjacentEdges;
                     next.Point1 = e.Point2;
                 }
             }
         }
 
-        public void ApplyTranslation(List<Segment> chain, PointF displacement)
-        {
-            foreach(var e in chain)
-            {
-                e.Point1 = new PointF(e.Point1.X + displacement.X, e.Point1.Y + displacement.Y);
-                e.Point2 = new PointF(e.Point2.X + displacement.X, e.Point2.Y + displacement.Y);
-                (Vertex vertex1, Vertex vertex2) = GetEndpoints(e);
-                vertex1.Center = e.Point1;
-                vertex2.Center = e.Point2;
-
-                if(e == chain[0])
-                {
-                    (Segment prev, _) = GetAdjacentEdges(e);
-                    prev.Point2 = e.Point1;
-                }
-                if (e == chain[^1])
-                {
-                    (_, Segment next) = GetAdjacentEdges(e);
-                    next.Point1 = e.Point2;
-                }
-            }
-        }
-
-        private bool IsBefore(Segment s1, Segment s2)
-        {
-            int indxS1 = Edges.IndexOf(s1);
-            int indxS2 = Edges.IndexOf(s2);
-
-            if(indxS1 < indxS2 || indxS1 == Edges.Count - 1 && indxS2 == 0)
-                return true;
-            return false;
-        }
-
-        public bool HitTest(PointF p)
+        public bool HitTest(Point p)
         {
             float xMin = float.MaxValue;
             float xMax = float.MinValue;
@@ -236,7 +200,7 @@ namespace Polygons
             a.Apply(g, this);
         }
 
-        public void Move(PointF d)
+        public void Move(Point d)
         {
             foreach (var v in Vertices)
                 v.Move(d);

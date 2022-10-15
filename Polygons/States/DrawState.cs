@@ -33,29 +33,49 @@ namespace Polygons.States
         {
             if (!definingNewPolygon && constructedPolygon.Vertices.Count >= 3 && Utilities.IsOnVertex(constructedPolygon.Vertices[0], x, y, 10))
             {
+                drawnSegment.endpoints.Item2 = constructedPolygon.Vertices[0];
+                constructedPolygon.Vertices[0].adjacentEdges.Item1 = drawnSegment;
                 constructedPolygon.Edges.Add(drawnSegment);
                 Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                 context.Polygons.Add(constructedPolygon);
                 Debug.WriteLine($"Add polygon {constructedPolygon}");
+
+                for(int i = 0; i < constructedPolygon.Edges.Count; i++)
+                {
+                    Segment e = constructedPolygon.Edges[i];
+                    if(i == 0)
+                        e.adjacentEdges.Item1 = constructedPolygon.Edges[constructedPolygon.Edges.Count - 1];
+                    else
+                        e.adjacentEdges.Item1 = constructedPolygon.Edges[i - 1];
+
+                    if(i == constructedPolygon.Edges.Count - 1)
+                        e.adjacentEdges.Item2 = constructedPolygon.Edges[0];
+                    else
+                        e.adjacentEdges.Item2 = constructedPolygon.Edges[i + 1];
+                }
 
                 constructedPolygon = new Polygon();
                 definingNewPolygon = true;
             }
             else
             {
-                Vertex v = new Vertex(x, y);
+                Vertex v = new(x, y);
 
                 Debug.WriteLine("Add vertex " + v.ToString());
                 if(!definingNewPolygon)
                 {
+                    drawnSegment.endpoints.Item2 = v;
+                    v.adjacentEdges.Item1 = drawnSegment;
                     constructedPolygon.Edges.Add(drawnSegment);
                     Debug.WriteLine($"Add segment ({drawnSegment.Point1.X},{drawnSegment.Point1.Y})->({drawnSegment.Point2.X},{drawnSegment.Point2.Y})");
                 }
 
                 drawnSegment = new Segment();
-                drawnSegment.Point1 = drawnSegment.Point2 = new PointF(x, y);
+                drawnSegment.Point1 = drawnSegment.Point2 = new Point(x, y);
 
                 constructedPolygon.Vertices.Add(v);
+                drawnSegment.endpoints.Item1 = v;
+                v.adjacentEdges.Item2 = drawnSegment;
                 definingNewPolygon = false;
             }
 
@@ -64,7 +84,7 @@ namespace Polygons.States
 
         private void DrawEdgeUnderConstruction(int x, int y)
         {
-            drawnSegment.Point2 = new PointF(x, y);
+            drawnSegment.Point2 = new Point(x, y);
             context.Canvas.Invalidate();
         }
 

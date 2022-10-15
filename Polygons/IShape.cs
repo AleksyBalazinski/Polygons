@@ -2,8 +2,8 @@
 {
     internal interface IShape
     {
-        bool HitTest(PointF p);
+        bool HitTest(Point p);
         void Draw(Graphics g, Algorithm a);
-        void Move(PointF d);
+        void Move(Point d);
     }
 }
