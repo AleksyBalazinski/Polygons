@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Runtime.ExceptionServices;
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     internal class MovingVertexState : State
     {
@@ -193,26 +189,13 @@ namespace Polygons.States
             context.Canvas.Invalidate();
         }
 
-        /*private void InvalidateRelatedChains(float sinTheta, float cosTheta)
-        {
-            (int? relId1, int? relId2) = movedVertex.relationIds;
-            if (relId1 != null)
-            {
-                AdjustEdgesInRelation(relId1.Value, adjacentEdge1.chain, sinTheta, cosTheta);
-            }
-            if (relId2 != null)
-            {
-                AdjustEdgesInRelation(relId2.Value, adjacentEdge2.chain, sinTheta, cosTheta);
-            }
-        }*/
-
         private void InvalidateRelatedChains(List<Segment> chain, int relationId, float sinTheta, float cosTheta)
         {
             foreach(var relatedChain in context.relations[relationId])
             {
                 if(relatedChain != chain)
                 {
-                    Polygon? p = context.FindPolygon(chain);
+                    Polygon? p = context.FindPolygon(relatedChain);
                     p.ApplyParallelRelation(relatedChain, relatedChain[0].Point1, sinTheta, cosTheta);
                 }
             }

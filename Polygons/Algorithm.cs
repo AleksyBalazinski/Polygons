@@ -16,7 +16,13 @@
         public void Apply(Graphics g, Polygon polygon)
         {
             foreach(var v in polygon.Vertices)
+            {
                 Apply(g, v);
+                Font font = new Font("Arial", 10);
+                SolidBrush brush = new SolidBrush(Color.Black);
+                g.DrawString($"({v.Center.X},{v.Center.Y})", font, brush, new PointF(v.Center.X + 5, v.Center.Y + 5));
+            }
+                
             foreach(var e in polygon.Edges)
             {
                 Apply(g, e);

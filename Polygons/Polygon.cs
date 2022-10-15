@@ -125,7 +125,7 @@ namespace Polygons
             PointF v = new PointF(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
             edge.Point2 = new PointF(vRot.X + axis.X, vRot.Y + axis.Y);
-            (_, Vertex vertex2) = GetEndpoints(edge);
+            (Vertex vertex1, Vertex vertex2) = GetEndpoints(edge);
             vertex2.Center = edge.Point2;
         }
 

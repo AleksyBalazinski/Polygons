@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows.Forms.VisualStyles;
 
 namespace Polygons.States
 {
@@ -122,6 +123,11 @@ namespace Polygons.States
                         PointF oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
                         PointF newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        if (cos < 0)
+                        {
+                            newDirection = new(-newDirection.X, -newDirection.Y);
+                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        }
                         p.ApplyParallelRelation(edge, edge.Point1, sin, cos);
                         e2.Point1 = edge.Point2;
 
@@ -133,6 +139,11 @@ namespace Polygons.States
                         PointF oldDirection = new(edge.Point1.X - edge.Point2.X, edge.Point1.Y - edge.Point2.Y);
                         PointF newDirection = new(relation[0][0].Point1.X - relation[0][0].Point2.X, relation[0][0].Point1.Y - relation[0][0].Point2.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        if (cos < 0)
+                        {
+                            newDirection = new(-newDirection.X, -newDirection.Y);
+                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        }
                         p.ApplyParallelRelation1(edge, edge.Point2, sin, cos);
                         e1.Point2 = edge.Point1;
 
@@ -145,6 +156,11 @@ namespace Polygons.States
                         PointF oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
                         PointF newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        if(cos < 0)
+                        {
+                            newDirection = new(-newDirection.X, -newDirection.Y);
+                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                        }
                         p.ApplyParallelRelation(edge, edge.Point1, sin, cos);
                         e2.Point1 = edge.Point2;
 
@@ -166,7 +182,7 @@ namespace Polygons.States
                 {
                     foreach(var e in p.Edges)
                     {
-                        (Segment e1, Segment e2) = polygon.GetAdjacentEdges(e);
+                        (Segment e1, Segment e2) = p.GetAdjacentEdges(e);
                         if (e.RelationId != null && e1.RelationId != null
                             && e.RelationId == e1.RelationId && e.chain != e1.chain)
                         {
@@ -221,14 +237,30 @@ namespace Polygons.States
 
         private void MergeRelations(List<List<Segment>> r1, List<List<Segment>> r2, int oldRel, int newRel)
         {
-            // TODO wont work until chains are fully operational
             foreach(var chain in r2)
             {
                 foreach(var e in chain)
                 {
                     Polygon? p = context.FindPolygon(e);
-                    //p!.ApplyParallelRelation(e, r1[0][0]);
+                    PointF oldDirection = new(e.Point2.X - e.Point1.X, e.Point2.Y - e.Point1.Y);
+                    PointF newDirection = new(r1[0][0].Point2.X - r1[0][0].Point1.X, r1[0][0].Point2.Y - r1[0][0].Point1.Y);
+                    (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                    if (cos < 0)
+                    {
+                        newDirection = new(-newDirection.X, -newDirection.Y);
+                        (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+                    }
+                    p!.ApplyParallelRelation(e, e.Point1, sin, cos);
+                    (Segment s1, Segment s2) = p.GetAdjacentEdges(e);
+                    s1.Point2 = e.Point1;
+                    s2.Point1 = e.Point2;
                     e.RelationId = newRel;
+                    (Vertex v1, Vertex v2) = p.GetEndpoints(e);
+                    v1.relationIds.Item1 = newRel;
+                    v2.relationIds.Item2 = newRel;
+                    (Segment e1, Segment e2) = p.GetAdjacentEdges(e);
+                    e1.relationIds.Item1 = newRel;
+                    e2.relationIds.Item2 = newRel;
                     context.Canvas.Invalidate();
                 }
             }
