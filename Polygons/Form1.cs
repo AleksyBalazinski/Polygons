@@ -91,7 +91,7 @@ namespace Polygons
         }
 
         // polygons control
-        public Polygon? FindPolygon(Segment edge)
+        /*public Polygon? FindPolygon(Segment edge)
         {
             foreach (var p in polygons)
             {
@@ -127,7 +127,7 @@ namespace Polygons
             }
             return null;
         }
-
+*/
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             polygons.Clear();

@@ -21,7 +21,7 @@ namespace Polygons
         public (Segment, Segment) adjacentEdges;
         public float Length
         {
-            get => (float)Math.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X) 
+            get => MathF.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X)
                 + (Point1.Y - Point2.Y) * (Point1.Y - Point2.Y));
             set
             {
@@ -33,7 +33,7 @@ namespace Polygons
         }
         public Point MidPoint
         {
-            get => new Point((Point1.X + Point2.X) / 2, (Point1.Y + Point2.Y) / 2);
+            get => (Point1 + Point2) / 2;
         }
 
         public bool HitTest(Point p)
@@ -52,8 +52,8 @@ namespace Polygons
 
         public void Move(Point d)
         {
-            Point1 = new Point(Point1.X + d.X, Point1.Y + d.Y);
-            Point2 = new Point(Point2.X + d.X, Point2.Y + d.Y);
+            Point1 += d;
+            Point2 += d;
         }
 
         public void MoveStart(Point d)
@@ -73,7 +73,7 @@ namespace Polygons
 
         public void MoveEndAbs(Point p)
         {
-            Point2 = new Point(p.X, p.Y);
+            Point2 = new Point(p);
         }
 
         public override string ToString()

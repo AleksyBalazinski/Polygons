@@ -15,20 +15,22 @@
         public float X { get; set; }
         public float Y { get; set; }
 
+        public static Point operator -(Point a)
+            => new (-a.X, -a.Y);
         public static Point operator +(Point a, Point b)
-            => new Point(a.X + b.X, a.Y + b.Y);
+            => new (a.X + b.X, a.Y + b.Y);
         public static Point operator -(Point a, Point b)
-            => new Point(a.X - b.X, a.Y - b.Y);
+            => new (a.X - b.X, a.Y - b.Y);
         public static Point operator *(float c, Point a)
-            => new Point(a.X * c, a.Y * c);
+            => new (a.X * c, a.Y * c);
         public static Point operator /(Point a, float c)
-            => new Point(a.X / c, a.Y / c);
+            => new (a.X / c, a.Y / c);
 
         public static implicit operator PointF(Point a)
             => new System.Drawing.PointF(a.X, a.Y);
-        public static implicit operator Point(PointF a)
-            => new Point(a);
+        public static implicit operator Point(System.Drawing.PointF a)
+            => new (a);
         public static implicit operator Point(System.Drawing.Point a)
-            => new Point(a);
+            => new (a);
     }
 }

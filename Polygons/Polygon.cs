@@ -106,39 +106,32 @@ namespace Polygons
             Edges.Remove(edge1);
         }
 
-        public void ApplyParallelRelation(Segment edge, Point axis, float sinTheta, float cosTheta)
+        public static void ApplyParallelRelation(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            //Point v = new Point(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
             Point v = edge.Point2 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            //edge.Point2 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
             edge.Point2 = vRot + axis;
             (Vertex vertex1, Vertex vertex2) = edge.endpoints;
             vertex2.Center = edge.Point2;
         }
 
-        public void ApplyParallelRelation1(Segment edge, Point axis, float sinTheta, float cosTheta)
+        public static void ApplyParallelRelation1(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            //Point v = new Point(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
             Point v = edge.Point1 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            //edge.Point1 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
             edge.Point1 = vRot + axis;
             (Vertex vertex1, _) = edge.endpoints;
             vertex1.Center = edge.Point1;
         }
 
-        public void ApplyParallelRelation12(Segment edge, Point axis, float sinTheta, float cosTheta)
+        public static void ApplyParallelRelation12(Segment edge, Point axis, float sinTheta, float cosTheta)
         {
-            //Point v = new(edge.Point2.X - axis.X, edge.Point2.Y - axis.Y);
             Point v = edge.Point2 - axis;
             var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point2 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
+            edge.Point2 = vRot + axis;
 
-            //Point u = new(edge.Point1.X - axis.X, edge.Point1.Y - axis.Y);
             Point u = edge.Point1 - axis;
             var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-            //edge.Point1 = new Point(uRot.X + axis.X, uRot.Y + axis.Y);
             edge.Point1 = uRot + axis;
 
             (Vertex vertex1, Vertex vertex2) = edge.endpoints;
@@ -146,22 +139,18 @@ namespace Polygons
             vertex2.Center = edge.Point2;
         }
 
-        public void ApplyParallelRelation(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
+        public static void ApplyParallelRelation(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
         {
             foreach(var e in chain)
             {
                 (Vertex vertex1, Vertex vertex2) = e.endpoints;
-                //Point v = new Point(e.Point1.X - axis.X, e.Point1.Y - axis.Y);
                 Point v = e.Point1 - axis;
                 var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-                //e.Point1 = new Point(vRot.X + axis.X, vRot.Y + axis.Y);
                 e.Point1 = vRot + axis;
                 vertex1.Center = e.Point1;
 
-                //Point u = new Point(e.Point2.X - axis.X, e.Point2.Y - axis.Y);
                 Point u = e.Point2 - axis;
                 var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-                //e.Point2 = new Point(uRot.X + axis.X, uRot.Y + axis.Y);
                 e.Point2 = uRot + axis;
                 vertex2.Center = e.Point2;
                 

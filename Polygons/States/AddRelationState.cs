@@ -77,11 +77,10 @@ namespace Polygons.States
                     if(e1.RelationId != null && e1.RelationId == relationId
                         && e2.RelationId != null && e2.RelationId == relationId)
                     {
-                        Polygon? p = context.FindPolygon(edge);
                         Point oldDirection = edge.Point2 - edge.MidPoint;
                         Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        p.ApplyParallelRelation12(edge, edge.MidPoint, sin, cos);
+                        Polygon.ApplyParallelRelation12(edge, edge.MidPoint, sin, cos);
 
                         Point newDirRot = Geometry.Rotate(newDirection, 1, 0);
                         Point castingVersor2 = newDirRot / Geometry.VectorLength(newDirection);
@@ -119,32 +118,30 @@ namespace Polygons.States
                     }
                     else if(e1.RelationId != null && e1.RelationId == relationId)
                     {
-                        Polygon? p = context.FindPolygon(edge);
-                        Point oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
-                        Point newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
+                        Point oldDirection = edge.Point2 - edge.Point1;
+                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (cos < 0)
                         {
-                            newDirection = new(-newDirection.X, -newDirection.Y);
+                            newDirection = -newDirection;
                             (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         }
-                        p.ApplyParallelRelation(edge, edge.Point1, sin, cos);
+                        Polygon.ApplyParallelRelation(edge, edge.Point1, sin, cos);
                         e2.Point1 = edge.Point2;
 
                         AddToChainEnd(e1.chain!, edge, polygon);
                     }
                     else if(e2.RelationId != null && e2.RelationId == relationId)
                     {
-                        Polygon? p = context.FindPolygon(edge);
-                        Point oldDirection = new(edge.Point1.X - edge.Point2.X, edge.Point1.Y - edge.Point2.Y);
-                        Point newDirection = new(relation[0][0].Point1.X - relation[0][0].Point2.X, relation[0][0].Point1.Y - relation[0][0].Point2.Y);
+                        Point oldDirection = edge.Point1 - edge.Point2;
+                        Point newDirection = relation[0][0].Point1 - relation[0][0].Point2;
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if (cos < 0)
                         {
-                            newDirection = new(-newDirection.X, -newDirection.Y);
+                            newDirection = -newDirection;
                             (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         }
-                        p.ApplyParallelRelation1(edge, edge.Point2, sin, cos);
+                        Polygon.ApplyParallelRelation1(edge, edge.Point2, sin, cos);
                         e1.Point2 = edge.Point1;
 
                         AddToChainStart(e2.chain!, edge, polygon);
@@ -152,16 +149,15 @@ namespace Polygons.States
                     else
                     {
                         // TODO lacks some decision making
-                        Polygon? p = context.FindPolygon(edge);
-                        Point oldDirection = new(edge.Point2.X - edge.Point1.X, edge.Point2.Y - edge.Point1.Y);
-                        Point newDirection = new(relation[0][0].Point2.X - relation[0][0].Point1.X, relation[0][0].Point2.Y - relation[0][0].Point1.Y);
+                        Point oldDirection = edge.Point2 - edge.Point1;
+                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
                         (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         if(cos < 0)
                         {
                             newDirection = new(-newDirection.X, -newDirection.Y);
                             (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                         }
-                        p.ApplyParallelRelation(edge, edge.Point1, sin, cos);
+                        Polygon.ApplyParallelRelation(edge, edge.Point1, sin, cos);
                         e2.Point1 = edge.Point2;
 
                         List<Segment> chain = new();
@@ -241,16 +237,15 @@ namespace Polygons.States
             {
                 foreach(var e in chain)
                 {
-                    Polygon? p = context.FindPolygon(e);
-                    Point oldDirection = new(e.Point2.X - e.Point1.X, e.Point2.Y - e.Point1.Y);
-                    Point newDirection = new(r1[0][0].Point2.X - r1[0][0].Point1.X, r1[0][0].Point2.Y - r1[0][0].Point1.Y);
+                    Point oldDirection = e.Point2 - e.Point1;
+                    Point newDirection = r1[0][0].Point2 - r1[0][0].Point1;
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                     if (cos < 0)
                     {
-                        newDirection = new(-newDirection.X, -newDirection.Y);
+                        newDirection = -newDirection;
                         (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
                     }
-                    p!.ApplyParallelRelation(e, e.Point1, sin, cos);
+                    Polygon.ApplyParallelRelation(e, e.Point1, sin, cos);
                     (Segment s1, Segment s2) = e.adjacentEdges;
                     s1.Point2 = e.Point1;
                     s2.Point1 = e.Point2;
