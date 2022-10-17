@@ -265,8 +265,9 @@ namespace Polygons.States
 
         private int AddEmptyRelation()
         {
-            context.relations.Add(context.relations.Count, new List<List<Segment>>());
-            return context.relations.Count - 1;
+            int freshId = context.relations.Count > 0 ? context.relations.Keys.Max() + 1 : 0;
+            context.relations.Add(freshId, new List<List<Segment>>());
+            return freshId;
         }
     }
 }

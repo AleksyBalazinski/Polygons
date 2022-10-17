@@ -26,9 +26,9 @@ namespace Polygons
         public void Subdivide(Segment e)
         {
             int ei = Edges.IndexOf(e);
-            Vertex mid = new Vertex(e.MidPoint);
-            Segment e1 = new Segment(e.Point1, mid.Center);
-            Segment e2 = new Segment(mid.Center, e.Point2);
+            Vertex mid = new(e.MidPoint);
+            Segment e1 = new(e.Point1, mid.Center);
+            Segment e2 = new(mid.Center, e.Point2);
             mid.adjacentEdges.Item1 = e1;
             mid.adjacentEdges.Item2 = e2;
 
@@ -47,6 +47,15 @@ namespace Polygons
             e1.adjacentEdges.Item2 = e2;
             e2.adjacentEdges.Item2 = e.adjacentEdges.Item2;
             e2.adjacentEdges.Item1 = e1;
+
+            // removing relation
+            if(e.RelationId != null)
+            {
+                e1.endpoints.Item1.relationIds.Item1 = null;
+                e1.adjacentEdges.Item1.relationIds.Item1 = null;
+                e2.endpoints.Item2.relationIds.Item2 = null;
+                e2.adjacentEdges.Item2.relationIds.Item2 = null;
+            }
 
             Vertices.Insert(ei + 1, mid);
             Edges.Insert(ei, e1);
@@ -99,6 +108,18 @@ namespace Polygons
             else
             {
                 Edges.Insert(vi - 1, newEdge);
+            }
+
+            // removing relation
+            if(v.relationIds.Item2 != null)
+            {
+                edge1.endpoints.Item1.relationIds.Item1 = null;
+                edge1.adjacentEdges.Item1.relationIds.Item1 = null;
+            }
+            if(v.relationIds.Item1 != null)
+            {
+                edge2.endpoints.Item2.relationIds.Item2 = null;
+                edge2.adjacentEdges.Item2.relationIds.Item2 = null;
             }
                 
             Vertices.Remove(v);

@@ -74,6 +74,24 @@ namespace Polygons
         private void addRelation_Click(object sender, EventArgs e)
             => TransitionTo(new AddRelationState());
 
+        private void buttonDeleteRelation_Click(object sender, EventArgs e)
+        {
+            int relId = Utilities.QueryForRelationId();
+            foreach(var chain in relations[relId])
+            {
+                foreach(var edge in chain)
+                {
+                    edge.RelationId = null;
+                    edge.chain = null;
+                    edge.adjacentEdges.Item1.relationIds.Item1 = null;
+                    edge.endpoints.Item1.relationIds.Item1 = null;
+                    edge.adjacentEdges.Item2.relationIds.Item2 = null;
+                    edge.endpoints.Item2.relationIds.Item2 = null;
+                }
+            }
+            relations.Remove(relId);
+            canvas.Invalidate();
+        }
         //
         // algorithm selection
         //

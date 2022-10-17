@@ -13,7 +13,7 @@ namespace Polygons
         {
             string lengthString = "";
             float length;
-            using (InputForm inputForm = new InputForm())
+            using (InputForm inputForm = new())
             {
                 inputForm.Input = edge.Length.ToString();
                 if (inputForm.ShowDialog() == DialogResult.OK)
@@ -34,6 +34,19 @@ namespace Polygons
             }
 
             return length;
+        }
+        public static int QueryForRelationId()
+        {
+            string relIdString = "";
+            using (RelationInputForm inputForm = new())
+            {
+                if(inputForm.ShowDialog() == DialogResult.OK)
+                {
+                    relIdString = inputForm.Input;
+                }
+            }
+
+            return int.Parse(relIdString);
         }
     }
 }

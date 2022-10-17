@@ -1,6 +1,6 @@
 ﻿namespace Polygons
 {
-    partial class InputForm
+    partial class RelationInputForm
     {
         /// <summary>
         /// Required designer variable.
@@ -37,15 +37,15 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(61, 38);
+            this.label1.Location = new System.Drawing.Point(35, 45);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(70, 15);
+            this.label1.Size = new System.Drawing.Size(63, 15);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Edge length";
+            this.label1.Text = "Relation id";
             // 
             // textBoxInput
             // 
-            this.textBoxInput.Location = new System.Drawing.Point(61, 56);
+            this.textBoxInput.Location = new System.Drawing.Point(35, 63);
             this.textBoxInput.Name = "textBoxInput";
             this.textBoxInput.Size = new System.Drawing.Size(100, 23);
             this.textBoxInput.TabIndex = 1;
@@ -53,7 +53,7 @@
             // buttonOk
             // 
             this.buttonOk.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.buttonOk.Location = new System.Drawing.Point(24, 100);
+            this.buttonOk.Location = new System.Drawing.Point(12, 101);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(75, 23);
             this.buttonOk.TabIndex = 2;
@@ -63,14 +63,14 @@
             // buttonCancel
             // 
             this.buttonCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.buttonCancel.Location = new System.Drawing.Point(105, 100);
+            this.buttonCancel.Location = new System.Drawing.Point(93, 101);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 3;
             this.buttonCancel.Text = "cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             // 
-            // InputForm
+            // RelationInputForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -79,8 +79,8 @@
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.textBoxInput);
             this.Controls.Add(this.label1);
-            this.Name = "InputForm";
-            this.Text = "InputForm";
+            this.Name = "RelationInputForm";
+            this.Text = "RelationInputForm";
             this.ResumeLayout(false);
             this.PerformLayout();
 

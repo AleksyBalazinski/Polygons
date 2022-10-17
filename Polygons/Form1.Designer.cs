@@ -48,6 +48,7 @@
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.buttonDeleteRelation = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -64,8 +65,7 @@
             this.helpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Padding = new System.Windows.Forms.Padding(7, 3, 0, 3);
-            this.menuStrip1.Size = new System.Drawing.Size(1082, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(947, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -75,20 +75,20 @@
             this.clearToolStripMenuItem,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(46, 24);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // clearToolStripMenuItem
             // 
             this.clearToolStripMenuItem.Name = "clearToolStripMenuItem";
-            this.clearToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.clearToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.clearToolStripMenuItem.Text = "Clear";
             this.clearToolStripMenuItem.Click += new System.EventHandler(this.clearToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(101, 22);
             this.exitToolStripMenuItem.Text = "Exit";
             // 
             // helpToolStripMenuItem
@@ -96,50 +96,47 @@
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(55, 24);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.helpToolStripMenuItem.Text = "Help";
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(133, 26);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
             this.aboutToolStripMenuItem.Text = "About";
             // 
             // tableLayoutPanel
             // 
             this.tableLayoutPanel.ColumnCount = 2;
-            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 114F));
+            this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel.Controls.Add(this.panelCanvas, 1, 1);
             this.tableLayoutPanel.Controls.Add(this.panel1, 1, 0);
             this.tableLayoutPanel.Controls.Add(this.panel2, 0, 1);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel.Location = new System.Drawing.Point(0, 30);
-            this.tableLayoutPanel.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.tableLayoutPanel.Location = new System.Drawing.Point(0, 24);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
             this.tableLayoutPanel.RowCount = 2;
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 67F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel.Size = new System.Drawing.Size(1082, 723);
+            this.tableLayoutPanel.Size = new System.Drawing.Size(947, 541);
             this.tableLayoutPanel.TabIndex = 1;
             // 
             // panelCanvas
             // 
             this.panelCanvas.Controls.Add(this.canvas);
             this.panelCanvas.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelCanvas.Location = new System.Drawing.Point(117, 71);
-            this.panelCanvas.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panelCanvas.Location = new System.Drawing.Point(103, 53);
             this.panelCanvas.Name = "panelCanvas";
-            this.panelCanvas.Size = new System.Drawing.Size(962, 648);
+            this.panelCanvas.Size = new System.Drawing.Size(841, 485);
             this.panelCanvas.TabIndex = 0;
             // 
             // canvas
             // 
             this.canvas.Dock = System.Windows.Forms.DockStyle.Fill;
             this.canvas.Location = new System.Drawing.Point(0, 0);
-            this.canvas.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(962, 648);
+            this.canvas.Size = new System.Drawing.Size(841, 485);
             this.canvas.TabIndex = 0;
             this.canvas.TabStop = false;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.canvas_Paint);
@@ -152,24 +149,23 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonDeleteRelation);
             this.panel1.Controls.Add(this.addRelation);
             this.panel1.Controls.Add(this.buttonFixLength);
             this.panel1.Controls.Add(this.buttonAddVertex);
             this.panel1.Controls.Add(this.buttonDelete);
             this.panel1.Controls.Add(this.buttonMove);
             this.panel1.Controls.Add(this.buttonDraw);
-            this.panel1.Location = new System.Drawing.Point(117, 4);
-            this.panel1.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.panel1.Location = new System.Drawing.Point(103, 3);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(962, 59);
+            this.panel1.Size = new System.Drawing.Size(841, 44);
             this.panel1.TabIndex = 2;
             // 
             // addRelation
             // 
-            this.addRelation.Location = new System.Drawing.Point(681, 0);
-            this.addRelation.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.addRelation.Location = new System.Drawing.Point(417, 0);
             this.addRelation.Name = "addRelation";
-            this.addRelation.Size = new System.Drawing.Size(86, 59);
+            this.addRelation.Size = new System.Drawing.Size(75, 44);
             this.addRelation.TabIndex = 6;
             this.addRelation.Text = "Add relation";
             this.addRelation.UseVisualStyleBackColor = true;
@@ -177,10 +173,9 @@
             // 
             // buttonFixLength
             // 
-            this.buttonFixLength.Location = new System.Drawing.Point(542, 0);
-            this.buttonFixLength.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.buttonFixLength.Location = new System.Drawing.Point(336, 0);
             this.buttonFixLength.Name = "buttonFixLength";
-            this.buttonFixLength.Size = new System.Drawing.Size(86, 59);
+            this.buttonFixLength.Size = new System.Drawing.Size(75, 44);
             this.buttonFixLength.TabIndex = 5;
             this.buttonFixLength.Text = "Fix length";
             this.buttonFixLength.UseVisualStyleBackColor = true;
@@ -188,10 +183,9 @@
             // 
             // buttonAddVertex
             // 
-            this.buttonAddVertex.Location = new System.Drawing.Point(397, 0);
-            this.buttonAddVertex.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.buttonAddVertex.Location = new System.Drawing.Point(255, 0);
             this.buttonAddVertex.Name = "buttonAddVertex";
-            this.buttonAddVertex.Size = new System.Drawing.Size(86, 59);
+            this.buttonAddVertex.Size = new System.Drawing.Size(75, 44);
             this.buttonAddVertex.TabIndex = 4;
             this.buttonAddVertex.Text = "Add vertex";
             this.buttonAddVertex.UseVisualStyleBackColor = true;
@@ -199,10 +193,9 @@
             // 
             // buttonDelete
             // 
-            this.buttonDelete.Location = new System.Drawing.Point(270, 0);
-            this.buttonDelete.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.buttonDelete.Location = new System.Drawing.Point(174, 0);
             this.buttonDelete.Name = "buttonDelete";
-            this.buttonDelete.Size = new System.Drawing.Size(86, 59);
+            this.buttonDelete.Size = new System.Drawing.Size(75, 44);
             this.buttonDelete.TabIndex = 3;
             this.buttonDelete.Text = "Delete vertex";
             this.buttonDelete.UseVisualStyleBackColor = true;
@@ -210,10 +203,9 @@
             // 
             // buttonMove
             // 
-            this.buttonMove.Location = new System.Drawing.Point(143, 0);
-            this.buttonMove.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.buttonMove.Location = new System.Drawing.Point(93, 0);
             this.buttonMove.Name = "buttonMove";
-            this.buttonMove.Size = new System.Drawing.Size(86, 59);
+            this.buttonMove.Size = new System.Drawing.Size(75, 44);
             this.buttonMove.TabIndex = 2;
             this.buttonMove.Text = "Move";
             this.buttonMove.UseVisualStyleBackColor = true;
@@ -221,11 +213,9 @@
             // 
             // buttonDraw
             // 
-            this.buttonDraw.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.buttonDraw.Location = new System.Drawing.Point(14, 0);
-            this.buttonDraw.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
+            this.buttonDraw.Location = new System.Drawing.Point(12, 0);
             this.buttonDraw.Name = "buttonDraw";
-            this.buttonDraw.Size = new System.Drawing.Size(86, 59);
+            this.buttonDraw.Size = new System.Drawing.Size(75, 44);
             this.buttonDraw.TabIndex = 1;
             this.buttonDraw.Text = "Draw";
             this.buttonDraw.UseVisualStyleBackColor = true;
@@ -237,17 +227,19 @@
             this.panel2.Controls.Add(this.radioButtonLineLibrary);
             this.panel2.Controls.Add(this.label1);
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel2.Location = new System.Drawing.Point(3, 70);
+            this.panel2.Location = new System.Drawing.Point(3, 52);
+            this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(108, 650);
+            this.panel2.Size = new System.Drawing.Size(94, 487);
             this.panel2.TabIndex = 3;
             // 
             // radioButtonLineBresenham
             // 
             this.radioButtonLineBresenham.AutoSize = true;
-            this.radioButtonLineBresenham.Location = new System.Drawing.Point(5, 117);
+            this.radioButtonLineBresenham.Location = new System.Drawing.Point(4, 88);
+            this.radioButtonLineBresenham.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonLineBresenham.Name = "radioButtonLineBresenham";
-            this.radioButtonLineBresenham.Size = new System.Drawing.Size(103, 24);
+            this.radioButtonLineBresenham.Size = new System.Drawing.Size(84, 19);
             this.radioButtonLineBresenham.TabIndex = 2;
             this.radioButtonLineBresenham.Text = "Bresenham";
             this.radioButtonLineBresenham.UseVisualStyleBackColor = true;
@@ -257,9 +249,10 @@
             // 
             this.radioButtonLineLibrary.AutoSize = true;
             this.radioButtonLineLibrary.Checked = true;
-            this.radioButtonLineLibrary.Location = new System.Drawing.Point(5, 87);
+            this.radioButtonLineLibrary.Location = new System.Drawing.Point(4, 65);
+            this.radioButtonLineLibrary.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.radioButtonLineLibrary.Name = "radioButtonLineLibrary";
-            this.radioButtonLineLibrary.Size = new System.Drawing.Size(75, 24);
+            this.radioButtonLineLibrary.Size = new System.Drawing.Size(61, 19);
             this.radioButtonLineLibrary.TabIndex = 1;
             this.radioButtonLineLibrary.TabStop = true;
             this.radioButtonLineLibrary.Text = "Library";
@@ -269,21 +262,30 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 19);
+            this.label1.Location = new System.Drawing.Point(8, 14);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(94, 40);
+            this.label1.Size = new System.Drawing.Size(75, 30);
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
             // 
+            // buttonDeleteRelation
+            // 
+            this.buttonDeleteRelation.Location = new System.Drawing.Point(498, 3);
+            this.buttonDeleteRelation.Name = "buttonDeleteRelation";
+            this.buttonDeleteRelation.Size = new System.Drawing.Size(82, 41);
+            this.buttonDeleteRelation.TabIndex = 7;
+            this.buttonDeleteRelation.Text = "Delete relation";
+            this.buttonDeleteRelation.UseVisualStyleBackColor = true;
+            this.buttonDeleteRelation.Click += new System.EventHandler(this.buttonDeleteRelation_Click);
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1082, 753);
+            this.ClientSize = new System.Drawing.Size(947, 565);
             this.Controls.Add(this.tableLayoutPanel);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
-            this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Form1";
             this.Text = "Polygons";
             this.menuStrip1.ResumeLayout(false);
@@ -321,5 +323,6 @@
         private Button buttonAddVertex;
         private Button buttonFixLength;
         private Button addRelation;
+        private Button buttonDeleteRelation;
     }
 }
