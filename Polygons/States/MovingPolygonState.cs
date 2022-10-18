@@ -16,7 +16,7 @@
 
         public override void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            DrawAfterPolygonMoved(e.X, e.Y);
+            DrawAfterPolygonMoved(e.Location);
         }
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
@@ -24,11 +24,11 @@
             context.TransitionTo(new MoveState());
         }
 
-        private void DrawAfterPolygonMoved(int x, int y)
+        private void DrawAfterPolygonMoved(Point location)
         {
-            var displacement = new Point(x - previousPoint.X, y - previousPoint.Y);
+            var displacement = location - previousPoint;
             movedPolygon.Move(displacement);
-            previousPoint = new Point(x, y);
+            previousPoint = location;
             context.Canvas.Invalidate();
         }
     }

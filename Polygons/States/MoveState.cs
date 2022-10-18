@@ -11,8 +11,8 @@ namespace Polygons.States
             var vertexInfo = FindVertexToBeMoved(e.Location);
             if (vertexInfo != null)
             {
-                (Vertex vertex, Segment edge1, Segment edge2) = vertexInfo.Value;
-                context.TransitionTo(new MovingVertexState(vertex, edge1, edge2, previousPoint));
+                Vertex vertex = vertexInfo;
+                context.TransitionTo(new MovingVertexState(vertex));
                 return;
             }
 
@@ -40,7 +40,7 @@ namespace Polygons.States
         {
         }
 
-        private (Vertex, Segment, Segment)? FindVertexToBeMoved(Point p)
+        private Vertex? FindVertexToBeMoved(Point p)
         {
             Vertex movedVertex;
             foreach (var polygon in context.Polygons)
@@ -51,11 +51,9 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Vertex {vertex} hit");
                         movedVertex = vertex;
-                        //(Segment edge1, Segment edge2) = polygon.GetAdjacentEdges(vertex);
-                        (Segment edge1, Segment edge2) = vertex.adjacentEdges;
                         previousPoint = p;
 
-                        return (movedVertex, edge1, edge2);
+                        return movedVertex;
                     }
                 }
             }

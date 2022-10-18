@@ -15,6 +15,7 @@ namespace Polygons
 
         public (int?, int?) relationIds; // adjacent edges RENAME
         public bool fixedLength;
+        public float declaredLength;
         public (bool, bool) fixedLengths;
         public List<Segment>? chain; // pointer to mother chain
         public (Vertex, Vertex) endpoints;
@@ -63,7 +64,7 @@ namespace Polygons
 
         public void MoveStartAbs(Point p)
         {
-            Point1 = new Point(p.X, p.Y);
+            Point1 = p;
         }
 
         public void MoveEnd(Point d)
@@ -73,7 +74,7 @@ namespace Polygons
 
         public void MoveEndAbs(Point p)
         {
-            Point2 = new Point(p);
+            Point2 = p;
         }
 
         public override string ToString()

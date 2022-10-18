@@ -34,6 +34,7 @@ namespace Polygons.States
 
                         polygon.SetLength(edge, length);
                         edge.fixedLength = true;
+                        edge.declaredLength = length;
                         (Vertex v1, Vertex v2) = edge.endpoints;
                         v1.fixedLenghts.Item1 = true;
                         v2.fixedLenghts.Item2 = true;
