@@ -40,6 +40,7 @@ namespace Polygons
                 adjacentEdge2.Point1 = location;
                 adjacentEdge2.endpoints.Item1.MoveAbs(location);
                 FixEdgeLength(adjacentEdge2);
+                adjacentEdge1.Point2 = adjacentEdge2.Point1;
             }
             else
             {
@@ -90,14 +91,13 @@ namespace Polygons
             Segment adjacentEdge1 = movedVertex.adjacentEdges.Item1;
             Segment adjacentEdge2 = movedVertex.adjacentEdges.Item2;
             (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-            movedVertex.MoveAbs(location);
 
             Polygon.ApplyParallelRelation(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
 
             adjacentEdge2.MoveStartAbs(location);
             if (chain.Count > 1)
                 adjacentEdge2.MoveEndAbs(chain[1].Point1);
-
+            movedVertex.MoveAbs(location);
             InvalidateRelatedChains(chain, relId, sin, cos);
             seenRelations.Add(relId);
             FixLengthsInChain(chain);
@@ -109,7 +109,7 @@ namespace Polygons
             else if (adjacentEdge1.fixedLength)
             {
                 adjacentEdge1.MoveEndAbs(chain[0].Point1);
-                FixEdgeLength(adjacentEdge1);
+                FixEdgeLength2(adjacentEdge1);
             }
             else
             {
@@ -194,11 +194,35 @@ namespace Polygons
             Point versor = p1p2 / Geometry.VectorLength(p1p2);
             edge.Point2 = edge.Point1 + edge.declaredLength * versor;
             edge.endpoints.Item2.MoveAbs(edge.Point2);
-            //if(edge.adjacentEdges.Item2.RelationId == null)
+            if(edge.adjacentEdges.Item2.RelationId == null) // don't touch edge in a relation
                 edge.adjacentEdges.Item2.Point1 = edge.Point2;
+            else
+            {
+                FixChainAtStart(edge.adjacentEdges.Item2.chain, edge.Point2);
+                return;
+            }
             if(edge.adjacentEdges.Item2.fixedLength)
             {
                 FixEdgeLength(edge.adjacentEdges.Item2);
+            }
+        }
+
+        public void FixEdgeLength2(Segment edge)
+        {
+            Point p2p1 = edge.Point1 - edge.Point2;
+            Point versor = p2p1 / Geometry.VectorLength(p2p1);
+            edge.Point1 = edge.Point2 + edge.declaredLength * versor;
+            edge.endpoints.Item1.MoveAbs(edge.Point1);
+            if (edge.adjacentEdges.Item1.RelationId == null) // don't touch edge in a relation
+                edge.adjacentEdges.Item1.Point2 = edge.Point1;
+            else if(!seenRelations.Contains((int)edge.adjacentEdges.Item1.RelationId))
+            {
+                FixChainAtEnd(edge.adjacentEdges.Item1.chain, edge.Point1);
+                return;
+            }
+            if (edge.adjacentEdges.Item1.fixedLength)
+            {
+                FixEdgeLength(edge.adjacentEdges.Item1);
             }
         }
 
