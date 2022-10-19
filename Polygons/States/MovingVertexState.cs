@@ -26,7 +26,7 @@ namespace Polygons.States
 
         private void DrawAfterVertexMoved(Point location)
         {
-            Fixer fixer = new(context.relations);
+            Fixer fixer = new(context.relations, context.Canvas);
             fixer.Fix(movedVertex, location);
 
             context.Canvas.Invalidate();

@@ -47,7 +47,7 @@ namespace Polygons
 
         public void MoveAbs(Point p)
         {
-            Center = new Point(p.X, p.Y);
+            Center = p;
         }
 
         public override string ToString() => String.Format($"({Center.X}, {Center.Y})");

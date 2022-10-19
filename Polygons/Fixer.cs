@@ -6,9 +6,11 @@ namespace Polygons
     {
         private Dictionary<int, List<List<Segment>>> relations;
         private HashSet<int> seenRelations = new();
-        public Fixer(Dictionary<int, List<List<Segment>>> relations)
+        PictureBox canvas; // debug
+        public Fixer(Dictionary<int, List<List<Segment>>> relations, PictureBox canvas)
         {
             this.relations = relations;
+            this.canvas = canvas;
         }
 
         public void Fix(Vertex movedVertex, Point location)
@@ -48,23 +50,22 @@ namespace Polygons
         public void FixChainAtEnd(List<Segment> chain, Point location)
         {
             int relId = (int)chain[0].RelationId;
-            Point oldDirection = chain[^1].Point2 - chain[0].Point1;
+            Point oldDirection = chain[0].Point2 - chain[0].Point1;
             Point newDirection = location - chain[0].Point1;
             Vertex movedVertex = chain[^1].endpoints.Item2;
             Segment adjacentEdge1 = movedVertex.adjacentEdges.Item1;
             Segment adjacentEdge2 = movedVertex.adjacentEdges.Item2;
             (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-            movedVertex.MoveAbs(location);
 
             Polygon.ApplyParallelRelation(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
 
             adjacentEdge1.MoveEndAbs(location);
             if(chain.Count > 1)
-                adjacentEdge1.MoveStartAbs(chain[chain.Count - 2].Point2);
+                adjacentEdge1.MoveStartAbs(chain[^2].Point2);
+            movedVertex.MoveAbs(location);
             InvalidateRelatedChains(chain, relId, sin, cos);
             seenRelations.Add(relId);
             FixLengthsInChain(chain);
-
             if (adjacentEdge2.RelationId != null && !seenRelations.Contains((int)adjacentEdge2.RelationId))
             {
                 FixChainAtStart(adjacentEdge2.chain, chain[^1].Point2);
@@ -83,7 +84,7 @@ namespace Polygons
         public void FixChainAtStart(List<Segment> chain, Point location)
         {
             int relId = (int)chain[0].RelationId;
-            Point oldDirection = chain[0].Point1 - chain[^1].Point2;
+            Point oldDirection = chain[^1].Point1 - chain[^1].Point2;
             Point newDirection = location - chain[^1].Point2;
             Vertex movedVertex = chain[0].endpoints.Item1;
             Segment adjacentEdge1 = movedVertex.adjacentEdges.Item1;
@@ -142,7 +143,7 @@ namespace Polygons
             if (indx != 0)
                 adjacentEdge1.MoveStartAbs(chain[indx - 1].Point2);
 
-            adjacentEdge2.MoveStartAbs(location);
+
             if (indx <= chain.Count - 3)
                 adjacentEdge2.MoveEndAbs(chain[indx + 2].Point1);
             else
@@ -153,6 +154,7 @@ namespace Polygons
                 (_, Vertex v2) = adjacentEdge2.endpoints;
                 v2.MoveAbs(adjacentEdge2.Point2);
             }
+            adjacentEdge2.MoveStartAbs(adjacentEdge1.Point2);
 
             firstAdjacentEdges.Item1.Point2 = first.Point1;
 
@@ -192,7 +194,7 @@ namespace Polygons
             Point versor = p1p2 / Geometry.VectorLength(p1p2);
             edge.Point2 = edge.Point1 + edge.declaredLength * versor;
             edge.endpoints.Item2.MoveAbs(edge.Point2);
-            if(edge.adjacentEdges.Item2.RelationId == null)
+            //if(edge.adjacentEdges.Item2.RelationId == null)
                 edge.adjacentEdges.Item2.Point1 = edge.Point2;
             if(edge.adjacentEdges.Item2.fixedLength)
             {

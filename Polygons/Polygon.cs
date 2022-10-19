@@ -174,12 +174,6 @@ namespace Polygons
                 var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
                 e.Point2 = uRot + axis;
                 vertex2.Center = e.Point2;
-                
-                if(e == chain[^1])
-                {
-                    (_, Segment next) = e.adjacentEdges;
-                    next.Point1 = e.Point2;
-                }
             }
         }
 
