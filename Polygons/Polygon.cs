@@ -177,6 +177,18 @@ namespace Polygons
             }
         }
 
+        public static void ApplyTranslation(List<Segment> chain, Point displacement)
+        {
+            foreach(var e in chain)
+            {
+                e.Point1 += displacement;
+                e.Point2 += displacement;
+                (Vertex v1, Vertex v2) = e.endpoints;
+                v1.Center = e.Point1;
+                v2.Center = e.Point2;
+            }
+        }
+
         public bool HitTest(Point p)
         {
             float xMin = float.MaxValue;

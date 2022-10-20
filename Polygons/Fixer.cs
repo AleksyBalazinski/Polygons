@@ -1,22 +1,30 @@
-﻿using System.Diagnostics;
+﻿#define NEW
+using System.Diagnostics;
+using System.Windows.Forms.VisualStyles;
+
 
 namespace Polygons
 {
+    using Relations = Dictionary<int, List<List<Segment>>>;
+    using Chain = List<Segment>;
     internal class Fixer
     {
-        private Dictionary<int, List<List<Segment>>> relations;
-        private HashSet<int> seenRelations = new();
+        private Relations relations;
+        //private HashSet<int> seenRelations = new();
         PictureBox canvas; // debug
-        public Fixer(Dictionary<int, List<List<Segment>>> relations, PictureBox canvas)
+        private Segment theUnconstrainedEdge;
+        private Dictionary<int, List<Segment>> seenChains = new();
+        public Fixer(Relations relations, PictureBox canvas)
         {
             this.relations = relations;
             this.canvas = canvas;
         }
-
+#if OLD
         public void Fix(Vertex movedVertex, Point location)
         {
             (int? relId1, int? relId2) = movedVertex.relationIds;
             (Segment adjacentEdge1, Segment adjacentEdge2) = movedVertex.adjacentEdges;
+            
             if (relId1 != null && relId2 != null && relId1 == relId2)
             {
                 FixChainInside(adjacentEdge1.chain, location, movedVertex);
@@ -46,8 +54,160 @@ namespace Polygons
             {
                 MoveFreeVertex(location, movedVertex);
             }
+            
+        }
+#endif
+
+        public void Fix(Vertex movedVertex, Point location)
+        {
+            // TODO check if at least oe unconstrained edge exists
+            FixForward(movedVertex, location);
+            FixBackward(movedVertex, location);
         }
 
+        public void FixForward(Vertex movedVertex, Point location)
+        {
+            Segment adjacentEdge2 = movedVertex.adjacentEdges.Item2;
+            int? relId = adjacentEdge2.RelationId;
+            // v starts a chain
+            if (relId != null)
+            {
+                // seeing chain from relation relId for the first time
+                if(!seenChains.ContainsKey((int)relId))
+                {
+                    Chain chain = adjacentEdge2.chain;
+                    Point oldDirection = chain[^1].Point1 - chain[^1].Point2;
+                    Point newDirection = location - chain[^1].Point2;
+
+                    (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+
+                    Polygon.ApplyParallelRelation(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
+
+                    adjacentEdge2.MoveStartAbs(location);
+                    if (chain.Count > 1)
+                        adjacentEdge2.MoveEndAbs(chain[1].Point1);
+                    movedVertex.MoveAbs(location);
+                    seenChains.Add((int)relId, chain);
+                    canvas.Refresh();
+                    FixForward(chain[^1].endpoints.Item2, chain[^1].Point2);
+                }
+                else // already seen this relId
+                {
+                    var displacement = location - movedVertex.Center;
+                    Chain chain = adjacentEdge2.chain;
+                    Polygon.ApplyTranslation(chain, displacement);
+                    Chain model = seenChains[(int)relId];
+
+                    Point currentDirection = chain[^1].Point2 - chain[0].Point1;
+                    Point modelDirection = model[^1].Point2 - model[0].Point1;
+
+                    (float sin, float cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
+
+                    Polygon.ApplyParallelRelation(chain, chain[0].Point1, sin, cos);
+                    canvas.Refresh();
+                    FixForward(chain[^1].endpoints.Item2, chain[^1].Point2);
+                }
+            }
+            // v starts a constant length edge
+            else if(adjacentEdge2.fixedLength)
+            {
+                movedVertex.MoveAbs(location);
+                adjacentEdge2.Point1 = location;
+                Point p1p2 = adjacentEdge2.Point2 - adjacentEdge2.Point1;
+                Point versor = p1p2 / Geometry.VectorLength(p1p2);
+                adjacentEdge2.Point2 = adjacentEdge2.Point1 + adjacentEdge2.declaredLength * versor;
+                canvas.Refresh();
+                FixForward(adjacentEdge2.endpoints.Item2, adjacentEdge2.Point2);
+            }
+            // assume forawrdFirst == true TODO ...
+            // v starts unconstrained edge
+            else
+            {
+                movedVertex.MoveAbs(location);
+                adjacentEdge2.Point1 = location;
+                theUnconstrainedEdge = adjacentEdge2;
+                canvas.Refresh();
+                return;
+            }
+            canvas.Refresh();
+        }
+
+        public void FixBackward(Vertex movedVertex, Point location)
+        {
+            Segment adjacentEdge1 = movedVertex.adjacentEdges.Item1;
+            int? relId = adjacentEdge1.RelationId;
+            // v ends a chain
+            if(relId != null)
+            {
+                if(!seenChains.ContainsKey((int)relId))
+                {
+                    Chain chain = adjacentEdge1.chain;
+                    Point oldDirection = chain[0].Point2 - chain[0].Point1;
+                    Point newDirection = location - chain[0].Point1;
+
+                    (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
+
+                    Polygon.ApplyParallelRelation(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
+
+                    adjacentEdge1.MoveEndAbs(location);
+                    if (chain.Count > 1)
+                        adjacentEdge1.MoveStartAbs(chain[^2].Point2);
+                    movedVertex.MoveAbs(location);
+                    seenChains.Add((int)relId, chain);
+                    canvas.Refresh();
+
+                    FixBackward(chain[0].endpoints.Item1, chain[0].Point1);
+                }
+                else // already seen this relId
+                {
+                    var displacement = location - movedVertex.Center;
+                    Chain chain = adjacentEdge1.chain;
+                    Polygon.ApplyTranslation(chain, displacement);
+                    Chain model = seenChains[(int)relId];
+
+                    Point currentDirection = chain[0].Point1 - chain[^1].Point2;
+                    Point modelDirection = model[0].Point1 - model[^1].Point2;
+
+                    (float sin, float cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
+
+                    Polygon.ApplyParallelRelation(chain, chain[^1].Point2, sin, cos);
+
+                    canvas.Refresh();
+                    FixBackward(chain[0].endpoints.Item1, chain[0].Point1);
+                }
+            }
+            // v ends a constant length edge
+            else if (adjacentEdge1.fixedLength)
+            {
+                movedVertex.MoveAbs(location);
+                adjacentEdge1.Point2 = location;
+                Point p2p1 = adjacentEdge1.Point1 - adjacentEdge1.Point2;
+                Point versor = p2p1 / Geometry.VectorLength(p2p1);
+                adjacentEdge1.Point1 = adjacentEdge1.Point2 + adjacentEdge1.declaredLength * versor;
+
+                canvas.Refresh();
+                FixBackward(adjacentEdge1.endpoints.Item1, adjacentEdge1.Point1);
+            }
+
+            // assume forwardFirst == true TODO
+            // v ends unconstrained edge -> proceed until unconstrained edge that triggered FixBackward is found
+            else if (adjacentEdge1 != theUnconstrainedEdge)
+            {
+                movedVertex.MoveAbs(location);
+                adjacentEdge1.Point2 = location;
+                canvas.Refresh();
+                FixBackward(adjacentEdge1.endpoints.Item1, adjacentEdge1.Point1);
+            }
+            else
+            {
+                canvas.Refresh();
+                return;
+            }
+            canvas.Refresh();
+        }
+
+
+#if OLD
         public void FixChainAtEnd(List<Segment> chain, Point location)
         {
             int relId = (int)chain[0].RelationId;
@@ -245,5 +405,6 @@ namespace Polygons
                 }
             }
         }
+#endif
     }
 }
