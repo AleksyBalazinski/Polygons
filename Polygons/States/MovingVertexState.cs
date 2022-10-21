@@ -28,6 +28,13 @@ namespace Polygons.States
         {
             Fixer fixer = new(context.relations, context.Canvas);
             fixer.Fix(movedVertex, location);
+            foreach(var p in context.Polygons)
+            {
+                if(p != movedVertex.polygon)
+                {
+                    fixer.FixOffshoot(p);
+                }
+            }
 
             context.Canvas.Invalidate();
         }

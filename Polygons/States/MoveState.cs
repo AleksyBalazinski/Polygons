@@ -19,8 +19,8 @@ namespace Polygons.States
             var edgeInfo = FindEdgeToBeMoved(e.Location);
             if (edgeInfo != null)
             {
-                (Segment edge, Segment edge1, Segment edge2, Vertex vertex1, Vertex vertex2) = edgeInfo.Value;
-                context.TransitionTo(new MovingEdgeState(edge, edge1, edge2, vertex1, vertex2, previousPoint));
+                Segment edge = edgeInfo;
+                context.TransitionTo(new MovingEdgeState(edge, previousPoint));
                 return;
             }
 
@@ -60,7 +60,7 @@ namespace Polygons.States
             return null;
         }
 
-        private (Segment, Segment, Segment, Vertex, Vertex)? FindEdgeToBeMoved(Point p)
+        private Segment? FindEdgeToBeMoved(Point p)
         {
             Segment movedEdge;
             foreach (var polygon in context.Polygons)
@@ -76,7 +76,7 @@ namespace Polygons.States
 
                         previousPoint = p;
 
-                        return (movedEdge, edge1, edge2, vertex1, vertex2);
+                        return movedEdge;
                     }
                 }
             }

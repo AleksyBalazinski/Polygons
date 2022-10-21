@@ -24,6 +24,7 @@ namespace Polygons
         public (int?, int?) relationIds;
         public (bool, bool) fixedLenghts;
         public (Segment, Segment) adjacentEdges;
+        public Polygon polygon;
 
         public void Draw(Graphics g, Algorithm a)
         {

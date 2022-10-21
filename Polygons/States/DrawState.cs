@@ -74,6 +74,7 @@ namespace Polygons.States
                 drawnSegment.Point1 = drawnSegment.Point2 = new Point(x, y);
 
                 constructedPolygon.Vertices.Add(v);
+                v.polygon = constructedPolygon;
                 drawnSegment.endpoints.Item1 = v;
                 v.adjacentEdges.Item2 = drawnSegment;
                 definingNewPolygon = false;

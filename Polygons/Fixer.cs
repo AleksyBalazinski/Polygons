@@ -1,5 +1,4 @@
-﻿#define NEW
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows.Forms.VisualStyles;
 
 
@@ -11,9 +10,9 @@ namespace Polygons
     {
         private Relations relations;
         PictureBox canvas; // debug
-        private Segment theUnconstrainedEdge;
         private Vertex startVertex;
-        private Dictionary<int, List<Segment>> seenChains = new();
+        private Dictionary<int, Chain> seenChains = new();
+        private HashSet<Polygon> seenPolygons = new();
         public Fixer(Relations relations, PictureBox canvas)
         {
             this.relations = relations;
@@ -22,7 +21,7 @@ namespace Polygons
 
         public void Fix(Vertex movedVertex, Point location)
         {
-            // TODO check if at least oe unconstrained edge exists
+            // TODO check if at least oe unconstrained edge exists in movedVertex.polygon
             if(movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
                 && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
             {
@@ -34,6 +33,43 @@ namespace Polygons
             {
                 FixForward(movedVertex, location, true);
                 FixBackward(movedVertex, location, true);
+            }
+        }
+
+        public void Fix(Segment movedEdge, Point displacement)
+        {
+            // TODO check if at least oe unconstrained edge exists in movedEdge.endpoints.Item1.polygon
+            if (movedEdge.RelationId != null)
+            {
+                Polygon.ApplyTranslation(movedEdge.chain, displacement);
+                FixForward(movedEdge.chain[^1].endpoints.Item2, movedEdge.chain[^1].Point2, true);
+                FixBackward(movedEdge.chain[0].endpoints.Item1, movedEdge.chain[0].Point1, true);
+            }
+            else
+            {
+                movedEdge.Point1 += displacement;
+                movedEdge.Point2 += displacement;
+                FixForward(movedEdge.endpoints.Item2, movedEdge.Point2, true);
+                FixBackward(movedEdge.endpoints.Item1, movedEdge.Point1, true);
+            }
+        }
+
+        public void FixOffshoot(Polygon affectedPolygon)
+        {
+            // TODO check if at least oe unconstrained edge exists in affectedPolygon
+            Vertex movedVertex = affectedPolygon.Vertices[0];
+            Point location = movedVertex.Center;
+            if (movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
+                && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
+            {
+                Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain, movedVertex, location);
+                FixForward(v, v.Center, false);
+                FixBackward(v, v.Center, false);
+            }
+            else
+            {
+                FixForward(movedVertex, location, false);
+                FixBackward(movedVertex, location, false);
             }
         }
 
@@ -91,6 +127,7 @@ namespace Polygons
                     canvas.Refresh();
                     FixForward(chain[^1].endpoints.Item2, chain[^1].Point2, false);
                 }
+                // TODO invalidate other polygons
             }
             // v starts a constant length edge
             else if(adjacentEdge2.fixedLength)
@@ -108,7 +145,6 @@ namespace Polygons
             {
                 movedVertex.MoveAbs(location);
                 adjacentEdge2.Point1 = location;
-                theUnconstrainedEdge = adjacentEdge2;
                 startVertex = adjacentEdge2.endpoints.Item1;
                 //canvas.Refresh();
             }
@@ -198,6 +234,7 @@ namespace Polygons
                     FixBackward(chain[0].endpoints.Item1, chain[0].Point1, false);
                     
                 }
+                // TODO invalidate other polygons
             }
             // v ends a constant length edge
             else if (adjacentEdge1.fixedLength)
