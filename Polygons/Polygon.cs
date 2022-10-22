@@ -1,6 +1,4 @@
-﻿
-
-namespace Polygons
+﻿namespace Polygons
 {
     internal class Polygon : IShape
     {
@@ -63,28 +61,6 @@ namespace Polygons
             Edges.Remove(e);
         }
 
-        public void SetLength(Segment e, float length)
-        {
-            e.Length = length;
-
-            int ei = Edges.IndexOf(e);
-            Vertices[ei].MoveAbs(e.Point1);
-            if (ei == Edges.Count - 1)
-                Vertices[0].MoveAbs(e.Point2);
-            else
-                Vertices[ei + 1].MoveAbs(e.Point2);
-
-            if (ei == 0)
-                Edges[^1].MoveEndAbs(e.Point1);
-            else
-                Edges[ei - 1].MoveEndAbs(e.Point1);
-
-            if(ei == Edges.Count - 1)
-                Edges[0].MoveStartAbs(e.Point2);
-            else
-                Edges[ei + 1].MoveStartAbs(e.Point2);
-        }
-
         public void Delete(Vertex v)
         {
             (Segment edge1, Segment edge2) = v.adjacentEdges;
@@ -127,42 +103,9 @@ namespace Polygons
             Edges.Remove(edge1);
         }
 
-        public static void ApplyParallelRelation(Segment edge, Point axis, float sinTheta, float cosTheta)
+        public static void RotateChain(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
         {
-            Point v = edge.Point2 - axis;
-            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point2 = vRot + axis;
-            (Vertex vertex1, Vertex vertex2) = edge.endpoints;
-            vertex2.Center = edge.Point2;
-        }
-
-        public static void ApplyParallelRelation1(Segment edge, Point axis, float sinTheta, float cosTheta)
-        {
-            Point v = edge.Point1 - axis;
-            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point1 = vRot + axis;
-            (Vertex vertex1, _) = edge.endpoints;
-            vertex1.Center = edge.Point1;
-        }
-
-        public static void ApplyParallelRelation12(Segment edge, Point axis, float sinTheta, float cosTheta)
-        {
-            Point v = edge.Point2 - axis;
-            var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-            edge.Point2 = vRot + axis;
-
-            Point u = edge.Point1 - axis;
-            var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-            edge.Point1 = uRot + axis;
-
-            (Vertex vertex1, Vertex vertex2) = edge.endpoints;
-            vertex1.Center = edge.Point1;
-            vertex2.Center = edge.Point2;
-        }
-
-        public static void ApplyParallelRelation(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
-        {
-            foreach(var e in chain)
+            foreach (var e in chain)
             {
                 (Vertex vertex1, Vertex vertex2) = e.endpoints;
                 Point v = e.Point1 - axis;
@@ -177,15 +120,73 @@ namespace Polygons
             }
         }
 
-        public static void ApplyTranslation(List<Segment> chain, Point displacement)
+        public static void RotateChainForeward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
         {
-            foreach(var e in chain)
+            for(int i = 0; i < chain.Count; i++)
             {
+                Segment e = chain[i];
+                
+                Point v = e.Point1 - axis;
+                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+                e.Point1 = vRot + axis;
+                
+                Point u = e.Point2 - axis;
+                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
+                e.Point2 = uRot + axis;
+                (Vertex vertex1, Vertex vertex2) = e.endpoints;
+
+                vertex1.Center = e.Point1;
+                if (i != chain.Count - 1)
+                    vertex2.Center = e.Point2;
+            }
+        }
+
+        public static void RotateChainBackward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
+        {
+            for (int i = 0; i < chain.Count; i++)
+            {
+                Segment e = chain[i];
+
+                Point v = e.Point1 - axis;
+                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
+                e.Point1 = vRot + axis;
+
+                Point u = e.Point2 - axis;
+                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
+                e.Point2 = uRot + axis;
+                (Vertex vertex1, Vertex vertex2) = e.endpoints;
+
+                if(i != 0)
+                    vertex1.Center = e.Point1;
+                vertex2.Center = e.Point2;
+            }
+        }
+
+        public static void TranslateForeward(List<Segment> chain, Point displacement) // TODO move to separate class
+        {
+            for(int i = 0; i < chain.Count; i++)
+            {
+                Segment e = chain[i];
                 e.Point1 += displacement;
                 e.Point2 += displacement;
                 (Vertex v1, Vertex v2) = e.endpoints;
                 v1.Center = e.Point1;
+                if (i != chain.Count - 1)
+                    v2.Center = e.Point2;
+            }
+        }
+
+        public static void TranslateBackward(List<Segment> chain, Point displacement) // TODO move to separate class
+        {
+            for (int i = 0; i < chain.Count; i++)
+            {
+                Segment e = chain[i];
+                e.Point1 += displacement;
+                e.Point2 += displacement;
+                (Vertex v1, Vertex v2) = e.endpoints;
                 v2.Center = e.Point2;
+                if (i != 0)
+                    v1.Center = e.Point1;
             }
         }
 

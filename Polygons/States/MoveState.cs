@@ -71,9 +71,6 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Edge {edge} hit");
                         movedEdge = edge;
-                        (Segment edge1, Segment edge2) = edge.adjacentEdges;
-                        (Vertex vertex1, Vertex vertex2) = edge.endpoints;
-
                         previousPoint = p;
 
                         return movedEdge;

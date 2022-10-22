@@ -20,7 +20,9 @@
                 Apply(g, v);
                 Font font = new Font("Arial", 10);
                 SolidBrush brush = new SolidBrush(Color.Black);
+#if DEBUG
                 g.DrawString($"({v.Center.X},{v.Center.Y})", font, brush, new Point(v.Center.X + 5, v.Center.Y + 5));
+#endif
             }
                 
             foreach(var e in polygon.Edges)

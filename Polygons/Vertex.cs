@@ -42,7 +42,6 @@ namespace Polygons
 
         public void Move(Point d)
         {
-            //Center = new Point(Center.X + d.X, Center.Y + d.Y);
             Center += d;
         }
 

@@ -91,20 +91,20 @@
 
         public static void LineLibrary(Graphics g, Point p1, Point p2)
         {
-            using (var pen = new Pen(Color.Black, 2))
-                g.DrawLine(pen, p1, p2);
+            using var pen = new Pen(Color.Black, 2);
+            g.DrawLine(pen, p1, p2);
         }
 
         public static void CircleLibrary(Graphics g, Point center, float radius)
         {
-            using (var brush = new SolidBrush(Color.Black))
-                g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+            using var brush = new SolidBrush(Color.Black);
+            g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
         }
 
         private static void PutPixel(Graphics g, float x, float y)
         {
-            using (var brush = new SolidBrush(Color.Red))
-                g.FillRectangle(brush, x, y, 1, 1);
+            using var brush = new SolidBrush(Color.Red);
+            g.FillRectangle(brush, x, y, 1, 1);
         }
     }
 }

@@ -17,36 +17,53 @@ namespace Polygons.States
         {
         }
 
-        private void DrawAfterLengthFixed(Point p)
+        private void DrawAfterLengthFixed(Point location)
         {
+            Segment? edge = GetHitEdge(location);
+            if(edge != null)
+            {
+                Debug.WriteLine($"Edge {edge} will have fixed length");
+
+                float length = Utilities.QueryForEdgeLength(edge);
+                if (length <= 0)
+                    MessageBox.Show($"Invalid input: Positive real values only.",
+                        "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                edge.Length = length;
+                edge.fixedLength = true;
+                edge.declaredLength = length;
+                Fixer fixer = new(context.relations, context.Canvas);
+                fixer.Fix(edge, new Point(0, 0));
+                foreach (var p in context.Polygons)
+                {
+                    if (p != edge.endpoints.Item1.polygon)
+                    {
+                        fixer.FixOffshoot(p);
+                    }
+                }
+
+                context.Canvas.Invalidate();
+            }
+        }
+
+        private Segment? GetHitEdge(Point p)
+        {
+            Segment hitEdge;
             foreach (var polygon in context.Polygons)
             {
                 foreach (var edge in polygon.Edges)
                 {
                     if (edge.HitTest(p))
                     {
-                        Debug.WriteLine($"Edge {edge} will have fixed length");
+                        Debug.WriteLine($"Edge {edge} hit");
+                        hitEdge = edge;
 
-                        float length = Utilities.QueryForEdgeLength(edge);
-                        if (length <= 0)
-                            MessageBox.Show($"Invalid input: Positive real values only.",
-                                "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                        polygon.SetLength(edge, length);
-                        edge.fixedLength = true;
-                        edge.declaredLength = length;
-                        (Vertex v1, Vertex v2) = edge.endpoints;
-                        v1.fixedLenghts.Item1 = true;
-                        v2.fixedLenghts.Item2 = true;
-                        (Segment e1, Segment e2) = edge.adjacentEdges;
-                        e1.fixedLengths.Item1 = true;
-                        e2.fixedLengths.Item2 = true;
-
-                        context.Canvas.Invalidate();
-                        return;
+                        return hitEdge;
                     }
                 }
             }
+
+            return null;
         }
     }
 }

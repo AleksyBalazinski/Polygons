@@ -38,6 +38,7 @@
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonDeleteRelation = new System.Windows.Forms.Button();
             this.addRelation = new System.Windows.Forms.Button();
             this.buttonFixLength = new System.Windows.Forms.Button();
             this.buttonAddVertex = new System.Windows.Forms.Button();
@@ -48,7 +49,6 @@
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
-            this.buttonDeleteRelation = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -133,7 +133,9 @@
             // 
             // canvas
             // 
-            this.canvas.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.canvas.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.canvas.Location = new System.Drawing.Point(0, 0);
             this.canvas.Name = "canvas";
             this.canvas.Size = new System.Drawing.Size(841, 485);
@@ -160,6 +162,16 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(841, 44);
             this.panel1.TabIndex = 2;
+            // 
+            // buttonDeleteRelation
+            // 
+            this.buttonDeleteRelation.Location = new System.Drawing.Point(498, 3);
+            this.buttonDeleteRelation.Name = "buttonDeleteRelation";
+            this.buttonDeleteRelation.Size = new System.Drawing.Size(82, 41);
+            this.buttonDeleteRelation.TabIndex = 7;
+            this.buttonDeleteRelation.Text = "Delete relation";
+            this.buttonDeleteRelation.UseVisualStyleBackColor = true;
+            this.buttonDeleteRelation.Click += new System.EventHandler(this.buttonDeleteRelation_Click);
             // 
             // addRelation
             // 
@@ -267,16 +279,6 @@
             this.label1.Size = new System.Drawing.Size(75, 30);
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
-            // 
-            // buttonDeleteRelation
-            // 
-            this.buttonDeleteRelation.Location = new System.Drawing.Point(498, 3);
-            this.buttonDeleteRelation.Name = "buttonDeleteRelation";
-            this.buttonDeleteRelation.Size = new System.Drawing.Size(82, 41);
-            this.buttonDeleteRelation.TabIndex = 7;
-            this.buttonDeleteRelation.Text = "Delete relation";
-            this.buttonDeleteRelation.UseVisualStyleBackColor = true;
-            this.buttonDeleteRelation.Click += new System.EventHandler(this.buttonDeleteRelation_Click);
             // 
             // Form1
             // 

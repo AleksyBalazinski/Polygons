@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
 
 namespace Polygons.States
 {
@@ -63,12 +62,20 @@ namespace Polygons.States
             Debug.WriteLine($"Add edge {edge} to relation {relationId}");
 
             var relation = context.relations[relationId];
-            if (edge.RelationId == null)
+            if (edge.RelationId == null) // adding an edge that hasn't been in any relation up to this point
             {
-                if (relation.Count == 0)
+                if (relation.Count == 0) // this edge is the first one from this relation
                 {
                     List<Segment> chain = new();
-                    AddToChainEnd(chain, edge, polygon);
+                    chain.Add(edge);
+                    edge.chain = chain;
+                    edge.RelationId = relationId;
+                    (Vertex v1, Vertex v2) = edge.endpoints;
+                    v1.relationIds.Item1 = relationId;
+                    v2.relationIds.Item2 = relationId;
+                    (Segment e1, Segment e2) = edge.adjacentEdges;
+                    e1.relationIds.Item1 = relationId;
+                    e2.relationIds.Item2 = relationId;
                     relation.Add(chain);
                 }
                 else
@@ -77,103 +84,86 @@ namespace Polygons.States
                     if(e1.RelationId != null && e1.RelationId == relationId
                         && e2.RelationId != null && e2.RelationId == relationId)
                     {
-                        Point oldDirection = edge.Point2 - edge.MidPoint;
-                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
-                        (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        Polygon.ApplyParallelRelation12(edge, edge.MidPoint, sin, cos);
+                        List<Segment> tempChain = new();
+                        tempChain.Add(edge);
+                        edge.chain = tempChain;
+                        edge.RelationId = relationId;
+                        (Vertex v1, Vertex v2) = edge.endpoints;
+                        v1.relationIds.Item1 = relationId;
+                        v2.relationIds.Item2 = relationId;
+                        (Segment e11, Segment e21) = edge.adjacentEdges;
+                        e11.relationIds.Item1 = relationId;
+                        e21.relationIds.Item2 = relationId;
 
-                        Point newDirRot = Geometry.Rotate(newDirection, 1, 0);
-                        Point castingVersor2 = newDirRot / Geometry.VectorLength(newDirection);
-                        float length = Geometry.VectorLength(oldDirection) * sin;
-                        Point castingVector2 = length * castingVersor2;
-                        foreach(var e in e2.chain)
-                        {
-                            e.Point1 = castingVector2 + e.Point1;
-                            e.Point2 = castingVector2 + e.Point2;
-                            (Vertex v1, Vertex v2) = e.endpoints;
-                            v2.Center = castingVector2 + v2.Center;
-                        }
-                        Point castingVector1 = new(-castingVector2.X, -castingVector2.Y);
-                        foreach (var e in e1.chain)
-                        {
-                            e.Point1 = castingVector1 + e.Point1;
-                            e.Point2 = castingVector1 + e.Point2;
-                            (Vertex v1, Vertex v2) = e.endpoints;
-                            v1.Center = castingVector1 + v1.Center;
-                        }
-                        // fix ends of both chains
-                        Segment last = e2.chain[^1];
-                        (_, Segment sLast) = last.adjacentEdges;
-                        sLast.Point1 = last.Point2;
+                        Fixer fixer = new(context.relations, context.Canvas);
+                        fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        e1.chain.Add(tempChain[0]);
+                        edge.chain = e1.chain;
 
-                        Segment first = e1.chain[0];
-                        (Segment sFirst, _) = first.adjacentEdges;
-                        sFirst.Point2 = first.Point1;
-
-                        e2.Point1 = edge.Point2;
-                        e1.Point2 = edge.Point1;
-
-                        AddToChainEnd(e1.chain!, edge, polygon);
                         MergeChains(e1.chain!, e2.chain!, relationId);
                     }
                     else if(e1.RelationId != null && e1.RelationId == relationId)
                     {
-                        Point oldDirection = edge.Point2 - edge.Point1;
-                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
-                        (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        if (cos < 0)
-                        {
-                            newDirection = -newDirection;
-                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        }
-                        Polygon.ApplyParallelRelation(edge, edge.Point1, sin, cos);
-                        e2.Point1 = edge.Point2;
+                        List<Segment> tempChain = new();
+                        tempChain.Add(edge);
+                        edge.chain = tempChain;
+                        edge.RelationId = relationId;
+                        (Vertex v1, Vertex v2) = edge.endpoints;
+                        v1.relationIds.Item1 = relationId;
+                        v2.relationIds.Item2 = relationId;
+                        (Segment e11, Segment e21) = edge.adjacentEdges;
+                        e11.relationIds.Item1 = relationId;
+                        e21.relationIds.Item2 = relationId;
 
-                        AddToChainEnd(e1.chain!, edge, polygon);
+                        Fixer fixer = new(context.relations, context.Canvas);
+                        fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        e1.chain.Add(tempChain[0]);
+                        edge.chain = e1.chain;
                     }
                     else if(e2.RelationId != null && e2.RelationId == relationId)
                     {
-                        Point oldDirection = edge.Point1 - edge.Point2;
-                        Point newDirection = relation[0][0].Point1 - relation[0][0].Point2;
-                        (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        if (cos < 0)
-                        {
-                            newDirection = -newDirection;
-                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        }
-                        Polygon.ApplyParallelRelation1(edge, edge.Point2, sin, cos);
-                        e1.Point2 = edge.Point1;
+                        List<Segment> tempChain = new();
+                        tempChain.Add(edge);
+                        edge.chain = tempChain;
+                        edge.RelationId = relationId;
+                        (Vertex v1, Vertex v2) = edge.endpoints;
+                        v1.relationIds.Item1 = relationId;
+                        v2.relationIds.Item2 = relationId;
+                        (Segment e11, Segment e21) = edge.adjacentEdges;
+                        e11.relationIds.Item1 = relationId;
+                        e21.relationIds.Item2 = relationId;
 
-                        AddToChainStart(e2.chain!, edge, polygon);
+                        Fixer fixer = new(context.relations, context.Canvas);
+                        fixer.Fix(e2.chain[^1].endpoints.Item2, e2.chain[^1].Point2);
+                        e2.chain.Insert(0, tempChain[0]);
+                        edge.chain = e2.chain;
                     }
                     else
                     {
-                        // TODO lacks some decision making
-                        Point oldDirection = edge.Point2 - edge.Point1;
-                        Point newDirection = relation[0][0].Point2 - relation[0][0].Point1;
-                        (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        if(cos < 0)
-                        {
-                            newDirection = new(-newDirection.X, -newDirection.Y);
-                            (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                        }
-                        Polygon.ApplyParallelRelation(edge, edge.Point1, sin, cos);
-                        e2.Point1 = edge.Point2;
-
                         List<Segment> chain = new();
-                        AddToChainEnd(chain, edge, polygon);
+                        chain.Add(edge);
+                        edge.chain = chain;
+                        edge.RelationId = relationId;
+                        (Vertex v1, Vertex v2) = edge.endpoints;
+                        v1.relationIds.Item1 = relationId;
+                        v2.relationIds.Item2 = relationId;
+                        (Segment e11, Segment e21) = edge.adjacentEdges;
+                        e11.relationIds.Item1 = relationId;
+                        e21.relationIds.Item2 = relationId;
                         relation.Add(chain);
+
+                        Fixer fixer = new(context.relations, context.Canvas);
+                        fixer.Fix(relation[0][0].endpoints.Item1, relation[0][0].Point1);
                     }
                 }
             }
             else
             {
-                var oldRelation = context.relations[edge.RelationId.Value];
+                var oldRelation = context.relations[edge.RelationId.Value]; //System.Collections.Generic.KeyNotFoundException: 'The given key '0' was not present in the dictionary.'
 
                 // move all chains from old relation to currently constructed relation
                 MergeRelations(relation, oldRelation, edge.RelationId.Value, relationId);
 
-                // invalidate each chain, i.e. for each edge check if adjacent
                 foreach(var p in context.Polygons)
                 {
                     foreach(var e in p.Edges)
@@ -191,35 +181,8 @@ namespace Polygons.States
                         }
                     }
                 }
+
             }
-        }
-
-        private void AddToChainEnd(List<Segment> chain, Segment edge, Polygon polygon)
-        {
-            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)} at end");
-            chain.Add(edge);
-            edge.chain = chain;
-            edge.RelationId = relationId;
-            (Vertex v1, Vertex v2) = edge.endpoints;
-            v1.relationIds.Item1 = relationId;
-            v2.relationIds.Item2 = relationId;
-            (Segment e1, Segment e2) = edge.adjacentEdges;
-            e1.relationIds.Item1 = relationId;
-            e2.relationIds.Item2 = relationId;
-        }
-
-        private void AddToChainStart(List<Segment> chain, Segment edge, Polygon polygon)
-        {
-            Debug.WriteLine($"Adding {edge} to chain {string.Join(", ", chain)} at start");
-            chain.Insert(0, edge);
-            edge.chain = chain;
-            edge.RelationId = relationId;
-            (Vertex v1, Vertex v2) = edge.endpoints;
-            v1.relationIds.Item1 = relationId;
-            v2.relationIds.Item2 = relationId;
-            (Segment e1, Segment e2) = edge.adjacentEdges;
-            e1.relationIds.Item1 = relationId;
-            e2.relationIds.Item2 = relationId;
         }
 
         private void MergeChains(List<Segment> c1, List<Segment> c2, int rel)
@@ -237,25 +200,15 @@ namespace Polygons.States
             {
                 foreach(var e in chain)
                 {
-                    Point oldDirection = e.Point2 - e.Point1;
-                    Point newDirection = r1[0][0].Point2 - r1[0][0].Point1;
-                    (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                    if (cos < 0)
-                    {
-                        newDirection = -newDirection;
-                        (sin, cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
-                    }
-                    Polygon.ApplyParallelRelation(e, e.Point1, sin, cos);
-                    (Segment s1, Segment s2) = e.adjacentEdges;
-                    s1.Point2 = e.Point1;
-                    s2.Point1 = e.Point2;
-                    e.RelationId = newRel;
                     (Vertex v1, Vertex v2) = e.endpoints;
                     v1.relationIds.Item1 = newRel;
                     v2.relationIds.Item2 = newRel;
                     (Segment e1, Segment e2) = e.adjacentEdges;
                     e1.relationIds.Item1 = newRel;
                     e2.relationIds.Item2 = newRel;
+                    e.RelationId = newRel;
+                    Fixer fixer = new(context.relations, context.Canvas);
+                    fixer.Fix(r1[0][0].endpoints.Item1, r1[0][0].Point1);
                     context.Canvas.Invalidate();
                 }
             }

@@ -41,7 +41,7 @@ namespace Polygons
             // TODO check if at least oe unconstrained edge exists in movedEdge.endpoints.Item1.polygon
             if (movedEdge.RelationId != null)
             {
-                Polygon.ApplyTranslation(movedEdge.chain, displacement);
+                Polygon.TranslateForeward(movedEdge.chain, displacement);
                 FixForward(movedEdge.chain[^1].endpoints.Item2, movedEdge.chain[^1].Point2, true);
                 FixBackward(movedEdge.chain[0].endpoints.Item1, movedEdge.chain[0].Point1, true);
             }
@@ -75,7 +75,7 @@ namespace Polygons
 
         public void FixForward(Vertex movedVertex, Point location, bool isUserDefined)
         {
-            canvas.Refresh();
+            //canvas.Refresh();
             Segment adjacentEdge2 = movedVertex.adjacentEdges.Item2;
             int? relId = adjacentEdge2.RelationId;
             // v starts a chain
@@ -90,7 +90,7 @@ namespace Polygons
 
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-                    Polygon.ApplyParallelRelation(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
+                    Polygon.RotateChainForeward(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
 
                     adjacentEdge2.MoveStartAbs(location);
                     if (chain.Count > 1)
@@ -108,7 +108,7 @@ namespace Polygons
                 {
                     var displacement = location - movedVertex.Center;
                     Chain chain = adjacentEdge2.chain;
-                    Polygon.ApplyTranslation(chain, displacement);
+                    Polygon.TranslateForeward(chain, displacement);
                     Chain model = seenChains[(int)relId];
 
                     Point currentDirection = chain[^1].Point2 - chain[0].Point1;
@@ -121,10 +121,10 @@ namespace Polygons
                         (sin, cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
                     }
 
-                    Polygon.ApplyParallelRelation(chain, chain[0].Point1, sin, cos);
+                    Polygon.RotateChainForeward(chain, chain[0].Point1, sin, cos);
                     movedVertex.MoveAbs(location);
                     adjacentEdge2.Point1 = location;
-                    canvas.Refresh();
+                    //canvas.Refresh();
                     FixForward(chain[^1].endpoints.Item2, chain[^1].Point2, false);
                 }
                 // TODO invalidate other polygons
@@ -165,7 +165,7 @@ namespace Polygons
 
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-                    Polygon.ApplyParallelRelation(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
+                    Polygon.RotateChainBackward(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
 
                     adjacentEdge1.MoveEndAbs(location);
                     if (chain.Count > 1)
@@ -190,7 +190,7 @@ namespace Polygons
                     {
                         var displacement1 = location - movedVertex.Center;
                         Chain chain1 = adjacentEdge1.chain;
-                        Polygon.ApplyTranslation(chain1, displacement1);
+                        Polygon.TranslateBackward(chain1, displacement1);
                         Chain model1 = seenChains[(int)relId];
 
                         Point currentDirection1 = chain1[^1].Point2 - chain1[0].Point1;
@@ -203,7 +203,7 @@ namespace Polygons
                             (sin1, cos1) = Geometry.AngleBetweenVectors(currentDirection1, modelDirection1);
                         }
 
-                        Polygon.ApplyParallelRelation(chain1, chain1[0].Point1, sin1, cos1);
+                        Polygon.RotateChainBackward(chain1, chain1[0].Point1, sin1, cos1);
 
                         //movedVertex.MoveAbs(location); // sus af
                         //adjacentEdge1.Point2 = location; // 
@@ -213,7 +213,7 @@ namespace Polygons
                     }
                     var displacement = location - movedVertex.Center;
                     Chain chain = adjacentEdge1.chain;
-                    Polygon.ApplyTranslation(chain, displacement);
+                    Polygon.TranslateBackward(chain, displacement);
                     Chain model = seenChains[(int)relId];
 
                     Point currentDirection = chain[0].Point1 - chain[^1].Point2;
@@ -226,15 +226,14 @@ namespace Polygons
                         (sin, cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
                     }
 
-                    Polygon.ApplyParallelRelation(chain, chain[^1].Point2, sin, cos);
-                    canvas.Refresh();
+                    Polygon.RotateChainBackward(chain, chain[^1].Point2, sin, cos);
+                    //canvas.Refresh();
                     movedVertex.MoveAbs(location); // sus af
                     adjacentEdge1.Point2 = location; // 
 
                     FixBackward(chain[0].endpoints.Item1, chain[0].Point1, false);
                     
                 }
-                // TODO invalidate other polygons
             }
             // v ends a constant length edge
             else if (adjacentEdge1.fixedLength)
@@ -253,7 +252,6 @@ namespace Polygons
                 FixBackward(adjacentEdge1.endpoints.Item1, adjacentEdge1.Point1, false);
             }
 
-            // assume forwardFirst == true TODO
             // v ends unconstrained edge -> proceed until unconstrained edge that triggered FixBackward is found
             else if(movedVertex == startVertex && !isUserDefined)
             {
@@ -288,8 +286,8 @@ namespace Polygons
 
             (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-            Polygon.ApplyParallelRelation(chain.Take(indx).ToList(), first.Point1, sin, cos);
-            Polygon.ApplyParallelRelation(chain.Skip(indx + 2).ToList(), first.Point1, sin, cos);
+            Polygon.RotateChain(chain.Take(indx).ToList(), first.Point1, sin, cos);
+            Polygon.RotateChain(chain.Skip(indx + 2).ToList(), first.Point1, sin, cos);
 
             adjacentEdge1.MoveEndAbs(location);
             if (indx != 0)
