@@ -27,15 +27,15 @@ namespace Polygons.States
                     {
                         Debug.WriteLine($"Edge {edge} designated for adding a vertex");
                         polygon.Subdivide(edge);
-                        if(edge.RelationId != null)
+                        if (edge.RelationId != null)
                         {
                             List<List<Segment>> chains = context.relations[(int)edge.RelationId];
                             List<Segment> part1 = edge.chain.SkipWhile(s => s != edge).Skip(1).ToList();
                             List<Segment> part2 = edge.chain.TakeWhile(s => s != edge).ToList();
-                            if(part1.Count != 0)
+                            if (part1.Count != 0)
                                 chains.Add(part1);
 
-                            if(part2.Count != 0)
+                            if (part2.Count != 0)
                                 chains.Add(part2);
 
                             chains.Remove(edge.chain);

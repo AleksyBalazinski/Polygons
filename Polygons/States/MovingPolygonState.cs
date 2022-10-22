@@ -2,7 +2,7 @@
 {
     internal class MovingPolygonState : State
     {
-        Polygon movedPolygon;
+        readonly Polygon movedPolygon;
         Point previousPoint;
         public MovingPolygonState(Polygon movedPolygon, Point previousPoint)
         {

@@ -40,7 +40,7 @@ namespace Polygons
             string relIdString = "";
             using (RelationInputForm inputForm = new())
             {
-                if(inputForm.ShowDialog() == DialogResult.OK)
+                if (inputForm.ShowDialog() == DialogResult.OK)
                 {
                     relIdString = inputForm.Input;
                 }

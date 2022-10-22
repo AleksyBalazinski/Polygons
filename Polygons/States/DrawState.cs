@@ -20,7 +20,7 @@ namespace Polygons.States
 
         public override void canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            if(!definingNewPolygon)
+            if (!definingNewPolygon)
                 DrawEdgeUnderConstruction(e.X, e.Y);
         }
 
@@ -40,15 +40,15 @@ namespace Polygons.States
                 context.Polygons.Add(constructedPolygon);
                 Debug.WriteLine($"Add polygon {constructedPolygon}");
 
-                for(int i = 0; i < constructedPolygon.Edges.Count; i++)
+                for (int i = 0; i < constructedPolygon.Edges.Count; i++)
                 {
                     Segment e = constructedPolygon.Edges[i];
-                    if(i == 0)
+                    if (i == 0)
                         e.adjacentEdges.Item1 = constructedPolygon.Edges[constructedPolygon.Edges.Count - 1];
                     else
                         e.adjacentEdges.Item1 = constructedPolygon.Edges[i - 1];
 
-                    if(i == constructedPolygon.Edges.Count - 1)
+                    if (i == constructedPolygon.Edges.Count - 1)
                         e.adjacentEdges.Item2 = constructedPolygon.Edges[0];
                     else
                         e.adjacentEdges.Item2 = constructedPolygon.Edges[i + 1];
@@ -62,7 +62,7 @@ namespace Polygons.States
                 Vertex v = new(x, y);
 
                 Debug.WriteLine("Add vertex " + v.ToString());
-                if(!definingNewPolygon)
+                if (!definingNewPolygon)
                 {
                     drawnSegment.endpoints.Item2 = v;
                     v.adjacentEdges.Item1 = drawnSegment;
@@ -92,7 +92,7 @@ namespace Polygons.States
         public override void canvas_Paint(object sender, PaintEventArgs e)
         {
             DrawScene(e.Graphics);
-            if(!definingNewPolygon)
+            if (!definingNewPolygon)
                 drawnSegment.Draw(e.Graphics, drawingAlgorithm);
         }
 

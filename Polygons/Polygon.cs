@@ -4,7 +4,7 @@
     {
         public List<Vertex> Vertices { get; }
         public List<Segment> Edges { get; }
-        
+
         public Polygon()
         {
             Vertices = new List<Vertex>();
@@ -13,7 +13,7 @@
         public override string ToString()
         {
             string res = "Vertices: ";
-            foreach(var v in Vertices)
+            foreach (var v in Vertices)
                 res += v.ToString();
             res += "\nEdges: ";
             foreach (var e in Edges)
@@ -29,6 +29,7 @@
             Segment e2 = new(mid.Center, e.Point2);
             mid.adjacentEdges.Item1 = e1;
             mid.adjacentEdges.Item2 = e2;
+            mid.polygon = e.endpoints.Item1.polygon;
 
             e1.endpoints.Item1 = e.endpoints.Item1;
             e1.endpoints.Item2 = mid;
@@ -47,7 +48,7 @@
             e2.adjacentEdges.Item1 = e1;
 
             // removing relation
-            if(e.RelationId != null)
+            if (e.RelationId != null)
             {
                 e1.endpoints.Item1.relationIds.Item1 = null;
                 e1.adjacentEdges.Item1.relationIds.Item1 = null;
@@ -87,107 +88,20 @@
             }
 
             // removing relation
-            if(v.relationIds.Item2 != null)
+            if (v.relationIds.Item2 != null)
             {
                 edge1.endpoints.Item1.relationIds.Item1 = null;
                 edge1.adjacentEdges.Item1.relationIds.Item1 = null;
             }
-            if(v.relationIds.Item1 != null)
+            if (v.relationIds.Item1 != null)
             {
                 edge2.endpoints.Item2.relationIds.Item2 = null;
                 edge2.adjacentEdges.Item2.relationIds.Item2 = null;
             }
-                
+
             Vertices.Remove(v);
             Edges.Remove(edge2);
             Edges.Remove(edge1);
-        }
-
-        public static void RotateChain(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
-        {
-            foreach (var e in chain)
-            {
-                (Vertex vertex1, Vertex vertex2) = e.endpoints;
-                Point v = e.Point1 - axis;
-                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-                e.Point1 = vRot + axis;
-                vertex1.Center = e.Point1;
-
-                Point u = e.Point2 - axis;
-                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-                e.Point2 = uRot + axis;
-                vertex2.Center = e.Point2;
-            }
-        }
-
-        public static void RotateChainForeward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
-        {
-            for(int i = 0; i < chain.Count; i++)
-            {
-                Segment e = chain[i];
-                
-                Point v = e.Point1 - axis;
-                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-                e.Point1 = vRot + axis;
-                
-                Point u = e.Point2 - axis;
-                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-                e.Point2 = uRot + axis;
-                (Vertex vertex1, Vertex vertex2) = e.endpoints;
-
-                vertex1.Center = e.Point1;
-                if (i != chain.Count - 1)
-                    vertex2.Center = e.Point2;
-            }
-        }
-
-        public static void RotateChainBackward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
-        {
-            for (int i = 0; i < chain.Count; i++)
-            {
-                Segment e = chain[i];
-
-                Point v = e.Point1 - axis;
-                var vRot = Geometry.Rotate(v, sinTheta, cosTheta);
-                e.Point1 = vRot + axis;
-
-                Point u = e.Point2 - axis;
-                var uRot = Geometry.Rotate(u, sinTheta, cosTheta);
-                e.Point2 = uRot + axis;
-                (Vertex vertex1, Vertex vertex2) = e.endpoints;
-
-                if(i != 0)
-                    vertex1.Center = e.Point1;
-                vertex2.Center = e.Point2;
-            }
-        }
-
-        public static void TranslateForeward(List<Segment> chain, Point displacement) // TODO move to separate class
-        {
-            for(int i = 0; i < chain.Count; i++)
-            {
-                Segment e = chain[i];
-                e.Point1 += displacement;
-                e.Point2 += displacement;
-                (Vertex v1, Vertex v2) = e.endpoints;
-                v1.Center = e.Point1;
-                if (i != chain.Count - 1)
-                    v2.Center = e.Point2;
-            }
-        }
-
-        public static void TranslateBackward(List<Segment> chain, Point displacement) // TODO move to separate class
-        {
-            for (int i = 0; i < chain.Count; i++)
-            {
-                Segment e = chain[i];
-                e.Point1 += displacement;
-                e.Point2 += displacement;
-                (Vertex v1, Vertex v2) = e.endpoints;
-                v2.Center = e.Point2;
-                if (i != 0)
-                    v1.Center = e.Point1;
-            }
         }
 
         public bool HitTest(Point p)
@@ -197,15 +111,15 @@
             float yMin = float.MaxValue;
             float yMax = float.MinValue;
 
-            foreach(var v in Vertices)
+            foreach (var v in Vertices)
             {
-                if(v.Center.X < xMin)
+                if (v.Center.X < xMin)
                     xMin = v.Center.X;
-                if(v.Center.X > xMax)
+                if (v.Center.X > xMax)
                     xMax = v.Center.X;
-                if(v.Center.Y < yMin)
+                if (v.Center.Y < yMin)
                     yMin = v.Center.Y;
-                if(v.Center.Y > yMax)
+                if (v.Center.Y > yMax)
                     yMax = v.Center.Y;
             }
 

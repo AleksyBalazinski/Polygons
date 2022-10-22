@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using Polygons.States;
+using System.Diagnostics;
 
 namespace Polygons
 {
@@ -33,10 +33,10 @@ namespace Polygons
             polygons = new List<Polygon>();
             drawingAlgorithm = new Algorithm();
             relations = new Dictionary<int, List<List<Segment>>>();
-
+            InitializePolygons();
             TransitionTo(new DrawState());
         }
-        
+
         //
         // event handlers
         //
@@ -77,9 +77,9 @@ namespace Polygons
         private void buttonDeleteRelation_Click(object sender, EventArgs e)
         {
             int relId = Utilities.QueryForRelationId();
-            foreach(var chain in relations[relId])
+            foreach (var chain in relations[relId])
             {
-                foreach(var edge in chain)
+                foreach (var edge in chain)
                 {
                     edge.RelationId = null;
                     edge.chain = null;
@@ -92,6 +92,7 @@ namespace Polygons
             relations.Remove(relId);
             canvas.Invalidate();
         }
+
         //
         // algorithm selection
         //
@@ -108,44 +109,6 @@ namespace Polygons
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
         }
 
-        // polygons control
-        /*public Polygon? FindPolygon(Segment edge)
-        {
-            foreach (var p in polygons)
-            {
-                foreach (var e in p.Edges)
-                {
-                    if (e == edge)
-                        return p;
-                }
-            }
-            return null;
-        }
-        public Polygon? FindPolygon(Vertex vertex)
-        {
-            foreach (var p in polygons)
-            {
-                foreach (var v in p.Vertices)
-                {
-                    if (v == vertex)
-                        return p;
-                }
-            }
-            return null;
-        }
-        public Polygon? FindPolygon(List<Segment> chain)
-        {
-            foreach(var p in polygons)
-            {
-                foreach(var e in p.Edges)
-                {
-                    if (chain.Contains(e))
-                        return p;
-                }
-            }
-            return null;
-        }
-*/
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             polygons.Clear();
@@ -156,6 +119,73 @@ namespace Polygons
             relations.Clear();
             TransitionTo(new DrawState());
             this.Refresh();
+        }
+
+        private void InitializePolygons()
+        {
+            TransitionTo(new DrawState());
+
+            // hexagon
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 195, 83, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 93, 158, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 93, 158, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 94, 269, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 94, 269, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 203, 321, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 203, 321, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 293, 272, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 293, 272, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 291, 160, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 291, 160, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 197, 83, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 197, 83, 0));
+
+            // pentagon
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 455, 212, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 455, 295, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 455, 295, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 636, 294, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 636, 294, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 635, 213, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 635, 213, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 544, 144, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 544, 144, 0));
+            canvas_MouseMove(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 458, 211, 0));
+
+            canvas_MouseUp(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 458, 211, 0));
+
+            // rel 0
+            TransitionTo(new AddRelationState());
+            // hexagon, 0
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 94, 198, 0));
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 291, 204, 0));
+            // pentagon, 0
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 455, 247, 0));
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 636, 249, 0));
+
+            // rel 1
+            TransitionTo(new AddRelationState());
+            // hexagon, 1
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 134, 128, 0));
+            // pentagon, 1
+            canvas_MouseDown(Canvas, new MouseEventArgs(MouseButtons.Left, 1, 500, 178, 0));
+
+            // fixing lengths
+            Polygons[0].Edges[3].fixedLength = true;
+            Polygons[0].Edges[3].declaredLength = Polygons[0].Edges[3].Length;
+
+            Polygons[1].Edges[4].fixedLength = true;
+            Polygons[1].Edges[4].declaredLength = Polygons[1].Edges[4].Length;
         }
     }
 }

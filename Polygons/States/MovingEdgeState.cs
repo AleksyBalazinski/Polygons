@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     internal class MovingEdgeState : State
     {
@@ -28,9 +26,16 @@ namespace Polygons.States
 
         private void DrawAfterEdgeMoved(Point location)
         {
-            Fixer fixer = new(context.relations, context.Canvas);
+            Fixer fixer = new();
             fixer.Fix(movedEdge, location - previousPoint);
             previousPoint = location;
+            foreach (var p in context.Polygons)
+            {
+                if (p != movedEdge.endpoints.Item1.polygon)
+                {
+                    fixer.FixOffshoot(p);
+                }
+            }
 
             context.Canvas.Invalidate();
         }

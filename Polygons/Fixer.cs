@@ -1,28 +1,20 @@
-﻿using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
-
-
-namespace Polygons
+﻿namespace Polygons
 {
-    using Relations = Dictionary<int, List<List<Segment>>>;
     using Chain = List<Segment>;
     internal class Fixer
     {
-        private Relations relations;
-        PictureBox canvas; // debug
         private Vertex startVertex;
         private Dictionary<int, Chain> seenChains = new();
-        private HashSet<Polygon> seenPolygons = new();
-        public Fixer(Relations relations, PictureBox canvas)
-        {
-            this.relations = relations;
-            this.canvas = canvas;
-        }
 
         public void Fix(Vertex movedVertex, Point location)
         {
-            // TODO check if at least oe unconstrained edge exists in movedVertex.polygon
-            if(movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
+            if (!UnconstrainedEdgeExists(movedVertex.polygon))
+            {
+                var displacement = location - movedVertex.Center;
+                movedVertex.polygon.Move(displacement);
+                return;
+            }
+            if (movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
                 && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
             {
                 Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain, movedVertex, location);
@@ -38,10 +30,14 @@ namespace Polygons
 
         public void Fix(Segment movedEdge, Point displacement)
         {
-            // TODO check if at least oe unconstrained edge exists in movedEdge.endpoints.Item1.polygon
+            if (!UnconstrainedEdgeExists(movedEdge.endpoints.Item1.polygon))
+            {
+                movedEdge.endpoints.Item1.polygon.Move(displacement);
+                return;
+            }
             if (movedEdge.RelationId != null)
             {
-                Polygon.TranslateForeward(movedEdge.chain, displacement);
+                Chains.TranslateForeward(movedEdge.chain, displacement);
                 FixForward(movedEdge.chain[^1].endpoints.Item2, movedEdge.chain[^1].Point2, true);
                 FixBackward(movedEdge.chain[0].endpoints.Item1, movedEdge.chain[0].Point1, true);
             }
@@ -56,9 +52,15 @@ namespace Polygons
 
         public void FixOffshoot(Polygon affectedPolygon)
         {
-            // TODO check if at least oe unconstrained edge exists in affectedPolygon
             Vertex movedVertex = affectedPolygon.Vertices[0];
             Point location = movedVertex.Center;
+            if (!UnconstrainedEdgeExists(affectedPolygon))
+            {
+                var displacement = location - movedVertex.Center;
+                affectedPolygon.Move(displacement);
+                return;
+            }
+
             if (movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
                 && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
             {
@@ -73,16 +75,15 @@ namespace Polygons
             }
         }
 
-        public void FixForward(Vertex movedVertex, Point location, bool isUserDefined)
+        private void FixForward(Vertex movedVertex, Point location, bool isUserDefined)
         {
-            //canvas.Refresh();
             Segment adjacentEdge2 = movedVertex.adjacentEdges.Item2;
             int? relId = adjacentEdge2.RelationId;
             // v starts a chain
             if (relId != null)
             {
                 // seeing chain from relation relId for the first time
-                if(!seenChains.ContainsKey((int)relId) || isUserDefined)
+                if (!seenChains.ContainsKey((int)relId) || isUserDefined)
                 {
                     Chain chain = adjacentEdge2.chain;
                     Point oldDirection = chain[^1].Point1 - chain[^1].Point2;
@@ -90,7 +91,7 @@ namespace Polygons
 
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-                    Polygon.RotateChainForeward(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
+                    Chains.RotateChainForeward(chain.Skip(1).ToList(), chain[^1].Point2, sin, cos);
 
                     adjacentEdge2.MoveStartAbs(location);
                     if (chain.Count > 1)
@@ -100,7 +101,7 @@ namespace Polygons
                     {
                         seenChains[(int)relId] = chain;
                     }
-                    //canvas.Refresh();
+
                     FixLengthsInChain(chain);
                     FixForward(chain[^1].endpoints.Item2, chain[^1].Point2, false);
                 }
@@ -108,7 +109,7 @@ namespace Polygons
                 {
                     var displacement = location - movedVertex.Center;
                     Chain chain = adjacentEdge2.chain;
-                    Polygon.TranslateForeward(chain, displacement);
+                    Chains.TranslateForeward(chain, displacement);
                     Chain model = seenChains[(int)relId];
 
                     Point currentDirection = chain[^1].Point2 - chain[0].Point1;
@@ -121,23 +122,23 @@ namespace Polygons
                         (sin, cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
                     }
 
-                    Polygon.RotateChainForeward(chain, chain[0].Point1, sin, cos);
+                    Chains.RotateChainForeward(chain, chain[0].Point1, sin, cos);
                     movedVertex.MoveAbs(location);
                     adjacentEdge2.Point1 = location;
-                    //canvas.Refresh();
+
                     FixForward(chain[^1].endpoints.Item2, chain[^1].Point2, false);
                 }
                 // TODO invalidate other polygons
             }
             // v starts a constant length edge
-            else if(adjacentEdge2.fixedLength)
+            else if (adjacentEdge2.fixedLength)
             {
                 movedVertex.MoveAbs(location);
                 adjacentEdge2.Point1 = location;
                 Point p1p2 = adjacentEdge2.Point2 - adjacentEdge2.Point1;
                 Point versor = p1p2 / Geometry.VectorLength(p1p2);
                 adjacentEdge2.Point2 = adjacentEdge2.Point1 + adjacentEdge2.declaredLength * versor;
-                //canvas.Refresh();
+
                 FixForward(adjacentEdge2.endpoints.Item2, adjacentEdge2.Point2, false);
             }
             // v starts unconstrained edge
@@ -146,18 +147,17 @@ namespace Polygons
                 movedVertex.MoveAbs(location);
                 adjacentEdge2.Point1 = location;
                 startVertex = adjacentEdge2.endpoints.Item1;
-                //canvas.Refresh();
             }
         }
 
-        public void FixBackward(Vertex movedVertex, Point location, bool isUserDefined)
+        private void FixBackward(Vertex movedVertex, Point location, bool isUserDefined)
         {
             Segment adjacentEdge1 = movedVertex.adjacentEdges.Item1;
             int? relId = adjacentEdge1.RelationId;
             // v ends a chain
-            if(relId != null)
+            if (relId != null)
             {
-                if(!seenChains.ContainsKey((int)relId) || isUserDefined)
+                if (!seenChains.ContainsKey((int)relId) || isUserDefined)
                 {
                     Chain chain = adjacentEdge1.chain;
                     Point oldDirection = chain[0].Point2 - chain[0].Point1;
@@ -165,17 +165,17 @@ namespace Polygons
 
                     (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-                    Polygon.RotateChainBackward(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
+                    Chains.RotateChainBackward(chain.Take(chain.Count - 1).ToList(), chain[0].Point1, sin, cos);
 
                     adjacentEdge1.MoveEndAbs(location);
                     if (chain.Count > 1)
                         adjacentEdge1.MoveStartAbs(chain[^2].Point2);
                     movedVertex.MoveAbs(location);
-                    if(!seenChains.TryAdd((int)relId, chain))
+                    if (!seenChains.TryAdd((int)relId, chain))
                     {
                         seenChains[(int)relId] = chain;
                     }
-                    //canvas.Refresh();
+
                     FixLengthsInChain(chain);
 
                     if (movedVertex == startVertex && !isUserDefined)
@@ -190,7 +190,7 @@ namespace Polygons
                     {
                         var displacement1 = location - movedVertex.Center;
                         Chain chain1 = adjacentEdge1.chain;
-                        Polygon.TranslateBackward(chain1, displacement1);
+                        Chains.TranslateBackward(chain1, displacement1);
                         Chain model1 = seenChains[(int)relId];
 
                         Point currentDirection1 = chain1[^1].Point2 - chain1[0].Point1;
@@ -203,17 +203,15 @@ namespace Polygons
                             (sin1, cos1) = Geometry.AngleBetweenVectors(currentDirection1, modelDirection1);
                         }
 
-                        Polygon.RotateChainBackward(chain1, chain1[0].Point1, sin1, cos1);
+                        Chains.RotateChainBackward(chain1, chain1[0].Point1, sin1, cos1);
 
-                        //movedVertex.MoveAbs(location); // sus af
-                        //adjacentEdge1.Point2 = location; // 
                         movedVertex.MoveAbs(chain1[^1].Point2);
                         movedVertex.adjacentEdges.Item2.Point1 = chain1[^1].Point2;
                         return;
                     }
                     var displacement = location - movedVertex.Center;
                     Chain chain = adjacentEdge1.chain;
-                    Polygon.TranslateBackward(chain, displacement);
+                    Chains.TranslateBackward(chain, displacement);
                     Chain model = seenChains[(int)relId];
 
                     Point currentDirection = chain[0].Point1 - chain[^1].Point2;
@@ -226,13 +224,10 @@ namespace Polygons
                         (sin, cos) = Geometry.AngleBetweenVectors(currentDirection, modelDirection);
                     }
 
-                    Polygon.RotateChainBackward(chain, chain[^1].Point2, sin, cos);
-                    //canvas.Refresh();
-                    movedVertex.MoveAbs(location); // sus af
-                    adjacentEdge1.Point2 = location; // 
+                    Chains.RotateChainBackward(chain, chain[^1].Point2, sin, cos);
 
                     FixBackward(chain[0].endpoints.Item1, chain[0].Point1, false);
-                    
+
                 }
             }
             // v ends a constant length edge
@@ -244,7 +239,6 @@ namespace Polygons
                 Point versor = p2p1 / Geometry.VectorLength(p2p1);
                 adjacentEdge1.Point1 = adjacentEdge1.Point2 + adjacentEdge1.declaredLength * versor;
 
-                //canvas.Refresh();
                 if (movedVertex == startVertex && !isUserDefined)
                 {
                     return;
@@ -253,21 +247,21 @@ namespace Polygons
             }
 
             // v ends unconstrained edge -> proceed until unconstrained edge that triggered FixBackward is found
-            else if(movedVertex == startVertex && !isUserDefined)
+            else if (movedVertex == startVertex && !isUserDefined)
             {
                 return;
-            }    
+            }
             else
             {
                 movedVertex.MoveAbs(location);
                 adjacentEdge1.Point2 = location;
-                //canvas.Refresh();
+
                 FixBackward(adjacentEdge1.endpoints.Item1, adjacentEdge1.Point1, false);
 
             }
         }
 
-        public Vertex FixChainInside(Chain chain, Vertex movedVertex, Point location)
+        private Vertex FixChainInside(Chain chain, Vertex movedVertex, Point location)
         {
             int relId = (int)chain[0].RelationId;
             Segment first = chain[0];
@@ -282,12 +276,11 @@ namespace Polygons
             int indx = chain.IndexOf(adjacentEdge1);
 
             var firstAdjacentEdges = first.adjacentEdges;
-            var lastAdjacentEdges = last.adjacentEdges;
 
             (float sin, float cos) = Geometry.AngleBetweenVectors(oldDirection, newDirection);
 
-            Polygon.RotateChain(chain.Take(indx).ToList(), first.Point1, sin, cos);
-            Polygon.RotateChain(chain.Skip(indx + 2).ToList(), first.Point1, sin, cos);
+            Chains.RotateChain(chain.Take(indx).ToList(), first.Point1, sin, cos);
+            Chains.RotateChain(chain.Skip(indx + 2).ToList(), first.Point1, sin, cos);
 
             adjacentEdge1.MoveEndAbs(location);
             if (indx != 0)
@@ -315,9 +308,9 @@ namespace Polygons
             return chain[^1].endpoints.Item2;
         }
 
-        public void FixLengthsInChain(Chain chain)
+        private void FixLengthsInChain(Chain chain)
         {
-            foreach(var edge in chain)
+            foreach (var edge in chain)
             {
                 if (edge.fixedLength && edge.Length != edge.declaredLength)
                 {
@@ -328,6 +321,16 @@ namespace Polygons
                     edge.adjacentEdges.Item2.Point1 = edge.Point2;
                 }
             }
+        }
+
+        private bool UnconstrainedEdgeExists(Polygon polygon)
+        {
+            foreach (var e in polygon.Edges)
+            {
+                if (!e.fixedLength && e.RelationId == null)
+                    return true;
+            }
+            return false;
         }
     }
 }

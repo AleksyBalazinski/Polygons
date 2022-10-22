@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Windows.Forms.VisualStyles;
 
 
 namespace Polygons.States
@@ -28,7 +27,18 @@ namespace Polygons.States
                     if (vertex.HitTest(p))
                     {
                         Debug.WriteLine($"Vertex {vertex} designated for deletion");
-                        if(vertex.relationIds.Item1 != null && vertex.relationIds.Item1 == vertex.relationIds.Item2)
+                        if(polygon.Vertices.Count == 3)
+                        {
+                            foreach(var e in polygon.Edges)
+                            {
+                                if(e.RelationId != null)
+                                {
+                                    context.relations[(int)e.RelationId].Remove(e.chain!);
+                                }
+                            }
+                            context.Polygons.Remove(polygon);
+                        }
+                        if (vertex.relationIds.Item1 != null && vertex.relationIds.Item1 == vertex.relationIds.Item2)
                         {
                             Segment prevEdge = vertex.adjacentEdges.Item1;
                             Segment nextEdge = vertex.adjacentEdges.Item2;
@@ -50,7 +60,7 @@ namespace Polygons.States
                             chains.Remove(nextEdge.chain);
                             chains.Remove(prevEdge.chain);
                         }
-                        else if(vertex.relationIds.Item1 != null) // next edge is in relation
+                        else if (vertex.relationIds.Item1 != null) // next edge is in relation
                         {
                             // delete next edge from its chain
                             Segment nextEdge = vertex.adjacentEdges.Item2;

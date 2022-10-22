@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     internal class MovingVertexState : State
     {
@@ -26,11 +24,11 @@ namespace Polygons.States
 
         private void DrawAfterVertexMoved(Point location)
         {
-            Fixer fixer = new(context.relations, context.Canvas);
+            Fixer fixer = new();
             fixer.Fix(movedVertex, location);
-            foreach(var p in context.Polygons)
+            foreach (var p in context.Polygons)
             {
-                if(p != movedVertex.polygon)
+                if (p != movedVertex.polygon)
                 {
                     fixer.FixOffshoot(p);
                 }

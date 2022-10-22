@@ -20,7 +20,7 @@ namespace Polygons.States
         private void DrawAfterLengthFixed(Point location)
         {
             Segment? edge = GetHitEdge(location);
-            if(edge != null)
+            if (edge != null)
             {
                 Debug.WriteLine($"Edge {edge} will have fixed length");
 
@@ -32,7 +32,7 @@ namespace Polygons.States
                 edge.Length = length;
                 edge.fixedLength = true;
                 edge.declaredLength = length;
-                Fixer fixer = new(context.relations, context.Canvas);
+                Fixer fixer = new();
                 fixer.Fix(edge, new Point(0, 0));
                 foreach (var p in context.Polygons)
                 {

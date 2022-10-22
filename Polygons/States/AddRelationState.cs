@@ -81,7 +81,7 @@ namespace Polygons.States
                 else
                 {
                     (Segment e1, Segment e2) = edge.adjacentEdges;
-                    if(e1.RelationId != null && e1.RelationId == relationId
+                    if (e1.RelationId != null && e1.RelationId == relationId
                         && e2.RelationId != null && e2.RelationId == relationId)
                     {
                         List<Segment> tempChain = new();
@@ -95,14 +95,22 @@ namespace Polygons.States
                         e11.relationIds.Item1 = relationId;
                         e21.relationIds.Item2 = relationId;
 
-                        Fixer fixer = new(context.relations, context.Canvas);
+                        Fixer fixer = new();
                         fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        foreach (var p in context.Polygons)
+                        {
+                            if (p != e1.chain[0].endpoints.Item1.polygon)
+                            {
+                                fixer.FixOffshoot(p);
+                            }
+                        }
+
                         e1.chain.Add(tempChain[0]);
                         edge.chain = e1.chain;
 
                         MergeChains(e1.chain!, e2.chain!, relationId);
                     }
-                    else if(e1.RelationId != null && e1.RelationId == relationId)
+                    else if (e1.RelationId != null && e1.RelationId == relationId)
                     {
                         List<Segment> tempChain = new();
                         tempChain.Add(edge);
@@ -115,12 +123,20 @@ namespace Polygons.States
                         e11.relationIds.Item1 = relationId;
                         e21.relationIds.Item2 = relationId;
 
-                        Fixer fixer = new(context.relations, context.Canvas);
+                        Fixer fixer = new();
                         fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        foreach (var p in context.Polygons)
+                        {
+                            if (p != e1.chain[0].endpoints.Item1.polygon)
+                            {
+                                fixer.FixOffshoot(p);
+                            }
+                        }
+
                         e1.chain.Add(tempChain[0]);
                         edge.chain = e1.chain;
                     }
-                    else if(e2.RelationId != null && e2.RelationId == relationId)
+                    else if (e2.RelationId != null && e2.RelationId == relationId)
                     {
                         List<Segment> tempChain = new();
                         tempChain.Add(edge);
@@ -133,8 +149,16 @@ namespace Polygons.States
                         e11.relationIds.Item1 = relationId;
                         e21.relationIds.Item2 = relationId;
 
-                        Fixer fixer = new(context.relations, context.Canvas);
+                        Fixer fixer = new();
                         fixer.Fix(e2.chain[^1].endpoints.Item2, e2.chain[^1].Point2);
+                        foreach (var p in context.Polygons)
+                        {
+                            if (p != e2.chain[^1].endpoints.Item2.polygon)
+                            {
+                                fixer.FixOffshoot(p);
+                            }
+                        }
+
                         e2.chain.Insert(0, tempChain[0]);
                         edge.chain = e2.chain;
                     }
@@ -152,8 +176,15 @@ namespace Polygons.States
                         e21.relationIds.Item2 = relationId;
                         relation.Add(chain);
 
-                        Fixer fixer = new(context.relations, context.Canvas);
+                        Fixer fixer = new();
                         fixer.Fix(relation[0][0].endpoints.Item1, relation[0][0].Point1);
+                        foreach (var p in context.Polygons)
+                        {
+                            if (p != relation[0][0].endpoints.Item1.polygon)
+                            {
+                                fixer.FixOffshoot(p);
+                            }
+                        }
                     }
                 }
             }
@@ -164,9 +195,9 @@ namespace Polygons.States
                 // move all chains from old relation to currently constructed relation
                 MergeRelations(relation, oldRelation, edge.RelationId.Value, relationId);
 
-                foreach(var p in context.Polygons)
+                foreach (var p in context.Polygons)
                 {
-                    foreach(var e in p.Edges)
+                    foreach (var e in p.Edges)
                     {
                         (Segment e1, Segment e2) = e.adjacentEdges;
                         if (e.RelationId != null && e1.RelationId != null
@@ -174,14 +205,13 @@ namespace Polygons.States
                         {
                             MergeChains(e.chain, e1.chain, e.RelationId.Value);
                         }
-                        else if(e.RelationId != null && e2.RelationId != null
+                        else if (e.RelationId != null && e2.RelationId != null
                             && e.RelationId == e2.RelationId && e.chain != e2.chain)
                         {
                             MergeChains(e.chain, e2.chain, e.RelationId.Value);
                         }
                     }
                 }
-
             }
         }
 
@@ -196,9 +226,9 @@ namespace Polygons.States
 
         private void MergeRelations(List<List<Segment>> r1, List<List<Segment>> r2, int oldRel, int newRel)
         {
-            foreach(var chain in r2)
+            foreach (var chain in r2)
             {
-                foreach(var e in chain)
+                foreach (var e in chain)
                 {
                     (Vertex v1, Vertex v2) = e.endpoints;
                     v1.relationIds.Item1 = newRel;
@@ -207,8 +237,16 @@ namespace Polygons.States
                     e1.relationIds.Item1 = newRel;
                     e2.relationIds.Item2 = newRel;
                     e.RelationId = newRel;
-                    Fixer fixer = new(context.relations, context.Canvas);
+                    Fixer fixer = new();
                     fixer.Fix(r1[0][0].endpoints.Item1, r1[0][0].Point1);
+                    foreach (var p in context.Polygons)
+                    {
+                        if (p != r1[0][0].endpoints.Item1.polygon)
+                        {
+                            fixer.FixOffshoot(p);
+                        }
+                    }
+
                     context.Canvas.Invalidate();
                 }
             }

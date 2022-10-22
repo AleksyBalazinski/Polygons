@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     abstract class State
     {
