@@ -63,7 +63,7 @@ namespace Polygons
             => TransitionTo(new MoveState());
 
         private void buttonDelete_Click(object sender, EventArgs e)
-            => TransitionTo(new DeleteState());
+            => TransitionTo(new DeleteVertexState());
 
         private void buttonAddVertex_Click(object sender, EventArgs e)
             => TransitionTo(new AddVertexState());
@@ -73,6 +73,9 @@ namespace Polygons
 
         private void addRelation_Click(object sender, EventArgs e)
             => TransitionTo(new AddRelationState());
+
+        private void buttonDeletePolygon_Click(object sender, EventArgs e)
+            => TransitionTo(new DeletePolygonState());
 
         private void buttonDeleteRelation_Click(object sender, EventArgs e)
         {
@@ -187,5 +190,7 @@ namespace Polygons
             Polygons[1].Edges[4].fixedLength = true;
             Polygons[1].Edges[4].declaredLength = Polygons[1].Edges[4].Length;
         }
+
+        
     }
 }

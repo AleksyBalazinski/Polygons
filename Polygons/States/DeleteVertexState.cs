@@ -3,7 +3,7 @@
 
 namespace Polygons.States
 {
-    internal class DeleteState : State
+    internal class DeleteVertexState : State
     {
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {

@@ -38,6 +38,7 @@
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonDeletePolygon = new System.Windows.Forms.Button();
             this.buttonDeleteRelation = new System.Windows.Forms.Button();
             this.addRelation = new System.Windows.Forms.Button();
             this.buttonFixLength = new System.Windows.Forms.Button();
@@ -151,6 +152,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonDeletePolygon);
             this.panel1.Controls.Add(this.buttonDeleteRelation);
             this.panel1.Controls.Add(this.addRelation);
             this.panel1.Controls.Add(this.buttonFixLength);
@@ -163,11 +165,21 @@
             this.panel1.Size = new System.Drawing.Size(841, 44);
             this.panel1.TabIndex = 2;
             // 
+            // buttonDeletePolygon
+            // 
+            this.buttonDeletePolygon.Location = new System.Drawing.Point(586, 3);
+            this.buttonDeletePolygon.Name = "buttonDeletePolygon";
+            this.buttonDeletePolygon.Size = new System.Drawing.Size(75, 41);
+            this.buttonDeletePolygon.TabIndex = 8;
+            this.buttonDeletePolygon.Text = "Delete polygon";
+            this.buttonDeletePolygon.UseVisualStyleBackColor = true;
+            this.buttonDeletePolygon.Click += new System.EventHandler(this.buttonDeletePolygon_Click);
+            // 
             // buttonDeleteRelation
             // 
-            this.buttonDeleteRelation.Location = new System.Drawing.Point(498, 3);
+            this.buttonDeleteRelation.Location = new System.Drawing.Point(498, 0);
             this.buttonDeleteRelation.Name = "buttonDeleteRelation";
-            this.buttonDeleteRelation.Size = new System.Drawing.Size(82, 41);
+            this.buttonDeleteRelation.Size = new System.Drawing.Size(82, 44);
             this.buttonDeleteRelation.TabIndex = 7;
             this.buttonDeleteRelation.Text = "Delete relation";
             this.buttonDeleteRelation.UseVisualStyleBackColor = true;
@@ -326,5 +338,6 @@
         private Button buttonFixLength;
         private Button addRelation;
         private Button buttonDeleteRelation;
+        private Button buttonDeletePolygon;
     }
 }
