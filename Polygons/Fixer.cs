@@ -3,7 +3,7 @@
     using Chain = List<Segment>;
     internal class Fixer
     {
-        private Vertex startVertex;
+        private Vertex startVertex = null!;
         private Dictionary<int, Chain> seenChains = new();
 
         public void Fix(Vertex movedVertex, Point location)
@@ -17,7 +17,7 @@
             if (movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
                 && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
             {
-                Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain, movedVertex, location);
+                Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain!, movedVertex, location);
                 FixForward(v, v.Center, true);
                 FixBackward(v, v.Center, true);
             }
@@ -37,8 +37,8 @@
             }
             if (movedEdge.RelationId != null)
             {
-                Chains.TranslateForeward(movedEdge.chain, displacement);
-                FixForward(movedEdge.chain[^1].endpoints.Item2, movedEdge.chain[^1].Point2, true);
+                Chains.TranslateForeward(movedEdge.chain!, displacement);
+                FixForward(movedEdge.chain![^1].endpoints.Item2, movedEdge.chain[^1].Point2, true);
                 FixBackward(movedEdge.chain[0].endpoints.Item1, movedEdge.chain[0].Point1, true);
             }
             else
@@ -64,7 +64,7 @@
             if (movedVertex.relationIds.Item1 != null && movedVertex.relationIds.Item2 != null
                 && movedVertex.relationIds.Item1 == movedVertex.relationIds.Item2)
             {
-                Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain, movedVertex, location);
+                Vertex v = FixChainInside(movedVertex.adjacentEdges.Item1.chain!, movedVertex, location);
                 FixForward(v, v.Center, false);
                 FixBackward(v, v.Center, false);
             }
@@ -85,7 +85,7 @@
                 // seeing chain from relation relId for the first time
                 if (!seenChains.ContainsKey((int)relId) || isUserDefined)
                 {
-                    Chain chain = adjacentEdge2.chain;
+                    Chain chain = adjacentEdge2.chain!;
                     Point oldDirection = chain[^1].Point1 - chain[^1].Point2;
                     Point newDirection = location - chain[^1].Point2;
 
@@ -108,8 +108,8 @@
                 else // already seen this relId
                 {
                     var displacement = location - movedVertex.Center;
-                    Chain chain = adjacentEdge2.chain;
-                    Chains.TranslateForeward(chain, displacement);
+                    Chain chain = adjacentEdge2.chain!;
+                    Chains.TranslateForeward(chain!, displacement);
                     Chain model = seenChains[(int)relId];
 
                     Point currentDirection = chain[^1].Point2 - chain[0].Point1;
@@ -128,7 +128,6 @@
 
                     FixForward(chain[^1].endpoints.Item2, chain[^1].Point2, false);
                 }
-                // TODO invalidate other polygons
             }
             // v starts a constant length edge
             else if (adjacentEdge2.fixedLength)
@@ -159,7 +158,7 @@
             {
                 if (!seenChains.ContainsKey((int)relId) || isUserDefined)
                 {
-                    Chain chain = adjacentEdge1.chain;
+                    Chain chain = adjacentEdge1.chain!;
                     Point oldDirection = chain[0].Point2 - chain[0].Point1;
                     Point newDirection = location - chain[0].Point1;
 
@@ -189,7 +188,7 @@
                     if (movedVertex == startVertex && !isUserDefined)
                     {
                         var displacement1 = location - movedVertex.Center;
-                        Chain chain1 = adjacentEdge1.chain;
+                        Chain chain1 = adjacentEdge1.chain!;
                         Chains.TranslateBackward(chain1, displacement1);
                         Chain model1 = seenChains[(int)relId];
 
@@ -210,7 +209,7 @@
                         return;
                     }
                     var displacement = location - movedVertex.Center;
-                    Chain chain = adjacentEdge1.chain;
+                    Chain chain = adjacentEdge1.chain!;
                     Chains.TranslateBackward(chain, displacement);
                     Chain model = seenChains[(int)relId];
 
@@ -263,7 +262,7 @@
 
         private Vertex FixChainInside(Chain chain, Vertex movedVertex, Point location)
         {
-            int relId = (int)chain[0].RelationId;
+            int relId = (int)chain[0].RelationId!;
             Segment first = chain[0];
             Segment last = chain[^1];
             Point oldDirection = last.Point2 - first.Point1;

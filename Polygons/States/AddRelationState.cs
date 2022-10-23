@@ -13,10 +13,11 @@ namespace Polygons.States
 
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            var edgeInfo = FindSelectedEdge(e.Location);
-            if (edgeInfo != null)
+            HitTester hitTester = new(context.Polygons);
+            var edge = hitTester.GetHitEdge(e.Location);
+            if (edge != null)
             {
-                (Segment edge, Polygon polygon) = edgeInfo.Value;
+                Polygon polygon = edge.endpoints.Item1.polygon;
                 if (definingNewRelation)
                 {
                     relationId = AddEmptyRelation();
@@ -34,27 +35,6 @@ namespace Polygons.States
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-        }
-
-        private (Segment, Polygon)? FindSelectedEdge(Point p)
-        {
-            Segment selectedEdge;
-            foreach (var polygon in context.Polygons)
-            {
-                foreach (var edge in polygon.Edges)
-                {
-                    if (edge.HitTest(p))
-                    {
-                        Debug.WriteLine($"Edge {edge} hit");
-                        selectedEdge = edge;
-                        (Segment edge1, Segment edge2) = edge.adjacentEdges;
-                        (Vertex vertex1, Vertex vertex2) = edge.endpoints;
-                        return (selectedEdge, polygon);
-                    }
-                }
-            }
-
-            return null;
         }
 
         public void AddToRelation(Segment edge, Polygon polygon, int relationId)
@@ -96,7 +76,7 @@ namespace Polygons.States
                         e21.relationIds.Item2 = relationId;
 
                         Fixer fixer = new();
-                        fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        fixer.Fix(e1.chain![0].endpoints.Item1, e1.chain[0].Point1);
                         foreach (var p in context.Polygons)
                         {
                             if (p != e1.chain[0].endpoints.Item1.polygon)
@@ -124,7 +104,7 @@ namespace Polygons.States
                         e21.relationIds.Item2 = relationId;
 
                         Fixer fixer = new();
-                        fixer.Fix(e1.chain[0].endpoints.Item1, e1.chain[0].Point1);
+                        fixer.Fix(e1.chain![0].endpoints.Item1, e1.chain[0].Point1);
                         foreach (var p in context.Polygons)
                         {
                             if (p != e1.chain[0].endpoints.Item1.polygon)
@@ -150,7 +130,7 @@ namespace Polygons.States
                         e21.relationIds.Item2 = relationId;
 
                         Fixer fixer = new();
-                        fixer.Fix(e2.chain[^1].endpoints.Item2, e2.chain[^1].Point2);
+                        fixer.Fix(e2.chain![^1].endpoints.Item2, e2.chain[^1].Point2);
                         foreach (var p in context.Polygons)
                         {
                             if (p != e2.chain[^1].endpoints.Item2.polygon)
@@ -190,7 +170,7 @@ namespace Polygons.States
             }
             else
             {
-                var oldRelation = context.relations[edge.RelationId.Value]; //System.Collections.Generic.KeyNotFoundException: 'The given key '0' was not present in the dictionary.'
+                var oldRelation = context.relations[edge.RelationId.Value];
 
                 // move all chains from old relation to currently constructed relation
                 MergeRelations(relation, oldRelation, edge.RelationId.Value, relationId);
@@ -203,12 +183,12 @@ namespace Polygons.States
                         if (e.RelationId != null && e1.RelationId != null
                             && e.RelationId == e1.RelationId && e.chain != e1.chain)
                         {
-                            MergeChains(e.chain, e1.chain, e.RelationId.Value);
+                            MergeChains(e.chain!, e1.chain!, e.RelationId.Value);
                         }
                         else if (e.RelationId != null && e2.RelationId != null
                             && e.RelationId == e2.RelationId && e.chain != e2.chain)
                         {
-                            MergeChains(e.chain, e2.chain, e.RelationId.Value);
+                            MergeChains(e.chain!, e2.chain!, e.RelationId.Value);
                         }
                     }
                 }

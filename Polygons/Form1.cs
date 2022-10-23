@@ -77,6 +77,9 @@ namespace Polygons
         private void buttonDeletePolygon_Click(object sender, EventArgs e)
             => TransitionTo(new DeletePolygonState());
 
+        private void buttonVaryLength_Click(object sender, EventArgs e)
+            => TransitionTo(new VaryLengthState());
+
         private void buttonDeleteRelation_Click(object sender, EventArgs e)
         {
             int relId = Utilities.QueryForRelationId();
@@ -190,7 +193,5 @@ namespace Polygons
             Polygons[1].Edges[4].fixedLength = true;
             Polygons[1].Edges[4].declaredLength = Polygons[1].Edges[4].Length;
         }
-
-        
     }
 }

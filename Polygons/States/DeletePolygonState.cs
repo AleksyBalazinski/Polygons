@@ -1,14 +1,12 @@
-﻿using System.Diagnostics;
-
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     internal class DeletePolygonState : State
     {
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            Polygon? toBeDeleted = FindPolygonToBeDeleted(e.Location);
-            if(toBeDeleted != null)
+            HitTester hitTester = new(context.Polygons);
+            Polygon? toBeDeleted = hitTester.GetHitPolygon(e.Location);
+            if (toBeDeleted != null)
             {
                 foreach (var edge in toBeDeleted.Edges)
                 {
@@ -28,23 +26,6 @@ namespace Polygons.States
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-        }
-
-        private Polygon? FindPolygonToBeDeleted(Point p)
-        {
-            Polygon? hitPolygon;
-            foreach (var polygon in context.Polygons)
-            {
-                if (polygon.HitTest(p))
-                {
-                    Debug.WriteLine($"Polygon {polygon} hit");
-                    hitPolygon = polygon;
-
-                    return hitPolygon;
-                }
-            }
-
-            return null;
         }
     }
 }

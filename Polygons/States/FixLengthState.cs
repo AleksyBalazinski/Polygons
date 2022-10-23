@@ -19,51 +19,32 @@ namespace Polygons.States
 
         private void DrawAfterLengthFixed(Point location)
         {
-            Segment? edge = GetHitEdge(location);
-            if (edge != null)
+            HitTester hitTester = new(context.Polygons);
+            Segment? edge = hitTester.GetHitEdge(location);
+            if (edge == null)
+                return;
+
+            Debug.WriteLine($"Edge {edge} will have fixed length");
+
+            float length = Utilities.QueryForEdgeLength(edge);
+            if (length <= 0)
+                MessageBox.Show($"Invalid input: Positive real values only.",
+                    "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            edge.Length = length;
+            edge.fixedLength = true;
+            edge.declaredLength = length;
+            Fixer fixer = new();
+            fixer.Fix(edge, new Point(0, 0));
+            foreach (var p in context.Polygons)
             {
-                Debug.WriteLine($"Edge {edge} will have fixed length");
-
-                float length = Utilities.QueryForEdgeLength(edge);
-                if (length <= 0)
-                    MessageBox.Show($"Invalid input: Positive real values only.",
-                        "Polygons", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                edge.Length = length;
-                edge.fixedLength = true;
-                edge.declaredLength = length;
-                Fixer fixer = new();
-                fixer.Fix(edge, new Point(0, 0));
-                foreach (var p in context.Polygons)
+                if (p != edge.endpoints.Item1.polygon)
                 {
-                    if (p != edge.endpoints.Item1.polygon)
-                    {
-                        fixer.FixOffshoot(p);
-                    }
-                }
-
-                context.Canvas.Invalidate();
-            }
-        }
-
-        private Segment? GetHitEdge(Point p)
-        {
-            Segment hitEdge;
-            foreach (var polygon in context.Polygons)
-            {
-                foreach (var edge in polygon.Edges)
-                {
-                    if (edge.HitTest(p))
-                    {
-                        Debug.WriteLine($"Edge {edge} hit");
-                        hitEdge = edge;
-
-                        return hitEdge;
-                    }
+                    fixer.FixOffshoot(p);
                 }
             }
 
-            return null;
+            context.Canvas.Invalidate();
         }
     }
 }

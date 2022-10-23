@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Polygons.States
+﻿namespace Polygons.States
 {
     internal class MoveState : State
     {
@@ -8,25 +6,27 @@ namespace Polygons.States
 
         public override void canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            var vertexInfo = FindVertexToBeMoved(e.Location);
-            if (vertexInfo != null)
+            HitTester hitTester = new(context.Polygons);
+            var vertex = hitTester.GetHitVertex(e.Location);
+            if (vertex != null)
             {
-                Vertex vertex = vertexInfo;
+                previousPoint = e.Location;
                 context.TransitionTo(new MovingVertexState(vertex));
                 return;
             }
 
-            var edgeInfo = FindEdgeToBeMoved(e.Location);
-            if (edgeInfo != null)
+            var edge = hitTester.GetHitEdge(e.Location);
+            if (edge != null)
             {
-                Segment edge = edgeInfo;
+                previousPoint = e.Location;
                 context.TransitionTo(new MovingEdgeState(edge, previousPoint));
                 return;
             }
 
-            var polygon = FindPolygonToBeMoved(e.Location);
+            var polygon = hitTester.GetHitPolygon(e.Location);
             if (polygon != null)
             {
+                previousPoint = e.Location;
                 context.TransitionTo(new MovingPolygonState(polygon, previousPoint));
                 return;
             }
@@ -38,65 +38,6 @@ namespace Polygons.States
 
         public override void canvas_MouseUp(object sender, MouseEventArgs e)
         {
-        }
-
-        private Vertex? FindVertexToBeMoved(Point p)
-        {
-            Vertex movedVertex;
-            foreach (var polygon in context.Polygons)
-            {
-                foreach (var vertex in polygon.Vertices)
-                {
-                    if (vertex.HitTest(p))
-                    {
-                        Debug.WriteLine($"Vertex {vertex} hit");
-                        movedVertex = vertex;
-                        previousPoint = p;
-
-                        return movedVertex;
-                    }
-                }
-            }
-            return null;
-        }
-
-        private Segment? FindEdgeToBeMoved(Point p)
-        {
-            Segment movedEdge;
-            foreach (var polygon in context.Polygons)
-            {
-                foreach (var edge in polygon.Edges)
-                {
-                    if (edge.HitTest(p))
-                    {
-                        Debug.WriteLine($"Edge {edge} hit");
-                        movedEdge = edge;
-                        previousPoint = p;
-
-                        return movedEdge;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        private Polygon? FindPolygonToBeMoved(Point p)
-        {
-            Polygon? movedPolygon;
-            foreach (var polygon in context.Polygons)
-            {
-                if (polygon.HitTest(p))
-                {
-                    Debug.WriteLine($"Polygon {polygon} hit");
-                    movedPolygon = polygon;
-                    previousPoint = p;
-
-                    return movedPolygon;
-                }
-            }
-
-            return null;
         }
     }
 }

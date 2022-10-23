@@ -22,7 +22,6 @@ namespace Polygons
         public float Radius { get; set; }
 
         public (int?, int?) relationIds;
-        public (bool, bool) fixedLenghts;
         public (Segment, Segment) adjacentEdges;
         public Polygon polygon;
 

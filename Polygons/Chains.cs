@@ -19,7 +19,7 @@
             }
         }
 
-        public static void RotateChainForeward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
+        public static void RotateChainForeward(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
         {
             for (int i = 0; i < chain.Count; i++)
             {
@@ -40,7 +40,7 @@
             }
         }
 
-        public static void RotateChainBackward(List<Segment> chain, Point axis, float sinTheta, float cosTheta) // TODO move to separate class
+        public static void RotateChainBackward(List<Segment> chain, Point axis, float sinTheta, float cosTheta)
         {
             for (int i = 0; i < chain.Count; i++)
             {
@@ -61,7 +61,7 @@
             }
         }
 
-        public static void TranslateForeward(List<Segment> chain, Point displacement) // TODO move to separate class
+        public static void TranslateForeward(List<Segment> chain, Point displacement)
         {
             for (int i = 0; i < chain.Count; i++)
             {
@@ -75,7 +75,7 @@
             }
         }
 
-        public static void TranslateBackward(List<Segment> chain, Point displacement) // TODO move to separate class
+        public static void TranslateBackward(List<Segment> chain, Point displacement)
         {
             for (int i = 0; i < chain.Count; i++)
             {

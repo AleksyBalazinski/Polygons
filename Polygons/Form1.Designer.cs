@@ -38,6 +38,7 @@
             this.panelCanvas = new System.Windows.Forms.Panel();
             this.canvas = new System.Windows.Forms.PictureBox();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.buttonVaryLength = new System.Windows.Forms.Button();
             this.buttonDeletePolygon = new System.Windows.Forms.Button();
             this.buttonDeleteRelation = new System.Windows.Forms.Button();
             this.addRelation = new System.Windows.Forms.Button();
@@ -152,6 +153,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panel1.Controls.Add(this.buttonVaryLength);
             this.panel1.Controls.Add(this.buttonDeletePolygon);
             this.panel1.Controls.Add(this.buttonDeleteRelation);
             this.panel1.Controls.Add(this.addRelation);
@@ -165,11 +167,21 @@
             this.panel1.Size = new System.Drawing.Size(841, 44);
             this.panel1.TabIndex = 2;
             // 
+            // buttonVaryLength
+            // 
+            this.buttonVaryLength.Location = new System.Drawing.Point(667, 0);
+            this.buttonVaryLength.Name = "buttonVaryLength";
+            this.buttonVaryLength.Size = new System.Drawing.Size(75, 44);
+            this.buttonVaryLength.TabIndex = 9;
+            this.buttonVaryLength.Text = "Vary length";
+            this.buttonVaryLength.UseVisualStyleBackColor = true;
+            this.buttonVaryLength.Click += new System.EventHandler(this.buttonVaryLength_Click);
+            // 
             // buttonDeletePolygon
             // 
-            this.buttonDeletePolygon.Location = new System.Drawing.Point(586, 3);
+            this.buttonDeletePolygon.Location = new System.Drawing.Point(586, 0);
             this.buttonDeletePolygon.Name = "buttonDeletePolygon";
-            this.buttonDeletePolygon.Size = new System.Drawing.Size(75, 41);
+            this.buttonDeletePolygon.Size = new System.Drawing.Size(75, 44);
             this.buttonDeletePolygon.TabIndex = 8;
             this.buttonDeletePolygon.Text = "Delete polygon";
             this.buttonDeletePolygon.UseVisualStyleBackColor = true;
@@ -339,5 +351,6 @@
         private Button addRelation;
         private Button buttonDeleteRelation;
         private Button buttonDeletePolygon;
+        private Button buttonVaryLength;
     }
 }

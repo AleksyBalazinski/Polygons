@@ -12,10 +12,9 @@ namespace Polygons
         public Point Point2 { get; set; }
         public int? RelationId { get; set; }
 
-        public (int?, int?) relationIds; // adjacent edges RENAME
+        public (int?, int?) relationIds; // adjacent edges
         public bool fixedLength;
         public float declaredLength;
-        public (bool, bool) fixedLengths;
         public List<Segment>? chain; // pointer to mother chain
         public (Vertex, Vertex) endpoints;
         public (Segment, Segment) adjacentEdges;
