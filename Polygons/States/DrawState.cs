@@ -32,7 +32,7 @@ namespace Polygons.States
 
         private void DrawPolygonUnderConstruction(int x, int y)
         {
-            if (!definingNewPolygon && constructedPolygon.Vertices.Count >= 3 && Utilities.IsOnVertex(constructedPolygon.Vertices[0], x, y, 10))
+            if (!definingNewPolygon && constructedPolygon.Vertices.Count >= 3 && Utilities.IsOnPoint(constructedPolygon.Vertices[0].Center, new Point(x, y), 10))
             {
                 drawnSegment.endpoints.Item2 = constructedPolygon.Vertices[0];
                 constructedPolygon.Vertices[0].adjacentEdges.Item1 = drawnSegment;

@@ -5,9 +5,10 @@ namespace Polygons
 {
     static class Utilities
     {
-        public static bool IsOnVertex(Vertex vertex, float x, float y, float d)
+        public static bool IsOnPoint(Point point, Point hitLocation, float d)
         {
-            return x >= vertex.Center.X - d && x <= vertex.Center.X + d && y >= vertex.Center.Y - d && y <= vertex.Center.Y + d;
+            return hitLocation.X >= point.X - d && hitLocation.X <= point.X + d
+                && hitLocation.Y >= point.Y - d && hitLocation.Y <= point.Y + d;
         }
 
         public static float QueryForEdgeLength(Segment edge)

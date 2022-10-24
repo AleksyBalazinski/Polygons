@@ -116,6 +116,21 @@ namespace Polygons
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
         }
 
+
+        private void radioButtonStandardPolygon_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonStandardPolygon.Checked == true)
+                drawingAlgorithm.PolygonDrawingAlgorithm = DrawingAlgorithms.PolygonStandard;
+        }
+
+
+        private void radioButtonBezierPolygon_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonBezierPolygon.Checked == true)
+                drawingAlgorithm.PolygonDrawingAlgorithm = DrawingAlgorithms.PolygonBezier;
+            canvas.Invalidate();
+        }
+
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
         {
             polygons.Clear();

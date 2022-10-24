@@ -13,7 +13,6 @@ namespace Polygons
 
         public Vertex? GetHitVertex(Point p)
         {
-            Vertex movedVertex;
             foreach (var polygon in polygons)
             {
                 foreach (var vertex in polygon.Vertices)
@@ -21,9 +20,8 @@ namespace Polygons
                     if (vertex.HitTest(p))
                     {
                         Debug.WriteLine($"Vertex {vertex} hit");
-                        movedVertex = vertex;
 
-                        return movedVertex;
+                        return vertex;
                     }
                 }
             }
@@ -32,7 +30,6 @@ namespace Polygons
 
         public Segment? GetHitEdge(Point p)
         {
-            Segment movedEdge;
             foreach (var polygon in polygons)
             {
                 foreach (var edge in polygon.Edges)
@@ -40,9 +37,8 @@ namespace Polygons
                     if (edge.HitTest(p))
                     {
                         Debug.WriteLine($"Edge {edge} hit");
-                        movedEdge = edge;
 
-                        return movedEdge;
+                        return edge;
                     }
                 }
             }
@@ -61,6 +57,22 @@ namespace Polygons
                     movedPolygon = polygon;
 
                     return movedPolygon;
+                }
+            }
+
+            return null;
+        }
+
+        public (Segment, int)? GetHitControlPoint(Point p)
+        {
+            foreach (var polygon in polygons)
+            {
+                foreach (var edge in polygon.Edges)
+                {
+                    if (Utilities.IsOnPoint(edge.controlPoints[1], p, 10))
+                        return (edge, 1);
+                    if (Utilities.IsOnPoint(edge.controlPoints[2], p, 10))
+                        return (edge, 2);
                 }
             }
 

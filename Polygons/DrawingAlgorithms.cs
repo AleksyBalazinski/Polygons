@@ -1,4 +1,6 @@
-﻿namespace Polygons
+﻿using System.Diagnostics;
+
+namespace Polygons
 {
     internal static class DrawingAlgorithms
     {
@@ -99,6 +101,82 @@
         {
             using var brush = new SolidBrush(Color.Black);
             g.FillEllipse(brush, center.X - radius, center.Y - radius, radius * 2, radius * 2);
+        }
+
+        public static void PolygonStandard(Graphics g, Shapes.Polygon polygon, Algorithm a)
+        {
+            foreach (var v in polygon.Vertices)
+            {
+                v.Draw(g, a);
+                Font font = new("Arial", 10);
+                SolidBrush brush = new(Color.Black);
+#if DEBUG
+                g.DrawString($"({v.Center.X},{v.Center.Y})", font, brush, new Point(v.Center.X + 5, v.Center.Y + 5));
+#endif
+            }
+
+            foreach (var e in polygon.Edges)
+            {
+                e.Draw(g, a);
+                Font font = new("Arial", 12);
+                SolidBrush brush = new(Color.Black);
+                if (e.fixedLength)
+                    brush = new SolidBrush(Color.DarkGray);
+
+                g.DrawString(string.Format("{0:0.00}", e.Length), font, brush, new Point((e.Point1.X + e.Point2.X) / 2, (e.Point1.Y + e.Point2.Y) / 2));
+                if (e.RelationId != null)
+                {
+                    font = new Font("Arial", 12);
+                    brush = new SolidBrush(Color.Orange);
+
+                    g.DrawString($"{e.RelationId.Value}", font, brush, new Point((e.Point1.X + e.Point2.X) / 2 - 20, (e.Point1.Y + e.Point2.Y) / 2 - 20));
+                }
+            }
+        }
+
+        public static void PolygonBezier(Graphics g, Shapes.Polygon polygon, Algorithm a)
+        {
+            foreach (var v in polygon.Vertices)
+            {
+                v.Draw(g, a);
+                Font font = new("Arial", 10);
+                SolidBrush brush = new(Color.Black);
+#if DEBUG
+                g.DrawString($"({v.Center.X},{v.Center.Y})", font, brush, new Point(v.Center.X + 5, v.Center.Y + 5));
+#endif
+            }
+
+            foreach (var e in polygon.Edges)
+            {
+                if (e.AllowsBezier) // only free edges can be made into Bezier curves
+                {
+                    Debug.WriteLine("drawing bezier");
+                    const int cpRadius = 5;
+                    using var brush = new SolidBrush(Color.Black);
+                    g.FillRectangle(brush, e.controlPoints[1].X - cpRadius, e.controlPoints[1].Y - cpRadius, cpRadius * 2, cpRadius * 2);
+                    g.FillRectangle(brush, e.controlPoints[2].X - cpRadius, e.controlPoints[2].Y - cpRadius, cpRadius * 2, cpRadius * 2);
+
+                    using var pen = new Pen(Color.Orange, 2);
+                    g.DrawBezier(pen, e.controlPoints[0], e.controlPoints[1], e.controlPoints[2], e.controlPoints[3]);
+                }
+                else
+                {
+                    e.Draw(g, a);
+                    Font font = new("Arial", 12);
+                    SolidBrush brush = new(Color.Black);
+                    if (e.fixedLength)
+                        brush = new SolidBrush(Color.DarkGray);
+
+                    g.DrawString(string.Format("{0:0.00}", e.Length), font, brush, new Point((e.Point1.X + e.Point2.X) / 2, (e.Point1.Y + e.Point2.Y) / 2));
+                    if (e.RelationId != null)
+                    {
+                        font = new Font("Arial", 12);
+                        brush = new SolidBrush(Color.Orange);
+
+                        g.DrawString($"{e.RelationId.Value}", font, brush, new Point((e.Point1.X + e.Point2.X) / 2 - 20, (e.Point1.Y + e.Point2.Y) / 2 - 20));
+                    }
+                }
+            }
         }
 
         private static void PutPixel(Graphics g, float x, float y)

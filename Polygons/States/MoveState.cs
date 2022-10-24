@@ -15,6 +15,14 @@
                 return;
             }
 
+            var cpInfo = hitTester.GetHitControlPoint(e.Location);
+            if (cpInfo != null)
+            {
+                previousPoint = e.Location;
+                context.TransitionTo(new MovingControlPointState(cpInfo.Value.Item1, cpInfo.Value.Item2));
+                return;
+            }
+
             var edge = hitTester.GetHitEdge(e.Location);
             if (edge != null)
             {

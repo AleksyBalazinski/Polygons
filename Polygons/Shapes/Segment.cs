@@ -8,8 +8,29 @@ namespace Polygons.Shapes
         public Segment(Point p1, Point p2) { Point1 = p1; Point2 = p2; }
         public Color SegmentColor { get; set; }
         public int SegmentWidth { get; set; }
-        public Point Point1 { get; set; }
-        public Point Point2 { get; set; }
+        private Point point1;
+        private Point point2;
+        public Point Point1
+        {
+            get => point1;
+            set
+            {
+                point1 = value;
+                controlPoints[0] = point1;
+            }
+        }
+        public Point Point2
+        {
+            get => point2;
+            set
+            {
+                point2 = value;
+                // we're using the fact that point1 is already defined
+                controlPoints[1] = 0.67f * point1 + 0.33f * point2;
+                controlPoints[2] = 0.33f * point1 + 0.67f * point2;
+                controlPoints[3] = point2;
+            }
+        }
         public int? RelationId { get; set; }
 
         public (int?, int?) relationIds; // adjacent edges
@@ -18,6 +39,8 @@ namespace Polygons.Shapes
         public List<Segment>? chain; // pointer to mother chain
         public (Vertex, Vertex) endpoints;
         public (Segment, Segment) adjacentEdges;
+        public Point[] controlPoints = new Point[4]; // set of control points defining a Bezier curve
+        public bool AllowsBezier { get => RelationId == null && !fixedLength; }
         public float Length
         {
             get => MathF.Sqrt((Point1.X - Point2.X) * (Point1.X - Point2.X)

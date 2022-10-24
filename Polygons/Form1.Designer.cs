@@ -48,9 +48,12 @@
             this.buttonMove = new System.Windows.Forms.Button();
             this.buttonDraw = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.radioButtonStandardPolygon = new System.Windows.Forms.RadioButton();
+            this.labelPolygonAlgorithm = new System.Windows.Forms.Label();
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.radioButtonBezierPolygon = new System.Windows.Forms.RadioButton();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -259,6 +262,9 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.radioButtonBezierPolygon);
+            this.panel2.Controls.Add(this.radioButtonStandardPolygon);
+            this.panel2.Controls.Add(this.labelPolygonAlgorithm);
             this.panel2.Controls.Add(this.radioButtonLineBresenham);
             this.panel2.Controls.Add(this.radioButtonLineLibrary);
             this.panel2.Controls.Add(this.label1);
@@ -268,6 +274,26 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(94, 487);
             this.panel2.TabIndex = 3;
+            // 
+            // radioButtonStandardPolygon
+            // 
+            this.radioButtonStandardPolygon.AutoSize = true;
+            this.radioButtonStandardPolygon.Location = new System.Drawing.Point(12, 338);
+            this.radioButtonStandardPolygon.Name = "radioButtonStandardPolygon";
+            this.radioButtonStandardPolygon.Size = new System.Drawing.Size(72, 19);
+            this.radioButtonStandardPolygon.TabIndex = 4;
+            this.radioButtonStandardPolygon.TabStop = true;
+            this.radioButtonStandardPolygon.Text = "Standard";
+            this.radioButtonStandardPolygon.UseVisualStyleBackColor = true;
+            this.radioButtonStandardPolygon.CheckedChanged += new System.EventHandler(this.radioButtonStandardPolygon_CheckedChanged);
+            // 
+            // labelPolygonAlgorithm
+            // 
+            this.labelPolygonAlgorithm.Location = new System.Drawing.Point(11, 278);
+            this.labelPolygonAlgorithm.Name = "labelPolygonAlgorithm";
+            this.labelPolygonAlgorithm.Size = new System.Drawing.Size(72, 46);
+            this.labelPolygonAlgorithm.TabIndex = 3;
+            this.labelPolygonAlgorithm.Text = "Polygon drawing algorithm";
             // 
             // radioButtonLineBresenham
             // 
@@ -303,6 +329,17 @@
             this.label1.Size = new System.Drawing.Size(75, 30);
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
+            // 
+            // radioButtonBezierPolygon
+            // 
+            this.radioButtonBezierPolygon.Location = new System.Drawing.Point(11, 363);
+            this.radioButtonBezierPolygon.Name = "radioButtonBezierPolygon";
+            this.radioButtonBezierPolygon.Size = new System.Drawing.Size(72, 43);
+            this.radioButtonBezierPolygon.TabIndex = 5;
+            this.radioButtonBezierPolygon.TabStop = true;
+            this.radioButtonBezierPolygon.Text = "Bezier curves";
+            this.radioButtonBezierPolygon.UseVisualStyleBackColor = true;
+            this.radioButtonBezierPolygon.CheckedChanged += new System.EventHandler(this.radioButtonBezierPolygon_CheckedChanged);
             // 
             // Form1
             // 
@@ -352,5 +389,8 @@
         private Button buttonDeleteRelation;
         private Button buttonDeletePolygon;
         private Button buttonVaryLength;
+        private RadioButton radioButtonStandardPolygon;
+        private Label labelPolygonAlgorithm;
+        private RadioButton radioButtonBezierPolygon;
     }
 }
