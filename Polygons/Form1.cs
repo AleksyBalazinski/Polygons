@@ -108,12 +108,22 @@ namespace Polygons
         {
             if (radioButtonLineLibrary.Checked == true)
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineLibrary;
+
+            Canvas.Invalidate();
         }
 
         private void radioButtonLineBresenham_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonLineBresenham.Checked == true)
                 drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
+            Canvas.Invalidate();
+        }
+
+        private void radioButtonBresenhamThick_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButtonBresenhamThick.Checked == true)
+                drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenhamThick;
+            Canvas.Invalidate();
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)

@@ -89,6 +89,49 @@
             }
         }
 
+        public static void LineBresenhamThick(Graphics g, Point p1, Point p2)
+        {
+            float x1 = p1.X, y1 = p1.Y, x2 = p2.X, y2 = p2.Y;
+            bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
+            float temp;
+            if (steep)
+            {
+                temp = x1; x1 = y1; y1 = temp;
+                temp = x2; x2 = y2; y2 = temp;
+            }
+            if (x1 > x2)
+            {
+                temp = x1; x1 = x2; x2 = temp;
+                temp = y1; y1 = y2; y2 = temp;
+            }
+            float dx = x2 - x1;
+            float dy = Math.Abs(y2 - y1);
+            float error = dx / 2.0f;
+            int ystep = (y1 < y2) ? 1 : -1;
+            int y = (int)y1;
+
+            int maxX = (int)x2;
+
+            for (int x = (int)x1; x <= maxX; x++)
+            {
+                if (steep)
+                {
+                    PutThickPixel(g, y, x, 2);
+                }
+                else
+                {
+                    PutThickPixel(g, x, y, 2);
+                }
+
+                error -= dy;
+                if (error < 0)
+                {
+                    y += ystep;
+                    error += dx;
+                }
+            }
+        }
+
         public static void LineLibrary(Graphics g, Point p1, Point p2)
         {
             using var pen = new Pen(Color.Black, 2);
@@ -103,8 +146,22 @@
 
         private static void PutPixel(Graphics g, float x, float y)
         {
-            using var brush = new SolidBrush(Color.Red);
+            using var brush = new SolidBrush(Color.Black);
             g.FillRectangle(brush, x, y, 1, 1);
+        }
+
+        private static void PutThickPixel(Graphics g, float x, float y, int thickness)
+        {
+            thickness /= 2;
+            using var brush = new SolidBrush(Color.Black);
+            for (int xi = (int)x - thickness; xi < x + thickness; xi++)
+            {
+                for (int yi = (int)y - thickness; yi < y + thickness; yi++)
+                {
+                    PutPixel(g, xi, yi);
+                }
+            }
+
         }
     }
 }

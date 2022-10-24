@@ -51,6 +51,7 @@
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
+            this.radioButtonBresenhamThick = new System.Windows.Forms.RadioButton();
             this.menuStrip1.SuspendLayout();
             this.tableLayoutPanel.SuspendLayout();
             this.panelCanvas.SuspendLayout();
@@ -259,6 +260,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.radioButtonBresenhamThick);
             this.panel2.Controls.Add(this.radioButtonLineBresenham);
             this.panel2.Controls.Add(this.radioButtonLineLibrary);
             this.panel2.Controls.Add(this.label1);
@@ -303,6 +305,17 @@
             this.label1.Size = new System.Drawing.Size(75, 30);
             this.label1.TabIndex = 0;
             this.label1.Text = "Line drawing\r\nalgorithm";
+            // 
+            // radioButtonBresenhamThick
+            // 
+            this.radioButtonBresenhamThick.Location = new System.Drawing.Point(3, 176);
+            this.radioButtonBresenhamThick.Name = "radioButtonBresenhamThick";
+            this.radioButtonBresenhamThick.Size = new System.Drawing.Size(104, 39);
+            this.radioButtonBresenhamThick.TabIndex = 3;
+            this.radioButtonBresenhamThick.TabStop = true;
+            this.radioButtonBresenhamThick.Text = "Bresenham thick";
+            this.radioButtonBresenhamThick.UseVisualStyleBackColor = true;
+            this.radioButtonBresenhamThick.CheckedChanged += new System.EventHandler(this.radioButtonBresenhamThick_CheckedChanged);
             // 
             // Form1
             // 
@@ -352,5 +365,6 @@
         private Button buttonDeleteRelation;
         private Button buttonDeletePolygon;
         private Button buttonVaryLength;
+        private RadioButton radioButtonBresenhamThick;
     }
 }
