@@ -89,6 +89,98 @@
             }
         }
 
+        public static void LineSymmetricBresenham(Graphics g, Point p1, Point p2)
+        {
+            float x1 = p1.X, y1 = p1.Y, x2 = p2.X, y2 = p2.Y;
+            float x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+
+            dx = x2 - x1;
+            dy = y2 - y1;
+            dx1 = Math.Abs(dx);
+            dy1 = Math.Abs(dy);
+            px = 2 * dy1 - dx1;
+            py = 2 * dx1 - dy1;
+            float xf, yf, xb, yb;
+            if (dy1 <= dx1)
+            {
+                if (dx >= 0)
+                {
+                    xf = x1;
+                    yf = y1;
+                    xb = x2;
+                    yb = y2;
+                }
+                else
+                {
+                    xf = x2;
+                    yf = y2;
+                    xb = x1;
+                    yb = y1;
+                }
+                PutPixel(g, xf, yf); PutPixel(g, xb, yb);
+                while (xf < xb)
+                {
+                    xf++; xb--;
+                    if (px < 0)
+                    {
+                        px += 2 * dy1;
+                    }
+                    else
+                    {
+                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+                        {
+                            yf++; yb--;
+                        }
+                        else
+                        {
+                            yf--; yb++;
+                        }
+                        px += 2 * (dy1 - dx1);
+                    }
+                    PutPixel(g, xf, yf); PutPixel(g, xb, yb);
+                }
+            }
+            else
+            {
+                if (dy >= 0)
+                {
+                    xf = x1;
+                    yf = y1;
+                    yb = y2;
+                    xb = x2;
+                }
+                else
+                {
+                    xf = x2;
+                    yf = y2;
+                    yb = y1;
+                    xb = x1;
+                }
+                PutPixel(g, xf, yf); PutPixel(g, xb, yb);
+                while (yf < yb)
+                {
+                    yf++;
+                    if (py <= 0)
+                    {
+                        py += 2 * dx1;
+                    }
+                    else
+                    {
+                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
+                        {
+                            xf++; xb--;
+                        }
+                        else
+                        {
+                            xf--; xb++;
+                        }
+                        py += 2 * (dx1 - dy1);
+                    }
+                    PutPixel(g, xf, yf); PutPixel(g, xb, yb);
+                }
+            }
+        }
+
         public static void LineLibrary(Graphics g, Point p1, Point p2)
         {
             using var pen = new Pen(Color.Black, 2);

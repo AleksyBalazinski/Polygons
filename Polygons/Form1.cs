@@ -113,7 +113,8 @@ namespace Polygons
         private void radioButtonLineBresenham_CheckedChanged(object sender, EventArgs e)
         {
             if (radioButtonLineBresenham.Checked == true)
-                drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineBresenham;
+                drawingAlgorithm.SegmentDrawingAlgorithm = DrawingAlgorithms.LineSymmetricBresenham;
+            canvas.Invalidate();
         }
 
         private void clearToolStripMenuItem_Click(object sender, EventArgs e)
