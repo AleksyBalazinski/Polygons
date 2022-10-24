@@ -48,6 +48,7 @@
             this.buttonMove = new System.Windows.Forms.Button();
             this.buttonDraw = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.radioButtonXW = new System.Windows.Forms.RadioButton();
             this.radioButtonLineBresenham = new System.Windows.Forms.RadioButton();
             this.radioButtonLineLibrary = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
@@ -259,6 +260,7 @@
             // 
             // panel2
             // 
+            this.panel2.Controls.Add(this.radioButtonXW);
             this.panel2.Controls.Add(this.radioButtonLineBresenham);
             this.panel2.Controls.Add(this.radioButtonLineLibrary);
             this.panel2.Controls.Add(this.label1);
@@ -268,6 +270,18 @@
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(94, 487);
             this.panel2.TabIndex = 3;
+            // 
+            // radioButtonXW
+            // 
+            this.radioButtonXW.AutoSize = true;
+            this.radioButtonXW.Location = new System.Drawing.Point(3, 112);
+            this.radioButtonXW.Name = "radioButtonXW";
+            this.radioButtonXW.Size = new System.Drawing.Size(82, 19);
+            this.radioButtonXW.TabIndex = 3;
+            this.radioButtonXW.TabStop = true;
+            this.radioButtonXW.Text = "Xiaolin Wu";
+            this.radioButtonXW.UseVisualStyleBackColor = true;
+            this.radioButtonXW.CheckedChanged += new System.EventHandler(this.radioButtonXW_CheckedChanged);
             // 
             // radioButtonLineBresenham
             // 
@@ -352,5 +366,6 @@
         private Button buttonDeleteRelation;
         private Button buttonDeletePolygon;
         private Button buttonVaryLength;
+        private RadioButton radioButtonXW;
     }
 }
