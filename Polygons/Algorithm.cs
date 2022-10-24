@@ -20,8 +20,8 @@ namespace Polygons
             foreach (var v in polygon.Vertices)
             {
                 Apply(g, v);
-                Font font = new Font("Arial", 10);
-                SolidBrush brush = new SolidBrush(Color.Black);
+                Font font = new("Arial", 10);
+                SolidBrush brush = new(Color.Black);
 #if DEBUG
                 g.DrawString($"({v.Center.X},{v.Center.Y})", font, brush, new Point(v.Center.X + 5, v.Center.Y + 5));
 #endif
@@ -30,8 +30,8 @@ namespace Polygons
             foreach (var e in polygon.Edges)
             {
                 Apply(g, e);
-                Font font = new Font("Arial", 12);
-                SolidBrush brush = new SolidBrush(Color.Black);
+                Font font = new("Arial", 12);
+                SolidBrush brush = new(Color.Black);
                 if (e.fixedLength)
                     brush = new SolidBrush(Color.DarkGray);
 

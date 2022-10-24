@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using Polygons.Shapes;
+﻿using Polygons.Shapes;
+using System.Diagnostics;
 
 namespace Polygons.States
 {

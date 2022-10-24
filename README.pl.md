@@ -36,7 +36,7 @@ W przeciwnym razie `FixForward()` jest stosowana do końca całego łańcucha, a
 Algorytm jest również podobnie wykorzystywany podczas dodawania krawędzi do relacji równoległości oraz ustawiania
 ograniczenia stałej długości dla krawędzi.
 Bardziej szczegółowe działanie algorytmu (z pominięciem szczegółów implementacyjnych) przedstawia pseudokod
-(składnia _à la_ Lua).
+(składnia _à la_ Lua). Implementacja znajduje się w klasie `Fixer`.
 ```
 seenChains = {} -- słownik (numer relacji, łańcuch)
 
