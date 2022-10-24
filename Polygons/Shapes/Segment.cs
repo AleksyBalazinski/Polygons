@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 
-namespace Polygons
+namespace Polygons.Shapes
 {
     internal class Segment : IShape
     {

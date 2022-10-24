@@ -1,4 +1,6 @@
-﻿namespace Polygons.States
+﻿using Polygons.Shapes;
+
+namespace Polygons.States
 {
     internal class DeletePolygonState : State
     {

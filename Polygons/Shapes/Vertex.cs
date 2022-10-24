@@ -1,6 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 
-namespace Polygons
+namespace Polygons.Shapes
 {
     internal class Vertex : IShape
     {
@@ -49,7 +49,7 @@ namespace Polygons
             Center = p;
         }
 
-        public override string ToString() => String.Format($"({Center.X}, {Center.Y})");
+        public override string ToString() => string.Format($"({Center.X}, {Center.Y})");
 
         private GraphicsPath GetPath()
         {

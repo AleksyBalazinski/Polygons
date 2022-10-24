@@ -1,5 +1,8 @@
-﻿namespace Polygons
+﻿using Polygons.Shapes;
+
+namespace Polygons
 {
+    using Polygons.Shapes;
     using Chain = List<Segment>;
     internal class Fixer
     {

@@ -1,4 +1,3 @@
-[![pl](https://img.shields.io/badge/lang-pl-green.svg)](https://github.com/AleksyBalazinski/Polygons/master/README.pl.md)
 # Polygons
 Narzędzie do manipulowania zdefiniowanymi przez użytkownika wielokątami z możliwością dodawania relacji równoległości 
 i ustalania długości krawędzi.
@@ -7,7 +6,7 @@ Aby móc łatwiej zarządzać różnymi stanami w jakich może znaleźć się pr
 zastosowano wzorzec projektowy _state_, w którym przejścia między stanami są wywoływane naciśnięciem odpowiedniego przycisku.
 W celu umożliwienia łatwego dalszego rozszerzania programu o inne algorytmy rysujące linie i koła zastosowano wzorzec
 _visitor_, przy czym konkretne metody rysujące są podstawiane w trakcie wykonania programu, co było możliwe dzięki
-zastosowaniu obiektów funkcyjnych w klasie Algorithm.
+zastosowaniu obiektów funkcyjnych w klasie `Algorithm`.
 ## Algorytm relacji
 ### Nazewnictwo i założenia
 Krawędzie przyległe, które należą do tej samej relacji równoległości tworzą _łańcuch_. 
@@ -40,6 +39,8 @@ Bardziej szczegółowe działanie algorytmu (z pominięciem szczegółów implem
 (składnia _à la_ Lua).
 ```
 seenChains = {} -- słownik (numer relacji, łańcuch)
+
+
 -- movedVertex - przesuwany wierzchołek
 -- location - punkt, do którego chcemy przesunąć movedVertex
 function Fix(movedVertex, location)

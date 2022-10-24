@@ -1,4 +1,6 @@
-﻿namespace Polygons
+﻿using Polygons.Shapes;
+
+namespace Polygons
 {
     internal class Chains
     {

@@ -1,4 +1,4 @@
-﻿namespace Polygons
+﻿namespace Polygons.Shapes
 {
     internal class Polygon : IShape
     {
