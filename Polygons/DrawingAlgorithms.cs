@@ -1,7 +1,4 @@
-﻿using System.Drawing;
-using System.Runtime.Intrinsics.X86;
-
-namespace Polygons
+﻿namespace Polygons
 {
     internal static class DrawingAlgorithms
     {
@@ -95,15 +92,15 @@ namespace Polygons
         public static void LineXiaolinWu(Graphics g, Point p1, Point p2)
         {
             float x0 = p1.X, x1 = p2.X, y0 = p1.Y, y1 = p2.Y;
-            Func<float, int> ipart = x => (int)x;
-            Func<float, int> round = x => ipart(x + 0.5f);
-            Func<float, float> fpart = x =>
+            static int ipart(float x) => (int)x;
+            static int round(float x) => ipart(x + 0.5f);
+            static float fpart(float x)
             {
                 if (x < 0)
                     return 1 - (x - MathF.Floor(x));
                 return x - MathF.Floor(x);
-            };
-            Func<float, float> rfpart = x => 1 - fpart(x);
+            }
+            static float rfpart(float x) => 1 - fpart(x);
 
             bool steep = Math.Abs(p2.Y - p1.Y) > Math.Abs(p2.X - p1.X);
             float temp;
@@ -204,7 +201,7 @@ namespace Polygons
         private static void PutPixel(Graphics g, float x, float y, float c)
         {
             int alpha = (int)(c * 255f);
-            if(alpha > 255) 
+            if (alpha > 255)
                 alpha = 255;
             if (alpha < 0)
                 alpha = 0;
