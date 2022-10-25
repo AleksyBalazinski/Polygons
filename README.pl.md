@@ -1,6 +1,15 @@
 # Polygons
 Narzędzie do manipulowania zdefiniowanymi przez użytkownika wielokątami z możliwością dodawania relacji równoległości 
 i ustalania długości krawędzi.
+## Instrukcja obsługi
+* Draw - rysuje wielokąt (kliknięcie przciskiem myszy stawia wierzchołek w wybranym punkcie). Rysowanie wielokąta jest zakończone w momencie wybrania wierzchołka startowego ("zamknięcie figury").
+* Move - umożliwia przesunięcie wierzchołka / krawędzi / wielokąta (w zależności od tego, na który element klikniemy myszą).
+* Delete vertex - po naciśnięciu myszą na wierzchołek jest on usuwany.
+* Add vertex - po naciśnięciu myszą na krawędź dodaje wierzchołek w połowie jej długości
+* Fix length - ustala długość wybranej krawędzi
+* Add relation - umożliwia dodawanie krawędzi do relacji równoległosci. Początkowo (po pierwszym kliknięci tego przycisku) kliknięte krawędzie dodawane są do relacji 0. Ponowne naciśnięcie przycisku dodaje krawędzie do relacji 1, itd.
+* Delete relation - usuwa relację równoległości o wybranym numerze.
+* Vary length - zdejumuje ograniczenie długości z wybranej krawędzi.
 ## Kilka słów o architekturze programu
 Aby móc łatwiej zarządzać różnymi stanami w jakich może znaleźć się program (np. rysowanie, definiowanie relacji, itd.)
 zastosowano wzorzec projektowy _state_, w którym przejścia między stanami są wywoływane naciśnięciem odpowiedniego przycisku.
