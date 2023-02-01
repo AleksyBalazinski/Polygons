@@ -12,3 +12,7 @@ In order to make the program easily extensible with regard to adding new drawing
 ## Constraints algorithm
 The detailed description of the algorithm can be found (in Polish) in README.pl.md.
 The English translation is coming soon.
+
+## Demo
+Parallel edges are marked with orange numbers. Edges whose length is in gray have fixed length.
+![demo](demo/relations_demo.gif)
